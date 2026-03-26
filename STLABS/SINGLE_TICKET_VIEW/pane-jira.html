@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ticket Pane — TKT-4094 (Jira)</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cor: #CC4C00;
+    --cor-bg: rgba(204,76,0,0.10);
+    --cor-txt: #A33D00;
+    --bg-primary: #FEFEFE;
+    --bg-secondary: #EEEFF1;
+    --bg-tertiary: #E5E6E8;
+    --text-primary: #2C2F36;
+    --text-secondary: #5A5560;
+    --text-tertiary: #7A7F87;
+    --border: rgba(26,26,31,0.10);
+    --border-2: rgba(26,26,31,0.18);
+    --blue: #2F6FED;
+    --blue-bg: rgba(47,111,237,0.10);
+    --blue-txt: #2F6FED;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ticket-embed {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lbl {
+    font-size: 10px; font-weight: 500; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 5px;
+  }
+
+  .lbl-cf {
+    font-size: 10px; font-weight: 500; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 5px; opacity: .45;
+  }
+
+  .res-block {
+    background: #F9F6F1; border-radius: 8px;
+    padding: 12px 14px; display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px;
+  }
+
+  .run-btn {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 500; background: var(--cor); color: #fff;
+    border: none; border-radius: 8px; padding: 7px 14px; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0; margin-top: 2px;
+  }
+
+  .badge {
+    font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 4px;
+  }
+
+  .avatar {
+    width: 14px; height: 14px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 6px; font-weight: 500; flex-shrink: 0;
+  }
+
+  /* ── Two-column layout ── */
+  .body-columns {
+    display: flex;
+    flex: 1;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* ── Jira sidebar ── */
+  .jira-sidebar {
+    width: 160px;
+    flex-shrink: 0;
+    background: color-mix(in srgb, #2F6FED 3%, #FEFEFE);
+    border-left: 0.5px solid var(--border);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .jira-sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .jira-sidebar-header span {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--blue);
+  }
+
+  .sidebar-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sidebar-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .sidebar-val {
+    font-size: 12px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .sidebar-divider {
+    height: 0.5px;
+    background: var(--border);
+  }
+
+  .sidebar-muted {
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+
+  /* ── Activity timeline ── */
+  .activity-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .activity-header .lbl { margin-bottom: 0; }
+  .activity-count {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+  }
+  .activity-chevron {
+    width: 12px; height: 12px;
+    transition: transform 0.15s ease;
+    opacity: 0.35;
+  }
+  .activity-header.collapsed .activity-chevron {
+    transform: rotate(-90deg);
+  }
+
+  .tl { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+  .tl-row { display: flex; gap: 10px; }
+  .tl-spine { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 20px; }
+  .tl-line { width: 1px; flex: 1; background: var(--border); margin-top: 3px; min-height: 12px; }
+  .tl-content { flex: 1; min-width: 0; padding-top: 2px; }
+  .tl-ev { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .tl-ev-text { font-size: 12px; color: var(--text-secondary); }
+  .tl-ev-time { font-size: 11px; color: var(--text-tertiary); opacity: 0.5; }
+
+  .tl-av {
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7px; font-weight: 600; flex-shrink: 0;
+    background: var(--bg-tertiary); color: var(--text-secondary);
+  }
+  .tl-stlabs-icon { width: 14px; height: 14px; margin-top: 3px; filter: grayscale(1); opacity: 0.4; }
+  .tl-src-icon { width: 18px; height: 18px; border-radius: 4px; margin-top: 1px; }
+
+  .tl-decision { font-size: 11px; color: var(--text-tertiary); opacity: 0.4; margin-top: 2px; }
+
+  .tl-show-more {
+    font-size: 11px; color: var(--text-tertiary); opacity: 0.5;
+    cursor: pointer; margin-top: 4px; display: inline-block;
+    text-decoration: underline; text-underline-offset: 2px;
+    text-decoration-color: var(--border);
+    background: none; border: none; padding: 0;
+    font-family: var(--font-sans);
+  }
+  .tl-show-more:hover { opacity: 0.8; }
+
+  .tl-detail { display: none; margin-top: 6px; flex-direction: column; gap: 4px; }
+  .tl-detail.open { display: flex; }
+  .tl-detail-item {
+    font-size: 11px; line-height: 1.6; color: var(--text-tertiary); opacity: 0.5;
+    padding-left: 10px; position: relative;
+  }
+  .tl-detail-item::before {
+    content: ''; position: absolute; left: 0; top: 7px;
+    width: 3px; height: 3px; border-radius: 50%; background: rgba(26,26,31,0.18);
+  }
+</style>
+</head>
+<body>
+
+<div class="ticket-embed">
+  <!-- Header -->
+  <div style="padding:12px 16px 10px;border-bottom:0.5px solid var(--border)">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="flex:1">
+        <h1 style="font-size:17px;font-weight:500;line-height:1.35;margin-bottom:6px">Alex R. requesting access to Tableau for Q2 reporting</h1>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary)">#TKT-4094</span>
+          <span style="font-size:10px;color:var(--text-tertiary)">·</span>
+          <span style="font-size:11px;color:var(--text-tertiary)">via Jira Task</span>
+          <a href="#" style="display:inline-flex;align-items:center;gap:3px;font-family:var(--font-mono);font-size:11px;color:var(--cor);text-decoration:none;font-weight:500">INFRA-2847 <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H5M9 3V7" stroke="var(--cor)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;padding-top:3px">
+        <span class="badge" style="background:var(--bg-primary);border:0.5px solid var(--border-2);color:var(--text-secondary)">Open</span>
+        <span class="badge" style="background:rgba(0,0,0,0.04);color:var(--text-tertiary)">P4</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-column body -->
+  <div class="body-columns">
+    <!-- Main content -->
+    <div class="main-content">
+      <!-- Enrichment -->
+      <div>
+        <p style="font-size:13px;line-height:1.75;color:var(--text-secondary)">Alex R. needs access to Tableau for upcoming Q2 reporting. We found he's in the <strong style="font-weight:600;color:var(--text-primary)">Data Analytics</strong> team but doesn't have a Tableau license assigned. His manager <strong style="font-weight:600;color:var(--text-primary)">Lisa M.</strong> has approved similar requests before.</p>
+        <!-- Sources -->
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:-16px;padding-top:20px">
+          <span style="font-size:10px;color:var(--text-tertiary);opacity:0.4">Sources</span>
+          <span style="font-size:10px;color:var(--text-tertiary);opacity:0.4">Okta User Directory</span>
+          <span style="font-size:10px;color:var(--text-tertiary);opacity:0.4">Tableau License Manager</span>
+        </div>
+      </div>
+
+      <!-- Suggested resolution -->
+      <div>
+        <div class="lbl-cf">Suggested resolution</div>
+        <div class="res-block">
+          <div style="flex:1;min-width:0">
+            <a href="#" style="font-size:13px;font-weight:500;color:var(--text-primary);text-decoration:underline;text-underline-offset:2px;display:inline-flex;align-items:center;gap:4px;margin-bottom:6px">Provision Tableau Access <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H5M9 3V7" stroke="var(--text-primary)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+            <p style="font-size:13px;line-height:1.6;color:var(--text-secondary)">Assign Tableau license and configure role-based access for Alex R.</p>
+          </div>
+          <button class="run-btn"><svg width="8" height="8" viewBox="0 0 10 10"><polygon points="2,1 9,5 2,9" fill="#fff"/></svg>Run</button>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <div class="lbl" style="margin-bottom:5px">Description <span style="text-transform:none;letter-spacing:normal;font-weight:400;opacity:0.5">· via Jira</span></div>
+        <p style="font-size:12.5px;line-height:1.65;color:var(--text-tertiary)">I need access to Tableau for the Q2 reporting cycle. My team uses it for dashboards and I'm the only one without a license.</p>
+      </div>
+
+      <!-- Activity -->
+      <div>
+        <div class="activity-header" onclick="toggleActivity(this)">
+          <svg class="activity-chevron" viewBox="0 0 12 12" fill="none"><path d="M4 2L8 6L4 10" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="lbl" style="margin-bottom:0">Activity</div>
+          <span class="activity-count">3</span>
+        </div>
+        <div class="activity-body">
+          <div class="tl">
+            <!-- 1. Jordan K. ran workflow -->
+            <div class="tl-row">
+              <div class="tl-spine"><div class="tl-av">JK</div><div class="tl-line"></div></div>
+              <div class="tl-content">
+                <div class="tl-ev">
+                  <span class="tl-ev-text">Jordan K. ran Provision Tableau Access</span>
+                  <span class="tl-ev-time">10:30 AM PST</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Agent assessed ticket -->
+            <div class="tl-row">
+              <div class="tl-spine"><img src="stlabs-orange-icon.svg" class="tl-stlabs-icon"><div class="tl-line"></div></div>
+              <div class="tl-content">
+                <div class="tl-ev">
+                  <span class="tl-ev-text">Agent assessed ticket</span>
+                  <span class="tl-ev-time">10:20 AM PST</span>
+                </div>
+                <div class="tl-decision">Suggested Provision Tableau Access · Assigned to Jordan K.</div>
+                <button class="tl-show-more" onclick="toggleShowMore(event, this)">Show more</button>
+                <div class="tl-detail">
+                  <div class="tl-detail-item">Queried Okta user directory — Alex R. in Data Analytics team</div>
+                  <div class="tl-detail-item">Queried Tableau license manager — no license assigned, pool has 2 remaining</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Ticket received from Jira -->
+            <div class="tl-row">
+              <div class="tl-spine"><img src="jira.png" class="tl-src-icon"></div>
+              <div class="tl-content">
+                <div class="tl-ev">
+                  <span class="tl-ev-text">Ticket received from Jira</span>
+                  <span class="tl-ev-time">10:19 AM PST</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jira sidebar -->
+    <div class="jira-sidebar">
+      <div class="jira-sidebar-header">
+        <img src="jira.png" width="10" height="10" style="border-radius:2px">
+        <span>Jira fields</span>
+      </div>
+
+      <div class="sidebar-field">
+        <span class="sidebar-label">Requester</span>
+        <span class="sidebar-val"><div class="avatar" style="background:rgba(128,0,128,0.08);color:#7C3AED">AR</div> Alex R.</span>
+      </div>
+
+      <div class="sidebar-field">
+        <span class="sidebar-label">Assignee</span>
+        <span class="sidebar-val"><div class="avatar" style="background:var(--bg-tertiary);color:var(--text-secondary)">JK</div> Jordan K.</span>
+      </div>
+
+      <div class="sidebar-field">
+        <span class="sidebar-label">Due</span>
+        <span class="sidebar-val sidebar-muted">5d remaining</span>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-field">
+        <span class="sidebar-label">Component</span>
+        <span class="sidebar-val">Data Analytics</span>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-field">
+        <span class="sidebar-label">Created</span>
+        <span class="sidebar-muted">Mar 9 · 10:19 AM PST</span>
+      </div>
+
+      <div class="sidebar-field">
+        <span class="sidebar-label">Last modified</span>
+        <span class="sidebar-muted">Mar 9 · 10:20 AM PST</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleActivity(header) {
+  header.classList.toggle('collapsed');
+  var body = header.nextElementSibling;
+  body.style.display = header.classList.contains('collapsed') ? 'none' : 'block';
+}
+
+function toggleShowMore(e, el) {
+  e.stopPropagation();
+  var d = el.nextElementSibling;
+  var isOpen = d.classList.contains('open');
+  d.classList.toggle('open', !isOpen);
+  el.textContent = isOpen ? 'Show more' : 'Show less';
+}
+</script>
+
+</body>
+</html>

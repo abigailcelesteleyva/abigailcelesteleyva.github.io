@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ticket Pane — TKT-4092 (Slack)</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cor: #CC4C00;
+    --cor-bg: rgba(204,76,0,0.10);
+    --cor-txt: #A33D00;
+    --bg-primary: #FEFEFE;
+    --bg-secondary: #EEEFF1;
+    --bg-tertiary: #E5E6E8;
+    --text-primary: #2C2F36;
+    --text-secondary: #5A5560;
+    --text-tertiary: #7A7F87;
+    --border: rgba(26,26,31,0.10);
+    --border-2: rgba(26,26,31,0.18);
+    --blue: #2F6FED;
+    --blue-bg: rgba(47,111,237,0.10);
+    --blue-txt: #2F6FED;
+    --green-bg: rgba(34,150,79,0.10);
+    --green-txt: #22964F;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ticket-embed {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .badge {
+    font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 10px;
+  }
+
+  .avatar {
+    width: 16px; height: 16px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7px; font-weight: 500; flex-shrink: 0;
+  }
+
+  .run-btn {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 500; background: #9A3700; color: #fff;
+    border: none; border-radius: 8px; padding: 7px 14px; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
+  .run-btn:hover { background: #7E2D00; }
+
+  .lbl {
+    font-size: 10px; font-weight: 500; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px;
+  }
+
+  .sidebar-label {
+    font-size: 9px; font-weight: 500; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text-tertiary);
+  }
+
+  .sidebar-val {
+    font-size: 12px; color: var(--text-primary);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .sidebar-pair {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+
+  /* Activity timeline */
+  .tl { display: flex; flex-direction: column; gap: 0; }
+  .tl-row { display: flex; gap: 10px; }
+  .tl-spine { display: flex; flex-direction: column; align-items: center; width: 20px; flex-shrink: 0; }
+  .tl-line { width: 1px; flex: 1; background: var(--border); margin-top: 3px; min-height: 12px; }
+  .tl-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-2); margin-top: 5px; }
+  .tl-av { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 600; }
+  .tl-content { flex: 1; padding-top: 2px; }
+  .tl-ev { display: flex; align-items: baseline; gap: 6px; }
+  .tl-text { font-size: 12px; color: var(--text-secondary); }
+  .tl-time { font-size: 11px; color: var(--text-tertiary); opacity: 0.5; }
+  .tl-stlabs { width: 14px; height: 14px; filter: grayscale(1); opacity: 0.4; margin-top: 3px; }
+
+  .tl-header {
+    display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;
+  }
+  .tl-header .lbl { margin-bottom: 0; }
+  .tl-header .tl-count {
+    font-size: 10px; font-weight: 500; color: var(--text-tertiary); opacity: 0.5;
+  }
+  .tl-header .tl-chevron {
+    font-size: 10px; color: var(--text-tertiary); opacity: 0.4; transition: transform 0.15s ease;
+  }
+  .tl-header.collapsed .tl-chevron { transform: rotate(-90deg); }
+  .tl-body { margin-top: 10px; }
+  .tl-body.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="ticket-embed">
+  <!-- Header -->
+  <div style="padding:14px 16px 10px">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="flex:1">
+        <h1 style="font-size:17px;font-weight:500;line-height:1.35;margin-bottom:6px">Okta admin account locked, MFA push unresponsive</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;padding-top:2px">
+        <span class="badge" style="background:var(--bg-secondary);border:0.5px solid var(--border-2);color:var(--text-secondary)">New</span>
+        <span class="badge" style="background:var(--green-bg);color:var(--green-txt)">P3</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+      <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-tertiary);opacity:0.5">#TKT-4092</span>
+      <span style="font-size:10px;color:var(--text-tertiary);opacity:0.3">·</span>
+      <span style="font-size:10.5px;color:var(--text-tertiary);opacity:0.5">via Slack #it-help</span>
+    </div>
+  </div>
+
+  <!-- Two-column layout: main content + sidebar -->
+  <div style="display:flex;flex:1;min-height:0">
+
+    <!-- Left: main content -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:24px;overflow:auto;padding:8px 16px 16px">
+
+      <!-- Enrichment narrative (unlabeled) -->
+      <p style="font-size:13px;line-height:1.75;color:var(--text-secondary)">
+        Grant Fuhr can't log into Okta. We found his account is
+        <strong style="font-weight:600;color:var(--text-primary)">locked</strong> after
+        <strong style="font-weight:600;color:var(--text-primary)">3 failed sign-ins</strong> from
+        the corporate VPN — MFA token expired after a phone replacement and was never
+        re-enrolled.
+      </p>
+
+      <!-- Sources bar -->
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:-16px;font-size:10px;color:var(--text-tertiary);opacity:0.4">
+        <span>Sources</span>
+        <span style="display:inline-flex;align-items:center;gap:3px">Okta Auth Logs</span>
+        <span style="display:inline-flex;align-items:center;gap:3px">Okta User Profile</span>
+      </div>
+
+      <!-- Suggested resolution -->
+      <div>
+        <div class="lbl" style="opacity:0.45">Suggested resolution</div>
+        <div style="background:#F9F6F1;border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="flex:1;min-width:0">
+            <a href="#" style="font-size:13px;font-weight:500;color:var(--text-primary);text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(0,0,0,0.15);display:inline-flex;align-items:center;gap:4px;margin-bottom:6px">
+              Okta MFA Reset
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H5M9 3V7" stroke="var(--text-tertiary)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <p style="font-size:13px;line-height:1.55;color:var(--text-secondary)">Unlock account and push MFA re-enrollment to Grant Fuhr.</p>
+          </div>
+          <button class="run-btn"><svg width="8" height="8" viewBox="0 0 10 10"><polygon points="2,1 9,5 2,9" fill="#fff"/></svg> Run</button>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div>
+        <div class="tl-header" id="tl-toggle" onclick="toggleTimeline()">
+          <div class="lbl">Activity</div>
+          <span class="tl-count">4</span>
+          <span class="tl-chevron">&#9660;</span>
+        </div>
+        <div class="tl-body" id="tl-body">
+          <div class="tl">
+
+            <!-- 1. Outcome: Ticket closed -->
+            <div class="tl-row">
+              <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+              <div class="tl-content"><div class="tl-ev"><span class="tl-text">Ticket closed</span><span class="tl-time">11:14 AM PST</span></div></div>
+            </div>
+
+            <!-- 2. Human: Jordan K. ran workflow -->
+            <div class="tl-row">
+              <div class="tl-spine"><div class="tl-av" style="background:var(--bg-tertiary);color:var(--text-secondary)">JK</div><div class="tl-line"></div></div>
+              <div class="tl-content"><div class="tl-ev"><span class="tl-text">Jordan K. ran Okta MFA Reset</span><span class="tl-time">11:02 AM PST</span></div></div>
+            </div>
+
+            <!-- 3. Agent: assessed ticket -->
+            <div class="tl-row">
+              <div class="tl-spine"><img src="stlabs-orange-icon.svg" class="tl-stlabs"><div class="tl-line"></div></div>
+              <div class="tl-content">
+                <div class="tl-ev"><span class="tl-text">Agent assessed ticket</span><span class="tl-time">8:42 PM PST</span></div>
+                <div style="font-size:11px;color:var(--text-tertiary);opacity:0.4;margin-top:2px">Suggested Okta MFA Reset &middot; Assigned to Jordan K.</div>
+                <a href="#" onclick="event.preventDefault()" style="font-size:11px;color:var(--text-tertiary);opacity:0.5;margin-top:4px;display:inline-block;text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--border)">Show more</a>
+              </div>
+            </div>
+
+            <!-- 4. Source: Slack (oldest, no line below) -->
+            <div class="tl-row">
+              <div class="tl-spine">
+                <svg width="16" height="16" viewBox="0 0 54 54" style="margin-top:1px;flex-shrink:0"><path d="M19.7 32.4a4.2 4.2 0 1 1-4.2-4.2h4.2v4.2Zm2.1 0a4.2 4.2 0 1 1 8.4 0v10.5a4.2 4.2 0 1 1-8.4 0V32.4Z" fill="#E01E5A"/><path d="M21.8 11.1a4.2 4.2 0 1 1 4.2 4.2h-4.2v-4.2Zm-2.1 0a4.2 4.2 0 0 1-8.4 0V.6a4.2 4.2 0 0 1 8.4 0v10.5Z" fill="#36C5F0"/><path d="M32.3 19.7a4.2 4.2 0 1 1 4.2-4.2v4.2h-4.2Zm0 2.1a4.2 4.2 0 1 1 0 8.4H21.8a4.2 4.2 0 1 1 0-8.4h10.5Z" fill="#2EB67D"/><path d="M43.5 21.8a4.2 4.2 0 1 1-4.2 4.2v-4.2h4.2Zm-2.1 0a4.2 4.2 0 0 1-8.4 0V11.3a4.2 4.2 0 0 1 8.4 0v10.5Z" fill="#ECB22E"/></svg>
+              </div>
+              <div class="tl-content"><div class="tl-ev"><span class="tl-text">Ticket created via Slack #it-help</span><span class="tl-time">8:41 PM PST</span></div></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <script>
+      function toggleTimeline() {
+        var hdr = document.getElementById('tl-toggle');
+        var body = document.getElementById('tl-body');
+        hdr.classList.toggle('collapsed');
+        body.classList.toggle('hidden');
+      }
+      </script>
+    </div>
+
+    <!-- Right: metadata sidebar -->
+    <div style="width:160px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;overflow:auto;border-left:0.5px solid rgba(26,26,31,0.06);padding:14px;opacity:0.75">
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Requester</span>
+        <span class="sidebar-val"><div class="avatar" style="background:var(--blue-bg);color:var(--blue-txt)">GF</div> Grant Fuhr</span>
+      </div>
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Assignee</span>
+        <span class="sidebar-val"><div class="avatar" style="background:var(--bg-tertiary);color:var(--text-secondary)">JK</div> Jordan K.</span>
+      </div>
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Due</span>
+        <span class="sidebar-val" style="color:var(--text-secondary)">4h remaining</span>
+      </div>
+      <div style="height:0.5px;background:var(--border)"></div>
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Created</span>
+        <span class="sidebar-val" style="font-size:11px;color:var(--text-secondary)">Mar 9 · 8:41 PM PST</span>
+      </div>
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Last modified</span>
+        <span class="sidebar-val" style="font-size:11px;color:var(--text-secondary)">Mar 9 · 10:31 PM PST</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Decisions — Single Ticket Pane</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #EEEFF1;
+    --card: #FEFEFE;
+    --border: rgba(26,26,31,0.10);
+    --border-2: rgba(26,26,31,0.18);
+    --text: #2C2F36;
+    --text-2: #5A5560;
+    --text-3: #7A7F87;
+    --orange: #CC4C00;
+    --green: #16a34a;
+    --red: #B93737;
+    --ctx-bg: #F9F6F1;
+    --muted: rgba(0,0,0,0.04);
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'SF Mono', 'Fira Code', monospace;
+  }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); padding: 40px 24px; max-width: 900px; margin: 0 auto; }
+
+  h1 { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--text-3); margin-bottom: 12px; line-height: 1.5; }
+  .page-version { font-size: 11px; color: var(--text-3); opacity: 0.5; margin-bottom: 48px; }
+
+  .section { margin-bottom: 56px; }
+  .section-hdr { font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+
+  .block { margin-bottom: 28px; }
+  .block-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .block-body { font-size: 12.5px; line-height: 1.75; color: var(--text-2); }
+  .block-body strong { font-weight: 600; color: var(--text); }
+
+  .decision { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+  .decision-num { font-size: 9px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); opacity: 0.5; margin-bottom: 6px; }
+  .decision-title { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 8px; line-height: 1.4; }
+  .decision-body { font-size: 12.5px; line-height: 1.75; color: var(--text-2); }
+  .decision-body strong { font-weight: 600; color: var(--text); }
+</style>
+</head>
+<body>
+
+<h1>Design Decisions</h1>
+<p class="page-sub">Key decisions and their rationale. Each decision shaped how the ticket pane works today.</p>
+<p class="page-version">v1.0 · March 2026</p>
+
+<!-- ======================================= -->
+<!-- INFORMATION ARCHITECTURE                -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="section-hdr">Information Architecture</div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 1</div>
+    <div class="decision-title">Enrichment replaces description for conversation sources</div>
+    <div class="decision-body">
+      When a ticket comes from Slack, Teams, or native chat where the user talked to our agent, the enrichment absorbs everything. No separate description needed — the agent was part of the conversation and synthesizes it all. Description only appears for external ticketing systems (ServiceNow, Jira) where we received a form submission the agent wasn't part of.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 2</div>
+    <div class="decision-title">No label on the enrichment</div>
+    <div class="decision-body">
+      The enrichment is the hero content — it doesn't need a label. Position (immediately after header) and styling (full-size text, bold key facts) signal its importance. We tried <strong>"Context"</strong>, <strong>"What we know"</strong>, <strong>"Summary"</strong> — all felt reductive. The content speaks for itself.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 3</div>
+    <div class="decision-title">The "we found" transition</div>
+    <div class="decision-body">
+      The enrichment narrative has a clear structure: what the user told us, then what we found. Natural language cues like <strong>"we found"</strong> or <strong>"investigation shows"</strong> signal the shift from user-reported to agent-discovered. This lets the admin distinguish between what came from the person vs what the agent looked up.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 4</div>
+    <div class="decision-title">Sources bar instead of "Checked"</div>
+    <div class="decision-body">
+      Originally labeled <strong>"Checked"</strong> — changed to <strong>"Sources"</strong> to be descriptive rather than action-oriented. Shows which integrations were queried with logos. Max 3 visible + expandable "+X more" to avoid visual noise.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 5</div>
+    <div class="decision-title">Resolution disappears the suggested resolution</div>
+    <div class="decision-body">
+      When a workflow completes and the resolution section appears, the suggested resolution block smoothly collapses away (cross-fade animation). Showing both is redundant — the resolution tells you what happened, the activity timeline has the full record. The completed state shows briefly (green logo + "Completed") before the transition.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 6</div>
+    <div class="decision-title">Resolution has no attribution</div>
+    <div class="decision-body">
+      Resolution text doesn't include "Resolved by X" — the activity timeline has that detail. The resolution is about <strong>what happened</strong>, not who did it.
+    </div>
+  </div>
+</div>
+
+<!-- ======================================= -->
+<!-- METADATA & EXTERNAL SOURCES             -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="section-hdr">Metadata & External Sources</div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 7</div>
+    <div class="decision-title">Source zone over per-field labels</div>
+    <div class="decision-body">
+      For external ticketing integrations (ServiceNow, Jira), fields from the source system are grouped in a tinted zone with the integration logo. We explored per-field blue labels first — they were noisy and scattered attention. The zone approach is calmer: one visual region, one logo, immediately scannable. The admin builds muscle memory for where external fields live.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 8</div>
+    <div class="decision-title">Sidebar metadata (right side, 160px) over horizontal strip</div>
+    <div class="decision-body">
+      Metadata moved from a horizontal strip below the header to a fixed sidebar on the right. The strip competed with content for vertical space. The sidebar is always visible, never scrolls, and recedes behind the main content at <strong>75% opacity</strong>. Conditional fields (max 3 from external source) are configured per integration+type, not per ticket.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 9</div>
+    <div class="decision-title">Edited badges stay, strikethrough values fade</div>
+    <div class="decision-body">
+      When the agent or user edits a field, the <strong>[STLabs logo] Edited</strong> badge persists but the strikethrough previous value fades away after the edit conversation moves on. Keeps the signal ("this was changed") without the noise of old values cluttering the sidebar.
+    </div>
+  </div>
+</div>
+
+<!-- ======================================= -->
+<!-- ACTIVITY TIMELINE                       -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="section-hdr">Activity Timeline</div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 10</div>
+    <div class="decision-title">Agent assessed ticket — decisions always visible</div>
+    <div class="decision-body">
+      Renamed from <strong>"Agent processed ticket"</strong> to <strong>"Agent assessed ticket"</strong> — implies evaluation + judgment. The key decisions (suggested workflow + assignment) show as a visible summary line below. "Show more" only reveals the research trail (queried sources). Most users never need to expand.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 11</div>
+    <div class="decision-title">Three actors + outcomes</div>
+    <div class="decision-body">
+      Timeline has three actor types: <strong>Source</strong> (integration logo), <strong>Agent</strong> (greyed STLabs logo), <strong>Human</strong> (initials avatar). Plus <strong>outcomes</strong> (neutral/red dots). The spine icon always shows WHO. The text shows WHAT and WHERE. Simple, scannable, consistent.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 12</div>
+    <div class="decision-title">External comments use the person as the actor, not the system</div>
+    <div class="decision-body">
+      When Sarah K. comments via ServiceNow, the timeline shows her avatar (SK) with a left-bordered bubble containing the ServiceNow logo. The actor is always a person — the system is just the channel.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 13</div>
+    <div class="decision-title">Agent commenting on external source</div>
+    <div class="decision-body">
+      When the agent posts a comment to ServiceNow, it uses the standard agent communication pattern: greyed STLabs icon + "Agent commented via ServiceNow" + message bubble. No special email/external chrome — stays consistent with the design system. We'll rev on email treatment separately.
+    </div>
+  </div>
+</div>
+
+<!-- ======================================= -->
+<!-- WORKFLOW RUN STATES                     -->
+<!-- ======================================= -->
+<div class="section">
+  <div class="section-hdr">Workflow Run States</div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 14</div>
+    <div class="decision-title">Context decides what happens after failure</div>
+    <div class="decision-body">
+      In a conversation: agent auto-suggests a new workflow (block swaps with animation). Not in a conversation: Investigate button opens chat. The admin never guesses — the system decides <strong>Retry</strong> vs <strong>new workflow</strong> vs <strong>Investigate</strong> based on error type and context.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 15</div>
+    <div class="decision-title">The logo is the running indicator</div>
+    <div class="decision-body">
+      While running, the STLabs logo gently pulses and bounces (<strong>1.2s cycle</strong>). No spinner, no progress bar, no "Running" text. The brand doing the work is the signal.
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="decision-num">Decision 16</div>
+    <div class="decision-title">Suggested resolution collapses with a cross-fade</div>
+    <div class="decision-body">
+      When workflow completes: running logo &rarr; completed state (green logo, <strong>700ms</strong>) &rarr; suggested resolution collapses out while resolution section fades in. One continuous motion using Framer Motion's <strong>AnimatePresence mode="popLayout"</strong>. No discrete steps.
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

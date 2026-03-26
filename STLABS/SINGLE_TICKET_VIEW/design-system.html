@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Single Ticket Pane — Design System v2</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #EEEFF1;
+    --card: #FEFEFE;
+    --border: rgba(26,26,31,0.10);
+    --border-2: rgba(26,26,31,0.18);
+    --text: #2C2F36;
+    --text-2: #5A5560;
+    --text-3: #7A7F87;
+    --orange: #CC4C00;
+    --green: #16a34a;
+    --red: #B93737;
+    --ctx-bg: #F9F6F1;
+    --muted: rgba(0,0,0,0.04);
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'SF Mono', 'Fira Code', monospace;
+  }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); padding: 40px 24px; max-width: 900px; margin: 0 auto; }
+
+  h1 { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--text-3); margin-bottom: 12px; line-height: 1.5; }
+  .page-version { font-size: 11px; color: var(--text-3); opacity: 0.5; margin-bottom: 48px; }
+
+  .section { margin-bottom: 56px; }
+  .section-hdr { font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+
+  .block { margin-bottom: 28px; }
+  .block-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .block-body { font-size: 12.5px; line-height: 1.75; color: var(--text-2); }
+  .block-body strong { font-weight: 600; color: var(--text); }
+  .block-body ul { margin-top: 6px; padding-left: 16px; }
+  .block-body li { margin-bottom: 4px; }
+
+  .note { background: rgba(204,76,0,0.04); border-left: 2px solid var(--orange); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 12px; line-height: 1.7; color: var(--text-2); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+  /* Visual mockups */
+  .mock { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 16px 0; }
+  .mock-label { font-size: 9px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; color: var(--text-3); padding: 10px 16px 0; }
+
+  /* Inline mini components */
+  .badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 14px; display: inline-block; }
+  .badge-new { background: var(--muted); border: 0.5px solid var(--border-2); color: var(--text-2); }
+  .badge-closed { background: var(--muted); color: var(--text-3); }
+  .badge-p1 { background: rgba(204,76,0,0.10); color: var(--orange); }
+  .badge-p3 { background: rgba(34,139,34,0.08); color: #1a7a1a; }
+
+  .lbl { font-size: 9px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); margin-bottom: 4px; }
+
+  .meta-pair { display: flex; flex-direction: column; gap: 1px; }
+  .meta-label { font-size: 9px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; color: var(--text-3); }
+  .meta-val { font-size: 11px; color: var(--text); display: flex; align-items: center; gap: 3px; }
+  .mini-av { width: 14px; height: 14px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 6px; font-weight: 600; }
+
+  .rule { display: flex; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+  .rule:last-child { border-bottom: none; }
+  .rule-label { font-size: 12px; font-weight: 600; color: var(--text); min-width: 140px; flex-shrink: 0; }
+  .rule-body { font-size: 12px; line-height: 1.7; color: var(--text-2); }
+
+  .hierarchy { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin: 16px 0; }
+  .h-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; border-bottom: 0.5px solid var(--border); }
+  .h-item:last-child { border-bottom: none; }
+  .h-num { width: 18px; height: 18px; border-radius: 50%; background: rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: var(--text-3); flex-shrink: 0; margin-top: 1px; }
+  .h-label { font-size: 12px; font-weight: 600; color: var(--text); }
+  .h-desc { font-size: 11px; color: var(--text-3); }
+
+  .ref-link { font-size: 11px; color: var(--text-3); margin-top: 8px; }
+  .ref-link a { color: var(--orange); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<h1>Single Ticket Pane</h1>
+<p class="page-sub">Design system for the single ticket side pane view. Defines structure, hierarchy, behavior, and conditional rendering.</p>
+<p class="page-version">v2.0 · March 2026</p>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- LAYOUT                                  -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hdr">Layout & Hierarchy</div>
+
+  <div class="block">
+    <div class="block-body">
+      Split layout: <strong>main content</strong> (left, scrollable) and <strong>metadata sidebar</strong> (right, 160px fixed). The main content contains everything the admin reads and acts on. The sidebar is reference metadata — always visible, never scrolls, slightly faded.
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="block-title">Content hierarchy</div>
+      <div class="hierarchy">
+        <div class="h-item"><div class="h-num">1</div><div><div class="h-label">Header</div><div class="h-desc">Title, status, priority, ticket ref</div></div></div>
+        <div class="h-item"><div class="h-num">2</div><div><div class="h-label">Enrichment</div><div class="h-desc">AI narrative, unlabeled. The hero content.</div></div></div>
+        <div class="h-item"><div class="h-num">3</div><div><div class="h-label">Resolution</div><div class="h-desc">Closed tickets only. What actually resolved it.</div></div></div>
+        <div class="h-item"><div class="h-num">4</div><div><div class="h-label">Suggested resolution</div><div class="h-desc">Workflow + Run button. The primary action.</div></div></div>
+        <div class="h-item"><div class="h-num">5</div><div><div class="h-label">Description</div><div class="h-desc">Conditional. Only from external sources.</div></div></div>
+        <div class="h-item"><div class="h-num">6</div><div><div class="h-label">Activity</div><div class="h-desc">Collapsible timeline. Collapsed by default.</div></div></div>
+        <div class="h-item"><div class="h-num" style="background:none;font-size:11px">—</div><div><div class="h-label">Metadata sidebar</div><div class="h-desc">Always visible on the right. Not scrollable.</div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="block-title" style="margin-bottom:12px">Visual</div>
+      <div class="mock" style="padding:0;display:flex;height:380px">
+        <div style="flex:1;padding:12px;display:flex;flex-direction:column;gap:10px;overflow:hidden">
+          <!-- Header mock -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div style="font-size:13px;font-weight:500;line-height:1.3">Payroll manager locked out of Workday — pay run at risk</div>
+              <div style="display:flex;gap:4px;flex-shrink:0;margin-left:8px"><span class="badge badge-new">New</span><span class="badge badge-p1">P1</span></div>
+            </div>
+            <div style="font-size:9px;color:var(--text-3);opacity:0.5;margin-top:3px;font-family:var(--mono)">#TKT-4093 · via ServiceNow</div>
+          </div>
+          <!-- Enrichment mock -->
+          <div style="font-size:10.5px;line-height:1.7;color:var(--text-2)">Sarah's Workday account is locked after <strong style="color:var(--text)">3 failed logins</strong>. MFA device was never re-enrolled after a phone replacement. A payroll run for <strong style="color:var(--text)">214 employees</strong> is at risk.</div>
+          <!-- Suggested resolution mock -->
+          <div>
+            <div class="lbl">Suggested resolution</div>
+            <div style="background:var(--ctx-bg);border-radius:6px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:10.5px;font-weight:500;text-decoration:underline;text-underline-offset:2px">Restore Workday Access</div>
+                <div style="font-size:10px;color:var(--text-2);margin-top:2px">Re-enroll MFA and restore access.</div>
+              </div>
+              <div style="background:var(--orange);color:#fff;font-size:9px;padding:4px 8px;border-radius:5px;font-weight:500">Run</div>
+            </div>
+          </div>
+          <!-- Activity mock -->
+          <div>
+            <div style="display:flex;align-items:center;gap:4px;cursor:pointer" onclick="var el=document.getElementById('intro-tl');el.style.display=el.style.display==='none'?'block':'none';this.querySelector('.chev').style.transform=el.style.display==='none'?'':'rotate(90deg)'">
+              <div class="lbl" style="margin:0">Activity</div>
+              <span style="font-size:9px;color:var(--text-3);opacity:0.5">4</span>
+              <svg class="chev" width="8" height="8" viewBox="0 0 10 10" fill="none" style="transition:transform 0.2s"><path d="M3.5 2L7 5L3.5 8" stroke="var(--text-3)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div id="intro-tl" style="display:none;margin-top:8px">
+              <div style="display:flex;gap:6px;margin-bottom:6px">
+                <div style="display:flex;flex-direction:column;align-items:center;width:12px"><div style="width:4px;height:4px;border-radius:50%;background:var(--border-2);margin-top:4px"></div><div style="width:1px;flex:1;background:var(--border);margin-top:2px"></div></div>
+                <div style="font-size:9px;color:var(--text-2)">Ticket closed <span style="color:var(--text-3);opacity:0.5">11:14 AM PST</span></div>
+              </div>
+              <div style="display:flex;gap:6px;margin-bottom:6px">
+                <div style="display:flex;flex-direction:column;align-items:center;width:12px"><div style="width:12px;height:12px;border-radius:50%;background:rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;font-size:5px;font-weight:600;color:var(--text-2)">JK</div><div style="width:1px;flex:1;background:var(--border);margin-top:2px"></div></div>
+                <div style="font-size:9px;color:var(--text-2)">Jordan K. ran Restore Workday Access <span style="color:var(--text-3);opacity:0.5">11:02 AM</span></div>
+              </div>
+              <div style="display:flex;gap:6px;margin-bottom:6px">
+                <div style="display:flex;flex-direction:column;align-items:center;width:12px"><img src="stlabs-orange-icon.svg" style="width:10px;height:10px;filter:grayscale(1);opacity:0.4;margin-top:1px"><div style="width:1px;flex:1;background:var(--border);margin-top:2px"></div></div>
+                <div style="font-size:9px;color:var(--text-2)">Agent processed ticket <span style="color:var(--text-3);opacity:0.5">10:42 AM</span></div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <div style="display:flex;flex-direction:column;align-items:center;width:12px"><img src="single-ticket-march17/ServiceNow_logo.png" style="width:12px;height:12px;border-radius:2px;margin-top:1px"></div>
+                <div style="font-size:9px;color:var(--text-2)">Ticket received from ServiceNow <span style="color:var(--text-3);opacity:0.5">10:41 AM</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Sidebar mock -->
+        <div style="width:120px;border-left:0.5px solid var(--border);padding:10px;background:rgba(47,111,237,0.03);display:flex;flex-direction:column;gap:8px;opacity:0.75;font-size:9px">
+          <div style="display:flex;align-items:center;gap:3px"><img src="single-ticket-march17/ServiceNow_logo.png" width="8" height="8" style="border-radius:1px"><span style="font-weight:600;color:#2F6FED;font-size:8px;text-transform:uppercase;letter-spacing:.03em">ServiceNow fields</span></div>
+          <div class="meta-pair"><span class="meta-label">Requester</span><span class="meta-val"><div class="mini-av" style="background:rgba(47,111,237,0.1);color:#2F6FED">SK</div> Sarah K.</span></div>
+          <div class="meta-pair"><span class="meta-label">Assignee</span><span class="meta-val"><div class="mini-av" style="background:rgba(0,0,0,0.05);color:var(--text-2)">TM</div> Tanya M.</span></div>
+          <div class="meta-pair"><span class="meta-label">Due</span><span class="meta-val" style="color:var(--text-2)">2h remaining</span></div>
+          <div style="height:1px;background:var(--border);margin:2px 0"></div>
+          <div class="meta-pair"><span class="meta-label">Impact</span><span class="meta-val">4<span style="font-size:8px;color:var(--text-3)">/5</span></span></div>
+          <div class="meta-pair"><span class="meta-label">Urgency</span><span class="meta-val">5<span style="font-size:8px;color:var(--text-3)">/5</span></span></div>
+          <div class="meta-pair"><span class="meta-label">Config Item</span><span class="meta-val">Workday Prod</span></div>
+          <div style="height:0.5px;background:var(--border);margin:2px 0"></div>
+          <div class="meta-pair"><span class="meta-label">Created</span><span class="meta-val" style="font-size:9px;color:var(--text-2)">Mar 15 · 10:41 AM PST</span></div>
+          <div class="meta-pair"><span class="meta-label">Last modified</span><span class="meta-val" style="font-size:9px;color:var(--text-2)">Mar 15 · 11:14 AM PST</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- HEADER                                  -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hdr">1. Header</div>
+
+  <div class="two-col">
+    <div>
+      <div class="block-body">
+        The ticket's identity. Title left-aligned (17px), status and priority badges top-right. Ticket reference and source below the title, faded.
+        <br><br>
+        <strong>Source display</strong> depends on the integration type. Ticketing integrations include a linked external ID. Conversation integrations and email are plain text. Native shows no source line.
+      </div>
+    </div>
+    <div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <div style="font-size:9px;color:var(--text-3);opacity:0.6;margin-bottom:6px">Ticketing integration</div>
+          <div class="mock" style="padding:12px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div style="font-size:13px;font-weight:500;line-height:1.3">Payroll manager locked out of Workday</div>
+              <div style="display:flex;gap:4px;flex-shrink:0;margin-left:8px"><span class="badge badge-new">New</span><span class="badge badge-p1">P1</span></div>
+            </div>
+            <div style="font-size:9.5px;margin-top:3px;display:flex;align-items:center;gap:4px">
+              <span style="font-family:var(--mono);color:var(--text-3);opacity:0.5">#TKT-4093</span>
+              <span style="color:var(--text-3);opacity:0.3">·</span>
+              <span style="color:var(--text-3);opacity:0.5">via ServiceNow Incident</span>
+              <a href="#" style="color:var(--orange);text-decoration:none;font-size:9.5px">INC0047824 ↗</a>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--text-3);opacity:0.6;margin-bottom:6px">Native</div>
+          <div class="mock" style="padding:12px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div style="font-size:13px;font-weight:500;line-height:1.3">DNS resolution issue on internal network</div>
+              <div style="display:flex;gap:4px;flex-shrink:0;margin-left:8px"><span class="badge badge-new">Open</span><span class="badge badge-p3">P3</span></div>
+            </div>
+            <div style="font-size:9.5px;margin-top:3px">
+              <span style="font-family:var(--mono);color:var(--text-3);opacity:0.5">#TKT-4095</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--text-3);opacity:0.6;margin-bottom:6px">Conversation integration</div>
+          <div class="mock" style="padding:12px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div style="font-size:13px;font-weight:500;line-height:1.3">Okta admin account locked, MFA push unresponsive</div>
+              <div style="display:flex;gap:4px;flex-shrink:0;margin-left:8px"><span class="badge badge-new">New</span><span class="badge badge-p3">P3</span></div>
+            </div>
+            <div style="font-size:9.5px;margin-top:3px">
+              <span style="font-family:var(--mono);color:var(--text-3);opacity:0.5">#TKT-4092</span>
+              <span style="color:var(--text-3);opacity:0.3"> · </span>
+              <span style="color:var(--text-3);opacity:0.5">via Slack #it-help</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block" style="margin-top:8px">
+    <div class="rule"><div class="rule-label">Native</div><div class="rule-body">Ticket ID only. No source line.</div></div>
+    <div class="rule"><div class="rule-label">Conversation</div><div class="rule-body">Slack, Teams, etc. "via [integration] #channel" — plain text, faded. No link.</div></div>
+    <div class="rule"><div class="rule-label">Ticketing</div><div class="rule-body">ServiceNow, Jira, etc. "via [integration] [type]" + linked external ID in orange. Always clickable.</div></div>
+    <div class="rule"><div class="rule-label">Email</div><div class="rule-body">"via Email" — plain text, faded. No link.</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- METADATA SIDEBAR                        -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hdr">2. Metadata Sidebar</div>
+
+  <div class="two-col">
+    <div>
+      <div class="block-body">
+        Right side, 160px fixed. Does not scroll. Slightly faded (opacity 0.75) to recede behind main content.
+        <br><br>
+        <strong>Consistent fields</strong> (always present): Requester, Assignee, Due — divider — Created, Last modified.
+        <br><br>
+        <strong>Conditional fields</strong> (max 3, from external source): Configured per integration + type, not per ticket. The admin builds muscle memory. Examples: SN Incident → Impact, Urgency, Configuration Item. Jira Bug → Component, Severity.
+        <br><br>
+        <strong>External source styling</strong>: Source logo + "[Integration] fields" header in source brand color. Subtle background tint. No opacity reduction — the tint is the signal.
+      </div>
+      <div class="note">The sidebar is for triage, not completeness. If the admin needs the full source view, the linked external ID in the header takes them there.</div>
+    </div>
+    <div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <!-- SN Incident -->
+        <div>
+          <div style="font-size:9px;color:var(--text-3);opacity:0.6;margin-bottom:6px">ServiceNow Incident</div>
+          <div class="mock" style="padding:10px;display:flex;flex-direction:column;gap:7px;font-size:9px;background:color-mix(in srgb, #2F6FED 3%, var(--card))">
+            <div style="display:flex;align-items:center;gap:3px"><img src="single-ticket-march17/ServiceNow_logo.png" width="8" height="8" style="border-radius:1px"><span style="font-size:8px;font-weight:600;color:#2F6FED;letter-spacing:.03em;text-transform:uppercase">ServiceNow fields</span></div>
+            <div class="meta-pair"><span class="meta-label">Requester</span><span class="meta-val"><div class="mini-av" style="background:rgba(47,111,237,0.1);color:#2F6FED">SK</div> Sarah K.</span></div>
+            <div class="meta-pair"><span class="meta-label">Assignee</span><span class="meta-val"><div class="mini-av" style="background:rgba(0,0,0,0.05);color:var(--text-2)">TM</div> Tanya M.</span></div>
+            <div class="meta-pair"><span class="meta-label">Due</span><span class="meta-val" style="color:var(--text-2)">2h remaining</span></div>
+            <div style="height:1px;background:var(--border);margin:2px 0"></div>
+            <div class="meta-pair"><span class="meta-label">Impact</span><span class="meta-val">4<span style="font-size:8px;color:var(--text-3)">/5</span></span></div>
+            <div class="meta-pair"><span class="meta-label">Urgency</span><span class="meta-val">5<span style="font-size:8px;color:var(--text-3)">/5</span></span></div>
+            <div class="meta-pair"><span class="meta-label">Config Item</span><span class="meta-val">Workday Prod</span></div>
+            <div style="height:1px;background:var(--border);margin:2px 0"></div>
+            <div class="meta-pair"><span class="meta-label">Created</span><span class="meta-val" style="color:var(--text-2);font-size:9px">Mar 15 · 10:41 AM PST</span></div>
+            <div class="meta-pair"><span class="meta-label">Last modified</span><span class="meta-val" style="color:var(--text-2);font-size:9px">Mar 15 · 11:14 AM PST</span></div>
+          </div>
+        </div>
+        <!-- SN Change -->
+        <div>
+          <div style="font-size:9px;color:var(--text-3);opacity:0.6;margin-bottom:6px">ServiceNow Change</div>
+          <div class="mock" style="padding:10px;display:flex;flex-direction:column;gap:7px;font-size:9px;background:color-mix(in srgb, #2F6FED 3%, var(--card))">
+            <div style="display:flex;align-items:center;gap:3px"><img src="single-ticket-march17/ServiceNow_logo.png" width="8" height="8" style="border-radius:1px"><span style="font-size:8px;font-weight:600;color:#2F6FED;letter-spacing:.03em;text-transform:uppercase">ServiceNow fields</span></div>
+            <div class="meta-pair"><span class="meta-label">Requester</span><span class="meta-val"><div class="mini-av" style="background:rgba(47,111,237,0.1);color:#2F6FED">MR</div> Mike R.</span></div>
+            <div class="meta-pair"><span class="meta-label">Assignee</span><span class="meta-val"><div class="mini-av" style="background:rgba(0,0,0,0.05);color:var(--text-2)">JK</div> Jordan K.</span></div>
+            <div class="meta-pair"><span class="meta-label">Due</span><span class="meta-val" style="color:var(--text-2)">12h remaining</span></div>
+            <div style="height:1px;background:var(--border);margin:2px 0"></div>
+            <div class="meta-pair"><span class="meta-label">Risk</span><span class="meta-val">High</span></div>
+            <div class="meta-pair"><span class="meta-label">Category</span><span class="meta-val">Network / Firewall</span></div>
+            <div class="meta-pair"><span class="meta-label">Config Item</span><span class="meta-val">APAC Gateway</span></div>
+            <div style="height:1px;background:var(--border);margin:2px 0"></div>
+            <div class="meta-pair"><span class="meta-label">Created</span><span class="meta-val" style="color:var(--text-2);font-size:9px">Mar 18 · 3:00 PM PST</span></div>
+            <div class="meta-pair"><span class="meta-label">Last modified</span><span class="meta-val" style="color:var(--text-2);font-size:9px">Mar 18 · 4:15 PM PST</span></div>
+          </div>
+        </div>
+        <!-- Jira Bug -->
+        <div>
+          <div style="font-size:9px;color:var(--text-3);opacity:0.6;margin-bottom:6px">Jira Bug</div>
+          <div class="mock" style="padding:10px;display:flex;flex-direction:column;gap:7px;font-size:9px;background:color-mix(in srgb, #2F6FED 3%, var(--card))">
+            <div style="display:flex;align-items:center;gap:3px"><img src="jira.png" width="8" height="8" style="border-radius:1px"><span style="font-size:8px;font-weight:600;color:#2F6FED;letter-spacing:.03em;text-transform:uppercase">Jira fields</span></div>
+            <div class="meta-pair"><span class="meta-label">Requester</span><span class="meta-val"><div class="mini-av" style="background:rgba(128,0,128,0.08);color:#7C3AED">AR</div> Alex R.</span></div>
+            <div class="meta-pair"><span class="meta-label">Assignee</span><span class="meta-val"><div class="mini-av" style="background:rgba(0,0,0,0.05);color:var(--text-2)">JK</div> Jordan K.</span></div>
+            <div class="meta-pair"><span class="meta-label">Due</span><span class="meta-val" style="color:var(--text-2)">6h remaining</span></div>
+            <div style="height:1px;background:var(--border);margin:2px 0"></div>
+            <div class="meta-pair"><span class="meta-label">Component</span><span class="meta-val">APAC VPN Gateway</span></div>
+            <div class="meta-pair"><span class="meta-label">Severity</span><span class="meta-val">2 — Major</span></div>
+            <div style="height:1px;background:var(--border);margin:2px 0"></div>
+            <div class="meta-pair"><span class="meta-label">Created</span><span class="meta-val" style="color:var(--text-2);font-size:9px">Mar 19 · 10:19 AM PST</span></div>
+            <div class="meta-pair"><span class="meta-label">Last modified</span><span class="meta-val" style="color:var(--text-2);font-size:9px">Mar 19 · 10:20 AM PST</span></div>
+          </div>
+        </div>
+        <!-- Jira Task -->
+        <div>
+          <div style="font-size:9px;color:var(--text-3);opacity:0.6;margin-bottom:6px">Jira Task</div>
+          <div class="mock" style="padding:10px;display:flex;flex-direction:column;gap:7px;font-size:9px;background:color-mix(in srgb, #2F6FED 3%, var(--card))">
+            <div style="display:flex;align-items:center;gap:3px"><img src="jira.png" width="8" height="8" style="border-radius:1px"><span style="font-size:8px;font-weight:600;color:#2F6FED;letter-spacing:.03em;text-transform:uppercase">Jira fields</span></div>
+            <div class="meta-pair"><span class="meta-label">Requester</span><span class="meta-val"><div class="mini-av" style="background:rgba(47,111,237,0.1);color:#2F6FED">LM</div> Lisa M.</span></div>
+            <div class="meta-pair"><span class="meta-label">Assignee</span><span class="meta-val"><div class="mini-av" style="background:rgba(0,0,0,0.05);color:var(--text-2)">TM</div> Tanya M.</span></div>
+            <div class="meta-pair"><span class="meta-label">Due</span><span class="meta-val" style="color:var(--text-2)">2d remaining</span></div>
+            <div style="height:1px;background:var(--border);margin:2px 0"></div>
+            <div class="meta-pair"><span class="meta-label">Component</span><span class="meta-val">Auth Service</span></div>
+            <div style="height:1px;background:var(--border);margin:2px 0"></div>
+            <div class="meta-pair"><span class="meta-label">Created</span><span class="meta-val" style="color:var(--text-2);font-size:9px">Mar 17 · 9:00 AM PST</span></div>
+            <div class="meta-pair"><span class="meta-label">Last modified</span><span class="meta-val" style="color:var(--text-2);font-size:9px">Mar 17 · 9:30 AM PST</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- ENRICHMENT                              -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hdr">3. Enrichment</div>
+
+  <div class="two-col">
+    <div>
+      <div class="block-body">
+        The agent's synthesis of everything it knows — from digital twin lookups, user conversations, and activity updates. <strong>Unlabeled in the UI.</strong> Position (immediately after header) and styling (full-size text, bold key facts) signal its importance.
+        <br><br>
+        For <strong>conversation integrations</strong> (Slack, Teams, native), the enrichment absorbs everything the user communicated. No separate description needed.
+        <br><br>
+        For <strong>ticketing integrations</strong>, the enrichment synthesizes data from the digital twin alongside whatever the external system provided. The original description appears separately below.
+      </div>
+
+      <div class="block-title">How to write the narrative</div>
+      <div class="block-body">
+        The narrative has a clear structure: <strong>what the user told us</strong> first, then <strong>what we found</strong>.
+        <br><br>
+        <strong>Start with the user's problem.</strong> Lead with what the person reported or is experiencing, in their terms. This is the situation as they see it. If they provided business context (a deadline, who's affected), include it here — it came from them, not from us.
+        <br><br>
+        <strong>Transition with "we found."</strong> Use natural language cues like "we found," "investigation shows," or "our checks revealed" to signal the shift from user-reported to agent-discovered. This is where the digital twin data appears.
+        <br><br>
+        <strong>Enrich the user's context with specifics.</strong> If the user said "payroll run is soon," the enrichment adds "affects 214 employees at 4:00 PM PST and she's the only admin with access." The user set the scene; we filled in the details they didn't have.
+        <br><br>
+        <strong>Bold the key facts</strong> that would change the admin's triage decision — numbers, system names, timeframes, affected scope. These are the datapoints that came from the digital twin.
+      </div>
+
+      <div class="block-title">Sources bar</div>
+      <div class="block-body">
+        A <strong>"Sources" bar</strong> sits below the enrichment showing which integrations were queried, with logos where available. Max 3 visible on one line — if more were queried, show 3 + clickable "+X more" that expands to reveal all. Click again to collapse.
+      </div>
+    </div>
+    <div>
+      <div class="mock" style="padding:14px">
+        <div style="font-size:11.5px;line-height:1.75;color:var(--text-2)">
+          Sarah K. can't access Workday with a company-wide payroll run due in hours. We found her account is locked after <strong style="color:var(--text)">3 failed logins</strong> from the corporate VPN (<strong style="color:var(--text)">10.0.47.12</strong>) — MFA device was never re-enrolled after a phone replacement. The payroll run affects <strong style="color:var(--text)">214 employees</strong> at <strong style="color:var(--text)">4:00 PM PST</strong> and she's the only admin with access to initiate it.
+        </div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;font-size:9px;color:var(--text-3);opacity:0.4">
+          <span>Sources</span>
+          <span style="display:inline-flex;align-items:center;gap:3px"><img src="single-ticket-march17/ServiceNow_logo.png" style="width:9px;height:9px;border-radius:50%">Workday Auth Logs</span>
+          <span style="display:inline-flex;align-items:center;gap:3px"><img src="single-ticket-march17/ServiceNow_logo.png" style="width:9px;height:9px;border-radius:50%">Workday User Profile</span>
+          <span style="display:inline-flex;align-items:center;gap:3px"><img src="single-ticket-march17/ServiceNow_logo.png" style="width:9px;height:9px;border-radius:50%">HR Payroll Schedule</span>
+          <span style="text-decoration:underline;text-underline-offset:2px;cursor:pointer" onclick="var el=this.nextElementSibling;if(el.style.display==='none'){el.style.display='inline-flex';this.textContent='show less'}else{el.style.display='none';this.textContent='+1 more'}">+1 more</span>
+          <span style="display:none;align-items:center;gap:3px"><img src="single-ticket-march17/ServiceNow_logo.png" style="width:9px;height:9px;border-radius:50%">Workday Admin Roster</span>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text-3);opacity:0.5;margin-top:6px;text-align:center">No label. Bold = key facts. Sources bar shows integrations queried (max 3 + expandable).</div>
+
+      <div style="margin-top:16px">
+        <div style="font-size:9px;color:var(--text-3);opacity:0.6;margin-bottom:6px">Simple ticket (2 sources, no overflow)</div>
+        <div class="mock" style="padding:14px">
+          <div style="font-size:11.5px;line-height:1.75;color:var(--text-2)">
+            Grant Fuhr can't log into Okta. We found his account is <strong style="color:var(--text)">locked</strong> after <strong style="color:var(--text)">3 failed sign-ins</strong> from the corporate VPN — MFA token expired after a phone replacement and was never re-enrolled.
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:9px;color:var(--text-3);opacity:0.4">
+            <span>Sources</span>
+            <span style="display:inline-flex;align-items:center;gap:3px">Okta Auth Logs</span>
+            <span style="display:inline-flex;align-items:center;gap:3px">Okta User Profile</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SUGGESTED RESOLUTION                    -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hdr">4. Suggested Resolution</div>
+
+  <div class="two-col">
+    <div>
+      <div class="block-body">
+        The agent's recommended workflow. Warm cream background — the only colored container in the pane, drawing the eye to the action. Workflow name as a 2-3 word link. Content and button vertically centered.
+        <br><br>
+        States: <strong>Idle</strong> (Run button), <strong>Running</strong> (bouncing STLabs logo), <strong>Completed</strong> (green logo, block fades), <strong>Failed</strong> (red logo + Retry or Investigate).
+      </div>
+      <div class="ref-link">See: <a href="workflow-run-states.html">Workflow Run States →</a></div>
+    </div>
+    <div>
+      <div class="mock" style="padding:14px;display:flex;flex-direction:column;gap:14px">
+        <!-- Idle -->
+        <div>
+          <div class="lbl">Idle</div>
+          <div style="background:var(--ctx-bg);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:11.5px;font-weight:500;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(0,0,0,0.2)">Okta MFA Reset ↗</div>
+              <div style="font-size:11px;color:var(--text-2);margin-top:2px">Unlock account and push MFA re-enrollment.</div>
+            </div>
+            <div style="background:var(--orange);color:#fff;font-size:10px;padding:5px 10px;border-radius:6px;font-weight:500;display:flex;align-items:center;gap:4px"><span style="font-size:7px">▶</span> Run</div>
+          </div>
+        </div>
+        <!-- Completed -->
+        <div>
+          <div class="lbl">Completed</div>
+          <div style="background:var(--muted);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;opacity:0.6">
+            <div>
+              <div style="font-size:11.5px;font-weight:500;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(0,0,0,0.2)">Okta MFA Reset ↗</div>
+              <div style="font-size:11px;color:var(--text-2);margin-top:2px">Unlock account and push MFA re-enrollment.</div>
+            </div>
+            <div style="font-size:10px;font-weight:500;color:var(--green);display:flex;align-items:center;gap:4px"><img src="stlabs-orange-icon.svg" width="16" height="16" style="filter:brightness(0) saturate(100%) invert(50%) sepia(90%) saturate(500%) hue-rotate(100deg)"> Completed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- RESOLUTION                              -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hdr">5. Resolution (Closed Tickets Only)</div>
+
+  <div class="two-col">
+    <div>
+      <div class="block-body">
+        Agent-written summary of what actually resolved the ticket. Appears between enrichment and suggested resolution <strong>only when the ticket is closed</strong>. Labeled "RESOLUTION."
+        <br><br>
+        Adapts to however it was resolved: workflow ran (via pane or conversation), manual resolution with agent guidance, or resolved externally. Always a synthesis, never a transcript. No attribution ("Resolved by X") — the activity timeline has that detail.
+      </div>
+    </div>
+    <div>
+      <div class="mock" style="padding:14px">
+        <div class="lbl">Resolution</div>
+        <div style="font-size:11.5px;line-height:1.65;color:var(--text-2)">Workday payroll access restored via Workday Direct Unlock after initial MFA re-enrollment failed.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- DESCRIPTION                             -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hdr">6. Description (Conditional)</div>
+
+  <div class="two-col">
+    <div>
+      <div class="block-body">
+        <strong>Only when the ticket came from an external system</strong> — ticketing integrations (ServiceNow, Jira, etc.) or email. Uses the source system's field name: "DESCRIPTION · via [Integration]."
+        <br><br>
+        <strong>Not shown</strong> when the user communicated with our AI agent (Slack, Teams, native). The enrichment absorbs everything from that conversation.
+      </div>
+      <div class="note">If our agent was part of the conversation that created the ticket, description is absorbed into enrichment. If it came from a form the agent wasn't part of, it's shown separately.</div>
+    </div>
+    <div>
+      <div class="mock" style="padding:14px">
+        <div class="lbl">Description <span style="text-transform:none;letter-spacing:normal;opacity:0.6">· via ServiceNow</span></div>
+        <div style="font-size:11px;line-height:1.65;color:var(--text-3)">I can't get into Workday. I've tried logging in three times and the MFA push isn't coming through. We have a scheduled pay run in 4 hours for the full company.</div>
+      </div>
+      <div style="font-size:10px;color:var(--text-3);opacity:0.5;margin-top:6px;text-align:center">Smaller, muted — reference material, not primary content.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- ACTIVITY                                -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hdr">7. Activity Timeline</div>
+
+  <div class="block">
+    <div class="block-body">
+      Collapsible timeline at the bottom. Collapsed by default with chevron + event count. Newest first. Three actor types: <img src="slack.svg" style="width:11px;height:11px;vertical-align:middle"> Source, <img src="stlabs-orange-icon.svg" style="width:11px;height:11px;vertical-align:middle;filter:grayscale(1);opacity:0.4"> Agent, <span style="display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:rgba(0,0,0,0.05);font-size:5px;font-weight:600;color:var(--text-2);vertical-align:middle">JK</span> Human. Plus <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--border-2);vertical-align:middle"></span> outcomes.
+    </div>
+    <div class="ref-link">See: <a href="../activity_components.html">Activity Timeline Design System →</a></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- CONDITIONAL RENDERING                   -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-hdr">Conditional Rendering</div>
+
+  <div class="rule"><div class="rule-label">Native</div><div class="rule-body">Header (ID only) → Enrichment → Suggested resolution → Activity. No description. No sidebar tint.</div></div>
+  <div class="rule"><div class="rule-label">Conversation</div><div class="rule-body">Slack, Teams, etc. Header (no link) → Enrichment → Suggested resolution → Activity. No description — enrichment absorbs the conversation. No sidebar tint.</div></div>
+  <div class="rule"><div class="rule-label">Ticketing</div><div class="rule-body">ServiceNow, Jira, etc. Header (linked ID) → Enrichment → Suggested resolution → Description (· via [Integration]) → Activity. Sidebar tinted with "[Integration] fields" header.</div></div>
+  <div class="rule"><div class="rule-label">Email</div><div class="rule-body">Header (via Email) → Enrichment → Suggested resolution → Description (email body) → Activity. No sidebar tint.</div></div>
+  <div class="rule"><div class="rule-label">Closed</div><div class="rule-body">Adds Resolution between Enrichment and Description. Suggested resolution collapses away (smooth height + fade animation). Status badge → grey "Closed." The workflow record lives in the activity timeline.</div></div>
+</div>
+
+</body>
+</html>

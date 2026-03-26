@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ticket Pane — TKT-4093 (ServiceNow) — Edited</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cor: #CC4C00;
+    --cor-bg: rgba(204,76,0,0.10);
+    --cor-txt: #A33D00;
+    --bg-primary: #FEFEFE;
+    --bg-secondary: #EEEFF1;
+    --bg-tertiary: #E5E6E8;
+    --text-primary: #2C2F36;
+    --text-secondary: #5A5560;
+    --text-tertiary: #7A7F87;
+    --border: rgba(26,26,31,0.10);
+    --border-2: rgba(26,26,31,0.18);
+    --blue: #2F6FED;
+    --blue-bg: rgba(47,111,237,0.10);
+    --blue-txt: #2F6FED;
+    --sn-tint: color-mix(in srgb, #2F6FED 3%, #FEFEFE);
+    --sn-border: color-mix(in srgb, #2F6FED 12%, transparent);
+    --snb-txt: #2F6FED;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ticket-embed {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lbl {
+    font-size: 10px; font-weight: 500; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 5px;
+  }
+
+  .lbl-cf {
+    font-size: 10px; font-weight: 500; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 5px; opacity: .45;
+  }
+
+  .ctx-block {
+    background: #F9F6F1;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .ctx-s {
+    padding: 10px 12px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .ctx-s:last-child { border-bottom: none; }
+
+  .ctx-lbl {
+    font-size: 9px; font-weight: 500; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px;
+  }
+
+  .res-block {
+    background: #F9F6F1; border-radius: 8px;
+    padding: 12px 14px; display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px;
+  }
+
+  .run-btn {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 500; background: var(--cor); color: #fff;
+    border: none; border-radius: 8px; padding: 7px 14px; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0; margin-top: 2px;
+  }
+
+  .badge {
+    font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 10px;
+  }
+
+  .avatar {
+    width: 16px; height: 16px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7px; font-weight: 500; flex-shrink: 0;
+  }
+
+  /* ── Two-column layout ── */
+  .split {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .main-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow: auto;
+    padding: 10px 16px 16px;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 160px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: auto;
+    border-left: 0.5px solid var(--border);
+    background: var(--sn-tint);
+    padding: 14px;
+  }
+
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .sidebar-header span {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--snb-txt);
+  }
+
+  .sb-pair {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sb-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .sb-val {
+    font-size: 12px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .sb-divider {
+    height: 0.5px;
+    background: var(--border);
+  }
+
+  /* ── Edited badge (subtle, final design) ── */
+  .edited-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+  }
+
+  .edited-badge .dot {
+    width: 2.5px;
+    height: 2.5px;
+    border-radius: 50%;
+    background: var(--cor);
+    flex-shrink: 0;
+  }
+
+  .sb-label-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* ── Sources bar ── */
+  .sources-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: -12px;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    opacity: 0.4;
+  }
+
+  .sources-bar .src {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .sources-bar .src img {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 5px;
+  }
+
+  .section-label .sub {
+    text-transform: none;
+    letter-spacing: normal;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="ticket-embed">
+  <!-- Header -->
+  <div style="padding:12px 16px 10px;border-bottom:0.5px solid var(--border)">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="flex:1">
+        <h1 style="font-size:17px;font-weight:500;line-height:1.35;margin-bottom:4px">Payroll manager locked out of Workday — pay run at risk</h1>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-tertiary);opacity:0.5">#TKT-4093</span>
+          <span style="font-size:10px;color:var(--text-tertiary);opacity:0.3">·</span>
+          <span style="font-size:10.5px;color:var(--text-tertiary);opacity:0.5">via ServiceNow Incident</span>
+          <a href="#" style="display:inline-flex;align-items:center;gap:3px;font-size:10.5px;color:var(--cor-txt);text-decoration:none">
+            INC0047824
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H5M9 3V7" stroke="var(--cor-txt)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;padding-top:3px">
+        <span class="badge" style="background:var(--bg-secondary);border:0.5px solid var(--border-2);color:var(--text-secondary)">New</span>
+        <span class="badge" style="background:var(--cor-bg);color:var(--cor-txt)">P1</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Split: main content + sidebar -->
+  <div class="split">
+    <!-- Left: main content -->
+    <div class="main-col">
+      <!-- AI narrative (enrichment) -->
+      <p style="font-size:13px;line-height:1.75;color:var(--text-secondary)">
+        Sarah K. can't access Workday with a company-wide payroll run due in hours.
+        We found her account is locked after
+        <strong style="font-weight:600;color:var(--text-primary)">3 failed logins</strong> from the
+        corporate VPN (<strong style="font-weight:600;color:var(--text-primary)">10.0.47.12</strong>)
+        — MFA device was never re-enrolled after a phone replacement. The payroll run affects
+        <strong style="font-weight:600;color:var(--text-primary)">214 employees</strong> at
+        <strong style="font-weight:600;color:var(--text-primary)">4:00 PM PST</strong> and she's the
+        only admin with access to initiate it.
+      </p>
+
+      <!-- Sources bar -->
+      <div class="sources-bar">
+        <span>Sources</span>
+        <span class="src"><img src="ServiceNow_logo.png" alt="">Workday Auth Logs</span>
+        <span class="src"><img src="ServiceNow_logo.png" alt="">Workday User Profile</span>
+        <span class="src"><img src="ServiceNow_logo.png" alt="">HR Payroll Schedule</span>
+        <span style="color:var(--text-tertiary);opacity:0.7;text-decoration:underline;text-underline-offset:2px;cursor:pointer">+1 more</span>
+      </div>
+
+      <!-- Suggested resolution -->
+      <div>
+        <div class="lbl-cf">Suggested resolution</div>
+        <div class="res-block">
+          <div style="flex:1;min-width:0">
+            <a href="#" style="font-size:13px;font-weight:500;color:var(--text-primary);text-decoration:underline;text-underline-offset:2px;display:inline-flex;align-items:center;gap:4px;margin-bottom:6px">
+              Restore Workday Access
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H5M9 3V7" stroke="var(--text-tertiary)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <p style="font-size:13px;line-height:1.6;color:var(--text-secondary)">Re-enroll MFA device and restore Workday access for Sarah K.</p>
+          </div>
+          <button class="run-btn"><svg width="8" height="8" viewBox="0 0 10 10"><polygon points="2,1 9,5 2,9" fill="#fff"/></svg>Run</button>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <div class="section-label">Description <span class="sub">· via ServiceNow</span></div>
+        <p style="font-size:12.5px;line-height:1.65;color:var(--text-secondary);opacity:0.7">I can't get into Workday. I've tried logging in and the MFA push isn't coming through. We have a scheduled pay run in 4 hours for the full company. If I can't get in soon this is going to delay pay for everyone.</p>
+      </div>
+
+      <!-- Activity -->
+      <div style="padding-top:8px">
+        <div class="section-label" style="margin-bottom:0">Activity</div>
+      </div>
+    </div>
+
+    <!-- Right: metadata sidebar (SN tinted) -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <img src="ServiceNow_logo.png" width="10" height="10" style="border-radius:2px">
+        <span>ServiceNow fields</span>
+      </div>
+
+      <!-- Requester -->
+      <div class="sb-pair">
+        <span class="sb-label">Requester</span>
+        <span class="sb-val"><div class="avatar" style="background:var(--blue-bg);color:var(--blue-txt)">SK</div> Sarah K.</span>
+      </div>
+
+      <!-- Assignee — EDITED (final state: no strikethrough) -->
+      <div class="sb-pair">
+        <div class="sb-label-row">
+          <span class="sb-label">Assignee</span>
+          <span class="edited-badge"><span class="dot"></span>EDITED</span>
+        </div>
+        <span class="sb-val"><div class="avatar" style="background:var(--cor-bg);color:var(--cor-txt)">JK</div> Jordan K.</span>
+      </div>
+
+      <!-- Due -->
+      <div class="sb-pair">
+        <span class="sb-label">Due</span>
+        <span class="sb-val" style="color:var(--text-secondary)">2h remaining</span>
+      </div>
+
+      <div class="sb-divider"></div>
+
+      <!-- Impact -->
+      <div class="sb-pair">
+        <span class="sb-label">Impact</span>
+        <span class="sb-val">4<span style="font-size:10px;color:var(--text-tertiary)">/5</span></span>
+      </div>
+
+      <!-- Urgency — EDITED (final state: no strikethrough) -->
+      <div class="sb-pair">
+        <div class="sb-label-row">
+          <span class="sb-label">Urgency</span>
+          <span class="edited-badge"><span class="dot"></span>EDITED</span>
+        </div>
+        <span class="sb-val">4<span style="font-size:10px;color:var(--text-tertiary)">/5</span></span>
+      </div>
+
+      <!-- Configuration Item -->
+      <div class="sb-pair">
+        <span class="sb-label">Configuration Item</span>
+        <span class="sb-val">Workday Production</span>
+      </div>
+
+      <div class="sb-divider"></div>
+
+      <!-- Created -->
+      <div class="sb-pair">
+        <span class="sb-label">Created</span>
+        <span class="sb-val" style="font-size:11px;color:var(--text-secondary)">Mar 9 · 10:41 AM PST</span>
+      </div>
+
+      <!-- Last modified -->
+      <div class="sb-pair">
+        <span class="sb-label">Last modified</span>
+        <span class="sb-val" style="font-size:11px;color:var(--text-secondary)">Mar 9 · 10:31 AM PST</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

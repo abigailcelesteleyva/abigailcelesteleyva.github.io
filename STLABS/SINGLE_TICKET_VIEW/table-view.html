@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cortex — Ticket Table</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cor: #D85A30;
+    --cor-bg: #FAECE7;
+    --cor-txt: #712B13;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-tertiary: #eeedeb;
+    --text-primary: #1a1a18;
+    --text-secondary: #5f5e5a;
+    --text-tertiary: #888780;
+    --border: rgba(0,0,0,0.1);
+    --border-2: rgba(0,0,0,0.18);
+    --blue: #2B6CB0;
+    --blue-bg: #e6f1fb;
+    --blue-txt: #185fa5;
+    --green: #1C8A5A;
+    --green-bg: #e6f5ee;
+    --green-txt: #146945;
+    --amber: #B8860B;
+    --amber-bg: #fdf6e3;
+    --amber-txt: #7a5a08;
+    --red: #B93737;
+    --red-bg: #fde8e8;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  .table-wrap {
+    padding: 24px;
+  }
+
+  .ticket-table {
+    width: 100%;
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    border-spacing: 0;
+  }
+
+  .ticket-table thead th {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--bg-secondary);
+    white-space: nowrap;
+  }
+
+  .ticket-table thead th .sort-icon {
+    display: inline-block;
+    width: 10px;
+    margin-left: 3px;
+    opacity: 0.4;
+  }
+
+  .ticket-table tbody td {
+    font-size: 13px;
+    padding: 11px 14px;
+    border-bottom: 0.5px solid var(--border);
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 320px;
+  }
+
+  .ticket-table tbody tr {
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+
+  .ticket-table tbody tr:hover {
+    background: var(--bg-secondary);
+  }
+
+  .ticket-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .ticket-name {
+    font-weight: 500;
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Status badges */
+  .status-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .status-new { background: var(--bg-tertiary); border: 0.5px solid var(--border-2); color: var(--text-secondary); }
+  .status-open { background: var(--blue-bg); color: var(--blue-txt); }
+  .status-pending { background: var(--amber-bg); color: var(--amber-txt); }
+  .status-progress { background: var(--cor-bg); color: var(--cor-txt); }
+  .status-resolved { background: var(--green-bg); color: var(--green-txt); }
+
+  /* Priority badges */
+  .priority-badge {
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .p1 { background: #B93737; color: #fff; }
+  .p2 { background: var(--cor); color: #fff; }
+  .p3 { background: var(--blue); color: #fff; }
+  .p4 { background: #6e6d68; color: #fff; }
+
+  /* Avatars in table */
+  .table-avatar {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 8px; font-weight: 600;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+
+  .date-cell {
+    color: var(--text-secondary);
+    font-size: 12.5px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="table-wrap">
+    <table class="ticket-table">
+      <thead>
+        <tr>
+          <th>Name <span class="sort-icon">&#8693;</span></th>
+          <th>Status</th>
+          <th>Priority <span class="sort-icon">&#8693;</span></th>
+          <th>Last Modified <span class="sort-icon">&#8693;</span></th>
+          <th>Created At <span class="sort-icon">&#8693;</span></th>
+          <th>Assigned To</th>
+          <th>Ticket Requester</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="ticket-name">User locked out of Okta &#8212; admin passe...</span></td>
+          <td><span class="status-badge status-new">New</span></td>
+          <td><span class="priority-badge p3">P3</span></td>
+          <td class="date-cell">4 days ago</td>
+          <td class="date-cell">4 days ago</td>
+          <td><span class="table-avatar" style="background:var(--cor-bg);color:var(--cor-txt)">JK</span> Jordan K.</td>
+          <td>Grant Fuhr</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">Payroll manager locked out of Workday...</span></td>
+          <td><span class="status-badge status-new">New</span></td>
+          <td><span class="priority-badge p1">P1</span></td>
+          <td class="date-cell">4 days ago</td>
+          <td class="date-cell">4 days ago</td>
+          <td><span class="table-avatar" style="background:var(--blue-bg);color:var(--blue-txt)">TM</span> Tanya M.</td>
+          <td>Sarah K.</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">Password reset for Grant Fuhr &#8212; Okta a...</span></td>
+          <td><span class="status-badge status-open">Open</span></td>
+          <td><span class="priority-badge p2">P2</span></td>
+          <td class="date-cell">4 days ago</td>
+          <td class="date-cell">5 days ago</td>
+          <td><span class="table-avatar" style="background:var(--bg-tertiary);color:var(--text-secondary)">&#8212;</span> Unassigned</td>
+          <td>Grant Fuhr</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">User Grant Fuhr locked out of Okta &#8212; re...</span></td>
+          <td><span class="status-badge status-open">Open</span></td>
+          <td><span class="priority-badge p3">P3</span></td>
+          <td class="date-cell">5 days ago</td>
+          <td class="date-cell">5 days ago</td>
+          <td><span class="table-avatar" style="background:var(--bg-tertiary);color:var(--text-secondary)">&#8212;</span> Unassigned</td>
+          <td>Grant Fuhr</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">Jenkins errors</span></td>
+          <td><span class="status-badge status-open">Open</span></td>
+          <td><span class="priority-badge p2">P2</span></td>
+          <td class="date-cell">5 days ago</td>
+          <td class="date-cell">5 days ago</td>
+          <td><span class="table-avatar" style="background:#e8dff5;color:#7C3AED">AR</span> Alex R.</td>
+          <td>DevOps Team</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">Gmail not frozen</span></td>
+          <td><span class="status-badge status-pending">Pending</span></td>
+          <td><span class="priority-badge p3">P3</span></td>
+          <td class="date-cell">7 days ago</td>
+          <td class="date-cell">7 days ago</td>
+          <td><span class="table-avatar" style="background:var(--cor-bg);color:var(--cor-txt)">JK</span> Jordan K.</td>
+          <td>Maria L.</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">Bug in OneDrive</span></td>
+          <td><span class="status-badge status-open">Open</span></td>
+          <td><span class="priority-badge p3">P3</span></td>
+          <td class="date-cell">7 days ago</td>
+          <td class="date-cell">7 days ago</td>
+          <td><span class="table-avatar" style="background:var(--bg-tertiary);color:var(--text-secondary)">&#8212;</span> Unassigned</td>
+          <td>Carlos V.</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">Tableau &#8212; credentials rejected</span></td>
+          <td><span class="status-badge status-open">Open</span></td>
+          <td><span class="priority-badge p2">P2</span></td>
+          <td class="date-cell">4 minutes ago</td>
+          <td class="date-cell">7 days ago</td>
+          <td><span class="table-avatar" style="background:var(--green-bg);color:var(--green-txt)">PN</span> Priya N.</td>
+          <td>Data Team</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">Requesting Google Drive</span></td>
+          <td><span class="status-badge status-open">Open</span></td>
+          <td><span class="priority-badge p4">P4</span></td>
+          <td class="date-cell">7 days ago</td>
+          <td class="date-cell">7 days ago</td>
+          <td><span class="table-avatar" style="background:var(--bg-tertiary);color:var(--text-secondary)">&#8212;</span> Unassigned</td>
+          <td>New Hire</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">VM vm-0c1f8d2 network unreachable</span></td>
+          <td><span class="status-badge status-open">Open</span></td>
+          <td><span class="priority-badge p3">P3</span></td>
+          <td class="date-cell">7 days ago</td>
+          <td class="date-cell">7 days ago</td>
+          <td><span class="table-avatar" style="background:var(--blue-bg);color:var(--blue-txt)">TM</span> Tanya M.</td>
+          <td>Infra Team</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">Guest access for HubSpot</span></td>
+          <td><span class="status-badge status-pending">Pending</span></td>
+          <td><span class="priority-badge p4">P4</span></td>
+          <td class="date-cell">7 days ago</td>
+          <td class="date-cell">7 days ago</td>
+          <td><span class="table-avatar" style="background:var(--bg-tertiary);color:var(--text-secondary)">&#8212;</span> Unassigned</td>
+          <td>Sales Ops</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">Analyst needs 4K monitor</span></td>
+          <td><span class="status-badge status-pending">Pending</span></td>
+          <td><span class="priority-badge p3">P3</span></td>
+          <td class="date-cell">7 days ago</td>
+          <td class="date-cell">7 days ago</td>
+          <td><span class="table-avatar" style="background:var(--cor-bg);color:var(--cor-txt)">JK</span> Jordan K.</td>
+          <td>Finance</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">Install Looker to my MacBook</span></td>
+          <td><span class="status-badge status-open">Open</span></td>
+          <td><span class="priority-badge p4">P4</span></td>
+          <td class="date-cell">7 days ago</td>
+          <td class="date-cell">7 days ago</td>
+          <td><span class="table-avatar" style="background:var(--bg-tertiary);color:var(--text-secondary)">&#8212;</span> Unassigned</td>
+          <td>New Hire</td>
+        </tr>
+        <tr>
+          <td><span class="ticket-name">Cable battery unresponsive test</span></td>
+          <td><span class="status-badge status-progress">In Progress</span></td>
+          <td><span class="priority-badge p4">P4</span></td>
+          <td class="date-cell">7 days ago</td>
+          <td class="date-cell">7 days ago</td>
+          <td><span class="table-avatar" style="background:#e8dff5;color:#7C3AED">AR</span> Alex R.</td>
+          <td>Facilities</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>

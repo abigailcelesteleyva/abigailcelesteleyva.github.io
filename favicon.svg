@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 105" width="64" height="64">
+  <!-- Hair -->
+  <path d="M18 44 Q18 16 50 12 Q82 16 82 44 L84 80 Q84 92 76 96 Q72 98 70 90 Q68 80 68 70 L68 58 L32 58 L32 70 Q32 80 30 90 Q28 98 24 96 Q16 92 16 80Z" fill="#3b2314" stroke="#2a1a0e" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Face -->
+  <ellipse cx="50" cy="54" rx="27" ry="25" fill="#e4c4a8" stroke="#2a1a0e" stroke-width="2.5"/>
+  <!-- Bang -->
+  <path d="M72 36 Q62 24 46 24 Q32 26 24 36 L24 44 Q28 34 40 30 Q54 28 68 34 Q72 36 72 36Z" fill="#3b2314" stroke="#2a1a0e" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M28 28 Q24 34 22 44 Q20 54 22 62 Q24 56 24 46 Q26 36 28 28Z" fill="#3b2314" stroke="#2a1a0e" stroke-width="2"/>
+  <!-- Flower -->
+  <g transform="translate(74, 28)">
+    <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(0)"/>
+    <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(72)"/>
+    <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(144)"/>
+    <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(216)"/>
+    <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(288)"/>
+    <circle cx="0" cy="0" r="2.5" fill="#e8b860"/>
+  </g>
+  <!-- Eyes — same as website -->
+  <ellipse cx="39" cy="54" rx="7" ry="7.5" fill="white" stroke="#2a1a0e" stroke-width="1.5"/>
+  <ellipse cx="61" cy="54" rx="7" ry="7.5" fill="white" stroke="#2a1a0e" stroke-width="1.5"/>
+  <!-- Eyelashes -->
+  <line x1="33" y1="49" x2="31" y2="46" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="36" y1="47.5" x2="35" y2="44.5" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="39" y1="47" x2="39" y2="44" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="42" y1="47.5" x2="43" y2="44.5" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="58" y1="47.5" x2="57" y2="44.5" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="61" y1="47" x2="61" y2="44" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="64" y1="47.5" x2="65" y2="44.5" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="67" y1="49" x2="69" y2="46" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Pupils — looking down -->
+  <circle cx="39" cy="57.5" r="3.5" fill="#4a2c1a"/>
+  <circle cx="61" cy="57.5" r="3.5" fill="#4a2c1a"/>
+  <!-- Eye shine -->
+  <circle cx="37" cy="55.5" r="1.2" fill="white"/>
+  <circle cx="59" cy="55.5" r="1.2" fill="white"/>
+</svg>

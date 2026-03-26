@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ticket Pane — TKT-4093 (ServiceNow)</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cor: #CC4C00;
+    --cor-bg: rgba(204,76,0,0.10);
+    --cor-txt: #A33D00;
+    --bg-primary: #FEFEFE;
+    --bg-secondary: #EEEFF1;
+    --bg-tertiary: #E5E6E8;
+    --text-primary: #2C2F36;
+    --text-secondary: #5A5560;
+    --text-tertiary: #7A7F87;
+    --border: rgba(26,26,31,0.10);
+    --border-2: rgba(26,26,31,0.18);
+    --blue: #2F6FED;
+    --blue-bg: rgba(47,111,237,0.10);
+    --blue-txt: #2F6FED;
+    --sn-tint: color-mix(in srgb, #2F6FED 3%, #FEFEFE);
+    --sn-border: color-mix(in srgb, #2F6FED 12%, transparent);
+    --snb-txt: #2F6FED;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ticket-embed {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lbl {
+    font-size: 10px; font-weight: 500; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px;
+  }
+
+  .badge {
+    font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 10px;
+  }
+
+  .avatar {
+    width: 16px; height: 16px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7px; font-weight: 500; flex-shrink: 0;
+  }
+
+  .run-btn {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 500; background: #9a3c00; color: #fff;
+    border: none; border-radius: 8px; padding: 7px 14px; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* ── Two-column layout ── */
+  .split {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow: auto;
+    padding: 8px 16px 16px;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 160px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: auto;
+    border-left: 0.5px solid var(--border);
+    background: var(--sn-tint);
+    padding: 14px;
+  }
+
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sidebar-header span {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--snb-txt);
+  }
+
+  .sidebar-pair {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sidebar-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .sidebar-val {
+    font-size: 12px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Sources bar ── */
+  .sources-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: -16px;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    opacity: 0.45;
+  }
+
+  .sources-bar .source-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .sources-bar .source-logo {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    background: var(--bg-tertiary);
+    flex-shrink: 0;
+  }
+
+  .sources-bar button {
+    background: none; border: none; cursor: pointer;
+    font-size: 10px; color: var(--text-tertiary); opacity: 0.6;
+    text-decoration: underline; text-underline-offset: 2px;
+    font-family: inherit;
+  }
+
+  /* ── Workflow block ── */
+  .workflow-block {
+    background: #F9F6F1;
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  /* ── Activity timeline ── */
+  .activity-section { }
+  .activity-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .activity-header .lbl { margin-bottom: 0; }
+  .activity-count {
+    font-size: 10px; font-weight: 500; color: var(--text-tertiary); opacity: 0.5;
+  }
+  .activity-chevron {
+    width: 10px; height: 10px; margin-left: auto; opacity: 0.35;
+    transition: transform 0.15s ease;
+  }
+  .activity-header.collapsed .activity-chevron { transform: rotate(-90deg); }
+  .activity-body { margin-top: 12px; }
+  .activity-body.hidden { display: none; }
+
+  .tl { display: flex; flex-direction: column; gap: 12px; }
+  .tl-row { display: flex; gap: 10px; }
+  .tl-spine { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 20px; }
+  .tl-line { width: 1px; flex: 1; background: var(--border); margin-top: 3px; min-height: 12px; }
+  .tl-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-2); margin-top: 5px; }
+  .tl-dot-red { width: 6px; height: 6px; border-radius: 50%; background: #B93737; margin-top: 5px; }
+  .tl-content { flex: 1; min-width: 0; padding-top: 2px; }
+  .tl-ev { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .tl-ev-text { font-size: 12px; color: var(--text-secondary); }
+  .tl-ev-text-red { font-size: 12px; color: #B93737; }
+  .tl-ev-time { font-size: 11px; color: var(--text-tertiary); opacity: 0.5; }
+
+  .tl-av {
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7px; font-weight: 600; flex-shrink: 0;
+  }
+  .tl-av-a { background: rgba(0,0,0,0.05); color: var(--text-secondary); }
+  .tl-av-b { background: rgba(47,111,237,0.1); color: #2F6FED; }
+
+  .tl-src-icon { width: 18px; height: 18px; border-radius: 4px; margin-top: 1px; }
+  .tl-stlabs-icon { width: 14px; height: 14px; margin-top: 3px; filter: grayscale(1); opacity: 0.4; }
+
+  .tl-bubble {
+    background: var(--bg-secondary); border-radius: 0 8px 8px 8px;
+    padding: 9px 12px; font-size: 12.5px; line-height: 1.6;
+    color: var(--text-secondary); margin-top: 4px;
+  }
+  .tl-bubble-ext {
+    background: var(--bg-secondary); border-left: 2.5px solid var(--border-2);
+    border-radius: 0 8px 8px 8px; padding: 9px 12px;
+    font-size: 12.5px; line-height: 1.6; color: var(--text-secondary); margin-top: 4px;
+  }
+  .tl-bubble-ext .tl-via { opacity: 1; margin-top: 0; margin-bottom: 4px; }
+
+  .tl-via {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 10px; color: var(--text-tertiary); opacity: 0.5; margin-top: 2px;
+  }
+  .tl-via img { width: 10px; height: 10px; border-radius: 2px; }
+
+  .tl-decision {
+    font-size: 11px; color: var(--text-tertiary); opacity: 0.4; margin-top: 2px;
+  }
+
+  .tl-show-more {
+    font-size: 11px; color: var(--text-tertiary); opacity: 0.5; cursor: pointer;
+    margin-top: 4px; display: inline-block; text-decoration: underline;
+    text-underline-offset: 2px; text-decoration-color: var(--border);
+    background: none; border: none; padding: 0; font-family: inherit;
+  }
+  .tl-show-more:hover { opacity: 0.8; }
+
+  .tl-detail { display: none; margin-top: 6px; flex-direction: column; gap: 4px; }
+  .tl-detail.open { display: flex; }
+  .tl-detail-item {
+    font-size: 11px; line-height: 1.6; color: var(--text-tertiary); opacity: 0.5;
+    padding-left: 10px; position: relative;
+  }
+  .tl-detail-item::before {
+    content: ''; position: absolute; left: 0; top: 7px;
+    width: 3px; height: 3px; border-radius: 50%; background: var(--border-2);
+  }
+
+  /* Workflow animation */
+  @keyframes logoPulse {
+    0%, 100% { transform: scale(1) translateY(0); opacity: 0.9; }
+    50% { transform: scale(1.15) translateY(-2px); opacity: 1; }
+  }
+  .running-logo { width: 24px; height: 24px; animation: logoPulse 1.2s ease-in-out infinite; }
+  .completed-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: #16a34a; }
+  .tl-row-new { animation: slideIn 0.4s ease forwards; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="ticket-embed">
+  <!-- Header -->
+  <div style="padding:12px 16px 10px">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="flex:1">
+        <h1 style="font-size:17px;font-weight:500;line-height:1.35;margin-bottom:4px">Payroll manager locked out of Workday — pay run at risk</h1>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+          <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-tertiary);opacity:0.5">#TKT-4093</span>
+          <span style="font-size:10px;color:var(--text-tertiary);opacity:0.3">·</span>
+          <span style="font-size:10.5px;color:var(--text-tertiary);opacity:0.5">via ServiceNow Incident</span>
+          <a href="#" style="display:inline-flex;align-items:center;gap:3px;font-size:10.5px;color:var(--cor);text-decoration:none">
+            INC0047824
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H5M9 3V7" stroke="var(--cor)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;padding-top:3px">
+        <span class="badge" style="background:var(--bg-secondary);border:0.5px solid var(--border-2);color:var(--text-secondary)">New</span>
+        <span class="badge" style="background:var(--cor-bg);color:var(--cor-txt)">P1</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Split: main content + sidebar -->
+  <div class="split">
+
+    <!-- Left: main content -->
+    <div class="main-content">
+
+      <!-- Enrichment (no label) -->
+      <p style="font-size:13px;line-height:1.75;color:var(--text-secondary)">
+        Sarah K. can't access Workday with a company-wide payroll run due in hours.
+        We found her account is locked after
+        <strong style="font-weight:600;color:var(--text-primary)">3 failed logins</strong> from the
+        corporate VPN (<strong style="font-weight:600;color:var(--text-primary)">10.0.47.12</strong>)
+        — MFA device was never re-enrolled after a phone replacement. The payroll run affects
+        <strong style="font-weight:600;color:var(--text-primary)">214 employees</strong> at
+        <strong style="font-weight:600;color:var(--text-primary)">4:00 PM PST</strong> and she's the
+        only admin with access to initiate it.
+      </p>
+
+      <!-- Sources bar -->
+      <div class="sources-bar" id="sourcesBar">
+        <span>Sources</span>
+        <span class="source-item"><span class="source-logo"></span>Workday Auth Logs</span>
+        <span class="source-item"><span class="source-logo"></span>Workday User Profile</span>
+        <span class="source-item"><span class="source-logo"></span>HR Payroll Schedule</span>
+        <button onclick="toggleSources()">+1 more</button>
+      </div>
+
+      <!-- Suggested resolution / Workflow -->
+      <div id="suggested-block">
+        <div class="lbl">Suggested resolution</div>
+        <div class="workflow-block">
+          <div style="flex:1;min-width:0">
+            <a href="#" onclick="event.preventDefault()" style="display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:500;color:var(--text-primary);text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--text-tertiary);margin-bottom:6px">
+              Restore Workday Access
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H5M9 3V7" stroke="var(--text-tertiary)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <p style="font-size:13px;line-height:1.5;color:var(--text-secondary)">Re-enroll MFA device and restore Workday access for Sarah K.</p>
+          </div>
+          <div id="run-area">
+            <button class="run-btn" onclick="runWorkflow()"><svg width="8" height="8" viewBox="0 0 10 10"><polygon points="2,1 9,5 2,9" fill="#fff"/></svg>Run</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resolution (hidden, fades in after completion) -->
+      <div id="resolution-block" style="display:none">
+        <div class="lbl">Resolution</div>
+        <div style="background:#F9F6F1;border-radius:8px;padding:12px 14px">
+          <p style="font-size:13px;line-height:1.55;color:var(--text-secondary);margin:0">Sarah K.'s Workday access has been restored. MFA device re-enrolled and account unlocked. Payroll run can proceed on schedule.</p>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <div class="lbl">Description <span style="text-transform:none;letter-spacing:normal;opacity:0.6">· via ServiceNow</span></div>
+        <p style="font-size:12.5px;line-height:1.65;color:var(--text-secondary);opacity:0.7">I can't get into Workday. I've tried logging in and the MFA push isn't coming through. We have a scheduled pay run in 4 hours for the full company. If I can't get in soon this is going to delay pay for everyone.</p>
+      </div>
+
+      <!-- Activity -->
+      <div class="activity-section">
+        <div class="activity-header" id="activityHeader" onclick="toggleActivity()">
+          <span class="lbl" style="margin-bottom:0">Activity</span>
+          <span class="activity-count">2</span>
+          <svg class="activity-chevron" viewBox="0 0 10 10" fill="none"><path d="M3 1.5L7 5L3 8.5" stroke="var(--text-tertiary)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="activity-body" id="activityBody">
+          <div class="tl">
+
+            <!-- 1. Agent assessed ticket -->
+            <div class="tl-row"><div class="tl-spine"><img src="stlabs-orange-icon.svg" class="tl-stlabs-icon"><div class="tl-line"></div></div>
+              <div class="tl-content">
+                <div class="tl-ev"><span class="tl-ev-text">Agent assessed ticket</span><span class="tl-ev-time">10:42 AM PST</span></div>
+                <div class="tl-decision">Suggested Restore Workday Access · Assigned to Tanya M.</div>
+                <button class="tl-show-more" onclick="toggleShowMore(this)">Show more</button>
+                <div class="tl-detail">
+                  <div class="tl-detail-item">Queried Workday auth logs — 3 failed logins from 10.0.47.12</div>
+                  <div class="tl-detail-item">Queried Workday user profile — MFA device unregistered, phone replaced</div>
+                  <div class="tl-detail-item">Queried HR payroll schedule — run at 4:00 PM PST, 214 employees</div>
+                  <div class="tl-detail-item">Queried Workday admin roster — Sarah K. only admin with run access</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 14. Ticket received from ServiceNow (no line below) -->
+            <div class="tl-row"><div class="tl-spine"><img src="ServiceNow_logo.png" class="tl-src-icon"></div>
+              <div class="tl-content"><div class="tl-ev"><span class="tl-ev-text">Ticket received from ServiceNow</span><span class="tl-ev-time">10:41 AM PST</span></div></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: metadata sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <img src="ServiceNow_logo.png" width="10" height="10" style="border-radius:2px">
+        <span>ServiceNow fields</span>
+      </div>
+
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Requester</span>
+        <span class="sidebar-val">
+          <div class="avatar" style="background:var(--blue-bg);color:var(--blue-txt)">SK</div>
+          Sarah K.
+        </span>
+      </div>
+
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Assignee</span>
+        <span class="sidebar-val">
+          <div class="avatar" style="background:var(--bg-tertiary);color:var(--text-secondary)">TM</div>
+          Tanya M.
+        </span>
+      </div>
+
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Due</span>
+        <span class="sidebar-val" style="color:var(--text-secondary)">2h remaining</span>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Impact</span>
+        <span class="sidebar-val">4<span style="font-size:10px;color:var(--text-tertiary)">/5</span></span>
+      </div>
+
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Urgency</span>
+        <span class="sidebar-val">5<span style="font-size:10px;color:var(--text-tertiary)">/5</span></span>
+      </div>
+
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Config Item</span>
+        <span class="sidebar-val">Workday Prod</span>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Created</span>
+        <span class="sidebar-val" style="font-size:11px;color:var(--text-secondary)">Mar 9 · 10:41 AM PST</span>
+      </div>
+
+      <div class="sidebar-pair">
+        <span class="sidebar-label">Last modified</span>
+        <span class="sidebar-val" style="font-size:11px;color:var(--text-secondary)">Mar 9 · 11:14 AM PST</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function toggleSources() {
+    const bar = document.getElementById('sourcesBar');
+    const btn = bar.querySelector('button');
+    const isExpanded = btn.textContent.trim() === 'show less';
+
+    if (isExpanded) {
+      const extra = bar.querySelector('.source-extra');
+      if (extra) extra.remove();
+      btn.textContent = '+1 more';
+    } else {
+      const item = document.createElement('span');
+      item.className = 'source-item source-extra';
+      item.innerHTML = '<span class="source-logo"></span>Workday Admin Roster';
+      bar.insertBefore(item, btn);
+      btn.textContent = 'show less';
+    }
+  }
+
+  function toggleActivity() {
+    const header = document.getElementById('activityHeader');
+    const body = document.getElementById('activityBody');
+    header.classList.toggle('collapsed');
+    body.classList.toggle('hidden');
+  }
+
+  function toggleShowMore(el) {
+    const detail = el.nextElementSibling;
+    const isOpen = detail.classList.contains('open');
+    detail.classList.toggle('open', !isOpen);
+    el.textContent = isOpen ? 'Show more' : 'Show less';
+  }
+
+  var hasRun = false;
+  function runWorkflow() {
+    if (hasRun) return;
+    hasRun = true;
+    var runArea = document.getElementById('run-area');
+    var tl = document.querySelector('.tl');
+    var countEl = document.querySelector('.activity-count');
+    var count = parseInt(countEl.textContent);
+
+    // Running
+    runArea.innerHTML = '<img src="stlabs-orange-icon.svg" class="running-logo">';
+
+    setTimeout(function() {
+      var row = document.createElement('div');
+      row.className = 'tl-row tl-row-new';
+      row.innerHTML = '<div class="tl-spine"><div class="tl-av tl-av-a">JK</div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-ev"><span class="tl-ev-text">Jordan K. ran Restore Workday Access</span><span class="tl-ev-time">Just now</span></div></div>';
+      tl.insertBefore(row, tl.firstChild);
+      count++; countEl.textContent = count;
+    }, 300);
+
+    // Completed
+    setTimeout(function() {
+      runArea.innerHTML = '<span class="completed-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#16a34a"/><path d="M8 12l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Completed</span>';
+
+      var row2 = document.createElement('div');
+      row2.className = 'tl-row tl-row-new';
+      row2.innerHTML = '<div class="tl-spine"><div class="tl-dot" style="background:#16a34a"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-ev"><span class="tl-ev-text">Restore Workday Access completed</span><span class="tl-ev-time">Just now</span></div></div>';
+      tl.insertBefore(row2, tl.firstChild);
+      count++; countEl.textContent = count;
+    }, 2200);
+
+    // Resolution cross-fade
+    setTimeout(function() {
+      var sugBlock = document.getElementById('suggested-block');
+      var resBlock = document.getElementById('resolution-block');
+      sugBlock.style.transition = 'opacity 0.4s ease';
+      sugBlock.style.opacity = '0';
+      setTimeout(function() {
+        sugBlock.style.display = 'none';
+        resBlock.style.display = 'block';
+        resBlock.style.opacity = '0';
+        resBlock.style.transition = 'opacity 0.4s ease';
+        setTimeout(function() { resBlock.style.opacity = '1'; }, 50);
+
+        var row3 = document.createElement('div');
+        row3.className = 'tl-row tl-row-new';
+        row3.innerHTML = '<div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-ev"><span class="tl-ev-text">Ticket closed</span><span class="tl-ev-time">Just now</span></div></div>';
+        tl.insertBefore(row3, tl.firstChild);
+        count++; countEl.textContent = count;
+      }, 400);
+    }, 3000);
+  }
+</script>
+
+</body>
+</html>

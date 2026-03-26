@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complex Timeline — Workday Payroll Lockout</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #EEEFF1;
+    --card: #FEFEFE;
+    --border: rgba(26,26,31,0.10);
+    --border-2: rgba(26,26,31,0.18);
+    --text: #2C2F36;
+    --text-2: #5A5560;
+    --text-3: #7A7F87;
+    --orange: #CC4C00;
+    --red: #B93737;
+    --ctx-bg: #F9F6F1;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'SF Mono', 'Fira Code', monospace;
+  }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 24px;
+    display: flex;
+    justify-content: center;
+  }
+  .pane {
+    width: 580px;
+    background: var(--card);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .header { padding: 14px 16px 0; }
+  .header-top { display: flex; align-items: flex-start; gap: 12px; }
+  .header-title { font-size: 17px; font-weight: 500; line-height: 1.35; margin-bottom: 4px; flex: 1; }
+  .badges { display: flex; gap: 6px; flex-shrink: 0; padding-top: 3px; }
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; }
+  .badge-open { background: rgba(47,111,237,0.08); color: #2F6FED; }
+  .badge-p1 { background: rgba(204,76,0,0.10); color: var(--orange); }
+  .ticket-ref { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .ticket-ref span { font-size: 10.5px; color: rgba(136,135,128,0.5); }
+  .ticket-ref .mono { font-family: var(--mono); }
+  .ticket-ref a { font-size: 10.5px; color: var(--orange); text-decoration: none; display: inline-flex; align-items: center; gap: 3px; }
+
+  /* Split layout */
+  .split { display: flex; flex: 1; min-height: 0; }
+  .split-main { flex: 1; overflow-y: auto; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 24px; }
+  .split-sidebar { width: 160px; flex-shrink: 0; border-left: 0.5px solid var(--border); padding: 14px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; background: color-mix(in srgb, #2F6FED 4%, var(--card)); opacity: 0.75; }
+
+  /* Sidebar */
+  .sb-label-header { display: flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #2F6FED; }
+  .sb-label-header img { width: 10px; height: 10px; border-radius: 2px; }
+  .sb-pair { display: flex; flex-direction: column; gap: 2px; }
+  .sb-label { font-size: 9px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); }
+  .sb-val { font-size: 12px; color: var(--text); display: flex; align-items: center; gap: 4px; }
+  .sb-sep { height: 1px; background: var(--border); }
+  .mini-av { width: 14px; height: 14px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 6px; font-weight: 500; }
+
+  /* Section label */
+  .lbl { font-size: 10px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: var(--text-3); margin-bottom: 6px; }
+
+  /* Narrative */
+  .narrative { font-size: 13.5px; line-height: 1.75; color: var(--text-2); }
+  .narrative strong { font-weight: 600; color: var(--text); }
+
+  /* Description */
+  .reported { font-size: 12.5px; line-height: 1.65; color: var(--text-3); }
+
+  /* Resolution block */
+  .res-block { background: var(--ctx-bg); border-radius: 8px; padding: 12px 14px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .res-link { font-size: 13px; font-weight: 500; color: var(--text); text-decoration: underline; text-underline-offset: 2px; text-decoration-color: rgba(0,0,0,0.2); display: inline-flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+  .res-desc { font-size: 13px; line-height: 1.6; color: var(--text-2); }
+  .completed-label { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; color: #16a34a; margin-top: 2px; flex-shrink: 0; }
+
+  /* Timeline */
+  .tl { display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; gap: 10px; }
+  .spine { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 20px; }
+  .line { width: 1px; flex: 1; background: var(--border); margin-top: 3px; min-height: 12px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-2); margin-top: 5px; }
+  .dot-red { width: 6px; height: 6px; border-radius: 50%; background: var(--red); margin-top: 5px; }
+  .content { flex: 1; min-width: 0; padding-top: 2px; }
+  .ev { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .ev-text { font-size: 12px; color: var(--text-2); }
+  .ev-text-red { font-size: 12px; color: var(--red); }
+  .ev-time { font-size: 11px; color: var(--text-3); opacity: 0.5; }
+
+  /* Avatars */
+  .av { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 600; flex-shrink: 0; }
+  .av-jk { background: rgba(0,0,0,0.05); color: var(--text-2); }
+  .av-sk { background: rgba(47,111,237,0.1); color: #2F6FED; }
+
+  /* Source icons */
+  .src-icon { width: 18px; height: 18px; border-radius: 4px; margin-top: 1px; }
+  .stlabs-icon { width: 14px; height: 14px; margin-top: 3px; filter: grayscale(1); opacity: 0.4; }
+
+  /* Via tag */
+  .via { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; color: var(--text-3); opacity: 0.5; margin-top: 2px; }
+  .via img { width: 10px; height: 10px; border-radius: 2px; }
+
+  /* Show more */
+  .show-more { font-size: 11px; color: var(--text-3); opacity: 0.5; cursor: pointer; margin-top: 4px; display: inline-block; text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--border); background: none; border: none; padding: 0; }
+  .show-more:hover { opacity: 0.8; }
+  .detail { display: none; margin-top: 6px; flex-direction: column; gap: 4px; }
+  .detail.open { display: flex; }
+  .detail-item { font-size: 11px; line-height: 1.6; color: var(--text-3); opacity: 0.5; padding-left: 10px; position: relative; }
+  .detail-item::before { content: ''; position: absolute; left: 0; top: 7px; width: 3px; height: 3px; border-radius: 50%; background: var(--border-2); }
+
+  /* Comment bubble */
+  .bubble { background: var(--bg); border-radius: 0 8px 8px 8px; padding: 9px 12px; font-size: 12.5px; line-height: 1.6; color: var(--text-2); margin-top: 4px; }
+  .bubble-ext { background: var(--bg); border-left: 2.5px solid var(--border-2); border-radius: 0 8px 8px 8px; padding: 9px 12px; font-size: 12.5px; line-height: 1.6; color: var(--text-2); margin-top: 4px; }
+  .via { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; color: var(--text-3); opacity: 0.5; margin-top: 2px; }
+  .via img { width: 10px; height: 10px; border-radius: 2px; }
+  .sn-source { display: inline-flex; align-items: center; gap: 3px; margin-bottom: 4px; }
+  .sn-source img { width: 10px; height: 10px; border-radius: 2px; }
+  .sn-source span { font-size: 10px; font-weight: 500; color: #0C447C; }
+</style>
+</head>
+<body>
+
+<div class="pane">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <h1 class="header-title">Payroll manager locked out of Workday — pay run at risk</h1>
+      <div class="badges">
+        <span class="badge" style="background:rgba(0,0,0,0.04);color:var(--text-3)">Closed</span>
+        <span class="badge badge-p1">P1</span>
+      </div>
+    </div>
+    <div class="ticket-ref">
+      <span class="mono">#TKT-4093</span>
+      <span>·</span>
+      <span>via ServiceNow Incident</span>
+      <a href="#">INC0047824 <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H5M9 3V7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </div>
+
+  <!-- Split -->
+  <div class="split">
+
+    <!-- Main content -->
+    <div class="split-main">
+
+      <!-- AI narrative -->
+      <div class="narrative">
+        Sarah K. can't access Workday with a company-wide payroll run due in hours. We found her account is locked after <strong>3 failed logins</strong> from the corporate VPN (<strong>10.0.47.12</strong>) — MFA device was never re-enrolled after a phone replacement. The payroll run affects <strong>214 employees</strong> at <strong>4:00 PM PST</strong> and she's the only admin with access to initiate it.
+      </div>
+
+      <!-- Resolution -->
+      <div>
+        <div class="lbl">Resolution</div>
+        <p style="font-size:13px;line-height:1.65;color:var(--text-2)">Workday payroll access restored via Workday Direct Unlock after initial MFA re-enrollment failed.</p>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <div class="lbl">Description <span style="text-transform:none;letter-spacing:normal;opacity:0.6">· via ServiceNow</span></div>
+        <p class="reported">I can't get into Workday. I've tried logging in three times and the MFA push isn't coming through. We have a scheduled pay run in 4 hours for the full company. If I can't get in soon this is going to delay pay for everyone.</p>
+      </div>
+
+      <!-- Activity -->
+      <div>
+        <button class="lbl" style="display:flex;align-items:center;gap:6px;cursor:pointer;background:none;border:none;padding:0;margin-bottom:6px;" onclick="document.getElementById('tl-complex').style.display=document.getElementById('tl-complex').style.display==='none'?'flex':'none'; this.querySelector('.chev').style.transform=document.getElementById('tl-complex').style.display==='none'?'':'rotate(90deg)'">
+          Activity <span style="opacity:0.5;font-weight:400">14</span>
+          <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none" style="transform:rotate(90deg);transition:transform 0.2s"><path d="M4.5 3L7.5 6L4.5 9" stroke="var(--text-3)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="tl" id="tl-complex">
+
+          <!-- NEWEST FIRST — 16 events -->
+
+          <div class="row"><div class="spine"><div class="dot"></div><div class="line"></div></div>
+            <div class="content"><div class="ev"><span class="ev-text">Ticket closed</span><span class="ev-time">11:22 AM PST</span></div></div></div>
+
+          <div class="row"><div class="spine"><img src="stlabs-orange-icon.svg" class="stlabs-icon"><div class="line"></div></div>
+            <div class="content">
+              <div class="ev"><span class="ev-text">Agent commented via ServiceNow</span><span class="ev-time">11:22 AM PST</span></div>
+              <div class="bubble" style="font-size:11.5px">Your Workday access has been restored. The MFA issue has been resolved — you should be able to log in now.</div>
+            </div></div>
+
+          <div class="row"><div class="spine"><div class="dot"></div><div class="line"></div></div>
+            <div class="content"><div class="ev"><span class="ev-text">Workday Direct Unlock completed</span><span class="ev-time">11:14 AM PST</span></div></div></div>
+
+          <div class="row"><div class="spine"><div class="av av-jk">JK</div><div class="line"></div></div>
+            <div class="content"><div class="ev"><span class="ev-text">Jordan K. ran Workday Direct Unlock</span><span class="ev-time">11:11 AM PST</span></div></div></div>
+
+          <div class="row"><div class="spine"><img src="stlabs-orange-icon.svg" class="stlabs-icon"><div class="line"></div></div>
+            <div class="content"><div class="ev"><span class="ev-text">Agent suggested Workday Direct Unlock</span><span class="ev-time">11:08 AM PST</span></div></div></div>
+
+          <div class="row"><div class="spine"><div class="av av-jk">JK</div><div class="line"></div></div>
+            <div class="content">
+              <div class="ev"><span class="ev-text" style="font-weight:500;color:var(--text)">Jordan K.</span><span class="ev-time">11:06 AM PST</span></div>
+              <div class="bubble">MFA re-enrollment failed. Workday API is rejecting the token refresh. Going to ask the agent to find an alternative.</div>
+            </div></div>
+
+          <div class="row"><div class="spine"><div class="dot-red"></div><div class="line"></div></div>
+            <div class="content"><div class="ev"><span class="ev-text-red">Restore Workday Access failed — Workday API token refresh rejected</span><span class="ev-time">11:04 AM PST</span></div></div></div>
+
+          <div class="row"><div class="spine"><div class="av av-jk">JK</div><div class="line"></div></div>
+            <div class="content"><div class="ev"><span class="ev-text">Jordan K. ran Restore Workday Access</span><span class="ev-time">11:02 AM PST</span></div></div></div>
+
+          <div class="row"><div class="spine"><img src="stlabs-orange-icon.svg" class="stlabs-icon"><div class="line"></div></div>
+            <div class="content"><div class="ev"><span class="ev-text">Agent escalated priority: P2 → P1</span><span class="ev-time">10:58 AM PST</span></div></div></div>
+
+          <div class="row"><div class="spine"><div class="av av-sk">SK</div><div class="line"></div></div>
+            <div class="content">
+              <div class="ev"><span class="ev-text" style="font-weight:500;color:var(--text)">Sarah K.</span><span class="ev-time">10:53 AM PST</span></div>
+              <div class="bubble-ext">
+                <div class="sn-source"><img src="single-ticket-march17/ServiceNow_logo.png"><span>ServiceNow</span></div>
+                This is urgent — payroll run is in less than an hour. Please prioritize.
+              </div>
+            </div></div>
+
+          <div class="row"><div class="spine"><div class="av av-jk">JK</div><div class="line"></div></div>
+            <div class="content"><div class="ev"><span class="ev-text">Jordan K. changed urgency: 5/5 → 4/5</span><span class="ev-time">10:52 AM PST</span></div></div></div>
+
+          <div class="row"><div class="spine"><div class="av av-jk">JK</div><div class="line"></div></div>
+            <div class="content"><div class="ev"><span class="ev-text">Jordan K. changed assignee: Tanya M. → Jordan K.</span><span class="ev-time">10:52 AM PST</span></div></div></div>
+
+          <div class="row"><div class="spine"><img src="stlabs-orange-icon.svg" class="stlabs-icon"><div class="line"></div></div>
+            <div class="content">
+              <div class="ev"><span class="ev-text">Agent assessed ticket</span><span class="ev-time">10:42 AM PST</span></div>
+              <div style="font-size:11px;color:var(--text-3);opacity:0.4;margin-top:2px">Suggested Restore Workday Access · Assigned to Tanya M.</div>
+              <button class="show-more" onclick="toggle(this)">Show more</button>
+              <div class="detail">
+                <div class="detail-item">Queried Workday auth logs — 3 failed logins from 10.0.47.12</div>
+                <div class="detail-item">Queried Workday user profile — MFA device unregistered, phone replaced</div>
+                <div class="detail-item">Queried HR payroll schedule — run at 4:00 PM PST, 214 employees</div>
+                <div class="detail-item">Queried Workday admin roster — Sarah K. only admin with run access</div>
+              </div>
+            </div></div>
+
+          <div class="row"><div class="spine"><img src="single-ticket-march17/ServiceNow_logo.png" class="src-icon"></div>
+            <div class="content"><div class="ev"><span class="ev-text">Ticket received from ServiceNow</span><span class="ev-time">10:41 AM PST</span></div></div></div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <div class="split-sidebar">
+      <div class="sb-label-header"><img src="single-ticket-march17/ServiceNow_logo.png"> ServiceNow fields</div>
+      <div class="sb-pair"><span class="sb-label">Requester</span><span class="sb-val"><div class="mini-av" style="background:rgba(47,111,237,0.1);color:#2F6FED">SK</div> Sarah K.</span></div>
+      <div class="sb-pair"><span class="sb-label">Assignee</span><span class="sb-val"><div class="mini-av" style="background:rgba(0,0,0,0.05);color:var(--text-2)">JK</div> Jordan K.</span></div>
+      <div class="sb-pair"><span class="sb-label">Due</span><span class="sb-val" style="color:var(--text-2)">1h remaining</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-pair"><span class="sb-label">Impact</span><span class="sb-val">4<span style="font-size:10px;color:var(--text-3)">/5</span></span></div>
+      <div class="sb-pair"><span class="sb-label">Urgency</span><span class="sb-val">4<span style="font-size:10px;color:var(--text-3)">/5</span></span></div>
+      <div class="sb-pair"><span class="sb-label">Configuration Item</span><span class="sb-val">Workday Production</span></div>
+      <div class="sb-sep"></div>
+      <div class="sb-pair"><span class="sb-label">Created</span><span class="sb-val" style="color:var(--text-2);font-size:11px">Mar 15 · 10:41 AM PST</span></div>
+      <div class="sb-pair"><span class="sb-label">Last modified</span><span class="sb-val" style="color:var(--text-2);font-size:11px">Mar 15 · 11:14 AM PST</span></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function toggle(el){
+  var d = el.nextElementSibling;
+  var open = d.classList.contains('open');
+  d.classList.toggle('open', !open);
+  el.textContent = open ? 'Show more' : 'Show less';
+}
+</script>
+
+</body>
+</html>

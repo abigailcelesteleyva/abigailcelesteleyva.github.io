@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="180x180" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <title>Ticket Inbox — Abigail Leyva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --text: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --bg: #ffffff;
+      --bg-alt: #f5f5f7;
+      --accent: #c0392b;
+      --border: #e5e5e7;
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    ::selection {
+      background: rgba(192, 57, 43, 0.15);
+      color: var(--text);
+    }
+
+    /* ========== NAV ========== */
+    .case-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .case-nav-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .case-nav a {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .case-nav a:hover { color: var(--text); }
+    .case-nav .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 500;
+    }
+
+    /* ========== CONTENT ========== */
+    .content {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ========== HERO ========== */
+    .case-hero {
+      padding: 5rem 0 4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .case-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .case-meta img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+    }
+    .case-meta span {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .case-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4.5vw, 2.8rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+    .case-hero .case-subtitle {
+      font-size: 1.1rem;
+      font-weight: 300;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin-bottom: 2rem;
+    }
+    .case-details {
+      display: flex;
+      gap: 3rem;
+    }
+    .case-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .case-detail-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #a1a1a6;
+    }
+    .case-detail-value {
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    /* ========== ARTICLE ========== */
+    .case-article {
+      padding: 3.5rem 0;
+    }
+
+    /* Section headers */
+    .case-article h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-top: 3.5rem;
+      margin-bottom: 1rem;
+    }
+    .case-article h2:first-child {
+      margin-top: 0;
+    }
+    .case-article h3 {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-top: 3rem;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Body text */
+    .case-article p {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+    }
+
+    /* Quotes / callouts */
+    .callout {
+      border-left: 2px solid var(--accent);
+      padding: 0.4rem 0 0.4rem 1rem;
+      margin: 1.25rem 0;
+    }
+    .callout p {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 0;
+      display: inline;
+    }
+    .callout .callout-attr {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-style: normal;
+      color: #a1a1a6;
+      display: inline;
+      margin-left: 0.3rem;
+    }
+
+    /* Key insight boxes */
+    .insight {
+      background: var(--bg-alt);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 2rem 0;
+    }
+    .insight-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .insight p {
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-bottom: 0;
+    }
+
+    /* Image / asset placeholders */
+    .case-asset {
+      margin: 2.5rem 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-alt);
+    }
+    .case-asset-inner {
+      padding: 3rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+    }
+    .case-asset-inner img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .case-asset-placeholder {
+      font-size: 0.8rem;
+      color: #c0c0c4;
+      text-align: center;
+    }
+    .case-asset-caption {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.75rem;
+      color: #a1a1a6;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Wide asset — breaks out of column */
+    .case-asset-wide {
+      margin-left: -4rem;
+      margin-right: -4rem;
+    }
+
+    /* Divider */
+    /* ========== ITERATION 2 — TABBED ACTIONS ========== */
+    .iter2-header {
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-alt);
+    }
+    .iter2-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .iter2-buttons {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .iter2-btn {
+      padding: 0;
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #a1a1a6;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .iter2-btn:hover {
+      color: var(--text-secondary);
+    }
+    .iter2-btn.active {
+      color: var(--accent);
+    }
+    .iter2-stage {
+      padding: 1.25rem;
+      background: #010308;
+      position: relative;
+      /* Hug tallest frame: 545/1249 */
+      aspect-ratio: 1249 / 545;
+    }
+    .iter2-frame {
+      width: calc(100% - 2.5rem);
+      height: auto;
+      display: none;
+      position: absolute;
+      top: 1.25rem;
+      left: 1.25rem;
+    }
+    .iter2-frame.active {
+      display: block;
+    }
+
+    /* ========== MANUAL SCROLL WINDOW ========== */
+    .manual-scroll-window {
+      height: 333px;
+      overflow-y: auto;
+      background: #010308;
+      padding: 1.25rem;
+    }
+    .manual-scroll-window img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    /* Custom scrollbar */
+    .manual-scroll-window::-webkit-scrollbar {
+      width: 4px;
+    }
+    .manual-scroll-window::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .manual-scroll-window::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+    }
+    .manual-scroll-window::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.4);
+    }
+
+    /* ========== VERTICAL SCROLL SNAP ========== */
+    .vsnap-wrapper {
+      margin: 0 0 3rem;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .vsnap-header {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0;
+      margin-bottom: 12px;
+    }
+    .vsnap-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #a1a1a6;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .vsnap-label.active {
+      color: var(--accent);
+    }
+    .vsnap-container {
+      /* Fixed height based on tallest image aspect: 471/1201 */
+      aspect-ratio: 1201 / 471;
+      background: var(--bg);
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .vsnap-container::-webkit-scrollbar {
+      display: none;
+    }
+    .vsnap-slide {
+      /* Each slide matches the container height */
+      aspect-ratio: 1201 / 471;
+      flex-shrink: 0;
+      scroll-snap-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .vsnap-slide img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    /* Shadow hint — fades when at bottom */
+    .vsnap-shadow {
+      position: absolute;
+      bottom: -30px;
+      left: 0;
+      right: 0;
+      height: 30px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.03), transparent);
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .vsnap-wrapper.at-bottom .vsnap-shadow {
+      opacity: 0;
+    }
+
+    /* ========== THREE ACTIONS ========== */
+    .three-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    .action-item {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .action-icon-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+    .action-icon {
+      height: 28px;
+      width: auto;
+    }
+    .action-item p {
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+
+    /* ========== GAMIFIED RESOLUTION ========== */
+    @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
+
+    .gamified-resolution {
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      margin: 1rem 0;
+      background: var(--bg);
+      border-radius: 0;
+    }
+    .res-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform-origin: center center;
+      transition: transform 0.6s ease;
+    }
+    .gamified-resolution.popped .res-stat:first-child {
+      transform: translateX(-40px);
+    }
+    .res-stat-resolved {
+      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.4);
+      transform-origin: right center;
+    }
+    .res-stat-resolved.pop {
+      transform: scale(1.3);
+    }
+    .res-number-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .res-number {
+      font-family: 'Lato', sans-serif;
+      font-size: 1.65rem;
+      font-weight: 900;
+      color: #a1a1a6;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      transition: color 0.6s ease;
+    }
+    .res-label {
+      font-family: 'Lato', sans-serif;
+      font-size: 1.65rem;
+      font-weight: 900;
+      color: #a1a1a6;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-top: 0;
+      transition: color 0.6s ease;
+    }
+    .res-arrow {
+      transition: transform 0.4s ease;
+    }
+    .res-arrow polyline, .res-arrow path {
+      transition: stroke 0.6s ease;
+    }
+    /* Green gradient state */
+    .res-stat-resolved.pop .res-number,
+    .res-stat-resolved.pop .res-label {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .res-stat-resolved.pop .res-arrow polyline,
+    .res-stat-resolved.pop .res-arrow path {
+      stroke: #22c55e;
+    }
+
+    /* ========== ITERATION 3 — VERTICAL SNAP ========== */
+    .iter3-snap {
+      /* Fixed to one component height */
+      aspect-ratio: 1467 / 164;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      margin: 2.5rem 0;
+      border-radius: 8px;
+    }
+    .iter3-snap::-webkit-scrollbar {
+      display: none;
+    }
+    .iter3-slide {
+      aspect-ratio: 1467 / 164;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin: 0;
+    }
+    .iter3-slide img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .case-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 3rem 0;
+    }
+
+    /* ========== FOOTER ========== */
+    .case-footer {
+      padding: 3rem 0 4rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .case-footer a {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--accent);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .case-footer a:hover { opacity: 0.7; }
+    .case-footer span {
+      font-size: 0.75rem;
+      color: #a1a1a6;
+    }
+
+    /* ========== ITERATION 1 — FREE FLOATING ========== */
+    .iter1-free {
+      position: relative;
+      margin: 2.5rem 0;
+      cursor: pointer;
+    }
+    .iter1-overlay {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 24px;
+    }
+    .iter1-overlay-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .iter1-overlay-hint {
+      font-size: 0.7rem;
+      font-weight: 400;
+      color: #a1a1a6;
+    }
+    .iter1-overlay .demo-dots {
+      margin-left: auto;
+    }
+
+    /* ========== RAW ASSETS ========== */
+    .raw-asset {
+      margin: 2.5rem 0;
+    }
+    .raw-asset img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .raw-wide {
+      margin-left: -6rem;
+      margin-right: -6rem;
+    }
+    .raw-placeholder {
+      padding: 4rem 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #c0c0c4;
+    }
+
+    /* ========== INTERACTIVE DEMO ========== */
+    .demo-box {
+      margin: 2.5rem 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-alt);
+    }
+    .demo-header {
+      padding: 0.6rem 1.25rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .demo-header .demo-hint {
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+      color: #a1a1a6;
+      font-size: 0.7rem;
+    }
+    .demo-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .demo-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #d4d4d8;
+      transition: background 0.3s ease;
+    }
+    .demo-dot.filled {
+      background: var(--accent);
+    }
+    .demo-inner {
+      padding: 1.25rem;
+      background: #ffffff;
+    }
+    /* 4-state swap — top-aligned, smooth fade */
+    .demo-stage {
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .demo-stage img {
+      width: 100%;
+      height: auto;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    /* Active frame: visible, on top, drives height */
+    .demo-stage img.active {
+      opacity: 1;
+      position: relative;
+      pointer-events: auto;
+      z-index: 2;
+    }
+    /* Previous frame stays at opacity 1 briefly so there's no dark gap */
+    .demo-stage img.prev {
+      opacity: 1;
+      z-index: 1;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .case-hero { padding: 3rem 0 3rem; }
+      .case-details { gap: 2rem; flex-wrap: wrap; }
+      .case-asset-wide, .raw-wide { margin-left: -1rem; margin-right: -1rem; }
+      .case-article h2 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="case-nav">
+    <div class="case-nav-inner">
+      <a href="index.html" class="back-link">← Back</a>
+      <a href="index.html">Abigail Leyva</a>
+    </div>
+  </nav>
+
+  <div class="content">
+
+    <!-- HERO -->
+    <section class="case-hero">
+      <div class="case-meta">
+        <img src="stlabs-orange-icon.svg" alt="STLabs">
+        <span>Standard Template Labs</span>
+      </div>
+      <h1>Rethinking mass ticket resolution for IT ops.</h1>
+      <p class="case-subtitle">A 0→1 design for grouping, prioritizing, and resolving tickets in seconds — through three major iterations shaped by stakeholder tension and user empathy.</p>
+      <div class="case-details">
+        <div class="case-detail">
+          <span class="case-detail-label">Role</span>
+          <span class="case-detail-value">UX Designer</span>
+        </div>
+        <div class="case-detail">
+          <span class="case-detail-label">Timeline</span>
+          <span class="case-detail-value">2025</span>
+        </div>
+        <div class="case-detail">
+          <span class="case-detail-label">Type</span>
+          <span class="case-detail-value">0→1 Product</span>
+        </div>
+        <div class="case-detail">
+          <span class="case-detail-label">Focus</span>
+          <span class="case-detail-value">Enterprise UX, AI Workflows</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARTICLE -->
+    <article class="case-article">
+
+      <!-- THE PROBLEM -->
+      <h2>The problem</h2>
+      <p>A core selling point of our product: intake and group tickets by workflow, then resolve them in bulk. But this was a 0→1 product — no existing patterns to reference, no shared understanding of what "grouping" meant across the team. The founder, engineers, and I each had a different mental model.</p>
+
+      <!-- ITERATION 1 -->
+      <h3>Iteration 1 — The safe bet</h3>
+      <h2>Starting with the known.</h2>
+      <p>I started with what existed in the market: a table view. Rows of tickets, expandable grouping applied on top. Each group showed the title, description, labels, a thumbnail of tickets inside, and a Resolve button with status controls. Groups could expand or collapse. The intention: mass resolve tickets in seconds.</p>
+
+      <div class="iter1-free">
+        <div class="iter1-overlay">
+          <span class="iter1-overlay-label">Interactive</span>
+          <span class="iter1-overlay-hint" id="demo-hint-text">Click to explore</span>
+          <div class="demo-dots" id="demo-dots">
+            <span class="demo-dot"></span>
+            <span class="demo-dot"></span>
+            <span class="demo-dot"></span>
+          </div>
+        </div>
+        <div class="demo-stage" id="demo-iter1">
+          <img class="active" src="STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-collapsed-component.svg" alt="">
+          <img src="STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-table-component.svg" alt="">
+          <img src="STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-full-table.svg" alt="">
+        </div>
+      </div>
+
+      <div class="callout">
+        <p>"This is exactly what I was thinking — I just couldn't explain it."</p>
+        <span class="callout-attr">— Grant Fuhr, Software Engineer</span>
+      </div>
+
+      <p>The engineer in charge of the grouping mechanism validated it immediately. But the founder's reaction was different:</p>
+
+      <div class="callout">
+        <p>"It feels too old world. Yes, we're capturing grouping and resolution — but we're not going to sell the product like this."</p>
+        <span class="callout-attr">— Amit Agarwal, Founder</span>
+      </div>
+
+      <!-- THE PIVOT -->
+      <h3>The pivot</h3>
+      <h2>Dark mode and the IT admin's identity.</h2>
+      <p>This led to a full redesign — not just the inbox, but the design system. Every competitor prioritized dark mode. Our user, the IT admin, is used to being the "boring sibling" of the engineer. Dark mode wasn't aesthetic — it was empowerment.</p>
+
+      <div class="insight">
+        <p class="insight-label">Design decision</p>
+        <p>The shift to dark mode wasn't aesthetic — it was strategic. It signaled to IT admins: this tool was built for you, not adapted from someone else's workflow.</p>
+      </div>
+
+      <!-- ITERATION 2 -->
+      <h3>Iteration 2 — Editorial layout</h3>
+      <h2>From table rows to a continuum.</h2>
+
+      <p>Instead of a table, the redesign presented groups editorially — a flowing continuum of grouped tickets, each with its title, description, ticket count, labels, thumbnails, and resolution action.</p>
+
+      <div class="raw-asset">
+        <img src="STLABS/TICKET_GROUPING/Iteration_2_components/tickets_full.svg" alt="">
+      </div>
+
+      <p>A common question from engineers and the founder: <em>how do we show ungrouped tickets?</em> My answer: the component doesn't change. A single ungrouped ticket looks the same — just with one ticket inside. Making it visually different would create unintended signals: "Was something wrong?" "Should I focus on this first?" That's not what we want.</p>
+
+      <div class="insight">
+        <p class="insight-label">Key insight</p>
+        <p>Visual consistency is trust. If the component looks different based on ticket count, users start reading meaning into the difference — meaning that doesn't exist.</p>
+      </div>
+
+      <p style="margin-bottom: 3rem;">But two new problems emerged.</p>
+
+      <!-- VERTICAL SCROLL SNAP — images live raw on the page -->
+      <div class="vsnap-header">
+        <span class="vsnap-label active" data-index="0">Run Agent</span>
+        <span class="vsnap-label" data-index="1">Run Workflow</span>
+        <span class="vsnap-label" data-index="2">Investigate</span>
+      </div>
+      <div class="vsnap-wrapper" id="iter2-vsnap-wrapper">
+        <div class="vsnap-container" id="iter2-vsnap">
+          <div class="vsnap-slide">
+            <img src="STLABS/TICKET_GROUPING/Iteration_2_components/tickets_1_ticketpage.svg" alt="">
+          </div>
+          <div class="vsnap-slide">
+            <img src="STLABS/TICKET_GROUPING/Iteration_2_components/tickets_2_ticketpage.svg" alt="">
+          </div>
+          <div class="vsnap-slide">
+            <img src="STLABS/TICKET_GROUPING/Iteration_2_components/tickets_3_ticketpage.svg" alt="">
+          </div>
+        </div>
+      </div>
+
+      <p><strong>Problem 1: Engineering jargon in the UI.</strong> Working closely with engineers, I'd absorbed their language. The buttons read "<span style="color:var(--accent)">Run Agent</span>," "<span style="color:var(--accent)">Run Workflow</span>," "<span style="color:var(--accent)">Investigate</span>" — terms that meant nothing to an IT admin. Run Agent runs multiple workflows. Run Workflow runs one. Investigate opens a conversation with an AI agent. These distinctions mattered to engineers, not users.</p>
+      <p><strong>Problem 2: Confidence.</strong> The design was essentially asking: <em>"Here's our grouping — want to confirm?"</em> That undermines trust. It also created an overwhelming landing screen: too many rows, too many actions, when the main thing is resolution. Period.</p>
+      <p>My PM wanted to ship. I pushed back.</p>
+
+      <!-- ITERATION 3 -->
+      <h3>Iteration 3 — Confident & simple</h3>
+      <h2>Present the answer, not the question.</h2>
+      <p>The final redesign flipped the posture. Groups are presented confidently — not as a suggestion, but as a decision. Click to preview tickets, but the focus is on description, resolution description, and the action itself.</p>
+
+      <div class="iter3-snap raw-wide" id="iter3-snap">
+        <div class="iter3-slide"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/Group-1.svg" alt=""></div>
+        <div class="iter3-slide"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/Group-2.svg" alt=""></div>
+        <div class="iter3-slide"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/Group-3.svg" alt=""></div>
+        <div class="iter3-slide"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/Group-4.svg" alt=""></div>
+      </div>
+
+      <p>Resolution collapsed to three clear actions:</p>
+
+      <div class="insight">
+        <p class="insight-label">The three actions</p>
+        <div class="three-actions">
+          <div class="action-item">
+            <div class="action-icon-wrap"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/run.svg" alt="Run" class="action-icon"></div>
+            <p><strong>Run</strong> — resolve autonomously. Whether it's one workflow or multiple agents, the user doesn't need to know the plumbing.</p>
+          </div>
+          <div class="action-item">
+            <div class="action-icon-wrap"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/inspect.svg" alt="Inspect" class="action-icon"></div>
+            <p><strong>Inspect</strong> — conversation with an AI agent to arrive at a decision together. If inspect appears alone, it means there's no automated resolution — the path to resolution <em>is</em> the conversation.</p>
+          </div>
+          <div class="action-item">
+            <div class="action-icon-wrap"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/dismiss.svg" alt="Dismiss" class="action-icon" style="height:22px;"></div>
+            <p><strong>Dismiss</strong> — remove from the queue.</p>
+          </div>
+        </div>
+      </div>
+
+      <p>I realized I'd been stuck in engineering language. "Run Agent" and "Run Workflow" both lead to the same outcome: resolved tickets. Is there really a need to distinguish them for the user? I brought this to engineering — and they agreed.</p>
+
+      <hr class="case-divider">
+
+      <!-- THE DETAILS -->
+      <h2>The details that matter.</h2>
+      <p><strong>Gamified resolution.</strong> When someone resolves a large batch of tickets at once, the UI celebrates it. Speed should feel rewarding.</p>
+
+      <div class="gamified-resolution" id="gamified-res">
+        <div class="res-stat">
+          <div class="res-number-row">
+            <span class="res-number" id="res-total">187</span>
+            <span class="res-label">Total</span>
+            <svg class="res-arrow res-arrow-down" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a1a1a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>
+            </svg>
+          </div>
+        </div>
+        <div class="res-stat res-stat-resolved" id="res-resolved-group">
+          <div class="res-number-row">
+            <span class="res-number" id="res-resolved">12</span>
+            <span class="res-label" id="res-resolved-label">Resolved Today</span>
+            <svg class="res-arrow" id="res-resolved-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a1a1a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <p><strong>Color as priority.</strong> Component ordering and color coding draw the eye to what matters most — no need to read labels to know urgency.</p>
+      <p><strong>Conversational foundation.</strong> The page is inherently interactive. An expandable chat bar sits at the bottom — the inbox is a conversation, not just a list.</p>
+
+      <div class="raw-asset">
+        <img src="STLABS/TICKET_GROUPING/fullview.svg" alt="">
+      </div>
+
+      <hr class="case-divider">
+
+      <!-- REFLECTION -->
+      <h2>What I learned.</h2>
+      <p>Working this closely with engineers is a gift and a trap. You gain deep technical fluency — you can talk in their terms, understand constraints, move fast. But you also start <em>designing</em> in their terms. The biggest shift in this project was remembering that the user doesn't care about the difference between an agent and a workflow. They care that the problem goes away.</p>
+      <p>The other lesson: conviction matters. My PM was ready to ship iteration 2. I wasn't. The final design was better because I trusted the discomfort and pushed for one more round.</p>
+
+    </article>
+
+    <!-- FOOTER -->
+    <div class="case-footer">
+      <a href="index.html">← Back to home</a>
+      <span>Abigail Leyva · 2025</span>
+    </div>
+
+  </div>
+
+  <script>
+    // Demo: click → expanded + dots, auto-advance, click to reset
+    const stage = document.getElementById('demo-iter1');
+    const frames = stage.querySelectorAll('img');
+    const dots = document.querySelectorAll('#demo-dots .demo-dot');
+    const dotsContainer = document.getElementById('demo-dots');
+    const hintText = document.getElementById('demo-hint-text');
+    let step = 0;
+    let autoTimer1 = null;
+    let autoTimer2 = null;
+
+    function goTo(s) {
+      const prev = step;
+      frames.forEach(f => f.classList.remove('prev'));
+      frames[prev].classList.remove('active');
+      frames[prev].classList.add('prev');
+      step = s;
+      frames[step].classList.add('active');
+      setTimeout(() => frames[prev].classList.remove('prev'), 900);
+      // Update dots — fill up to current step + 1
+      dots.forEach((d, i) => {
+        d.classList.toggle('filled', i <= step);
+      });
+    }
+
+    function clearTimers() {
+      clearTimeout(autoTimer1);
+      clearTimeout(autoTimer2);
+    }
+
+    stage.addEventListener('click', () => {
+      clearTimers();
+      if (step === 0) {
+        // Hide hint text
+        hintText.style.display = 'none';
+        // Click 1: collapsed → expanded, then auto-advance to full table
+        goTo(1);
+        autoTimer1 = setTimeout(() => goTo(2), 2000);
+      } else {
+        // Reset
+        goTo(0);
+        // Reset dots
+        dots.forEach(d => d.classList.remove('filled'));
+        hintText.style.display = '';
+      }
+    });
+    // ========== ITERATION 2 — VERTICAL SCROLL CYCLE ==========
+    const vsnapEl = document.getElementById('iter2-vsnap');
+    const vsnapSlides = vsnapEl.querySelectorAll('.vsnap-slide');
+    const vsnapLabels = document.querySelectorAll('.vsnap-label');
+    let vsnapIndex = 0;
+
+    function vsnapGoTo(i) {
+      vsnapIndex = i;
+      vsnapEl.scrollTo({ top: i * vsnapEl.offsetHeight, behavior: 'smooth' });
+      vsnapLabels.forEach((l, j) => l.classList.toggle('active', j === i));
+    }
+
+    // Update labels on manual scroll
+    vsnapEl.addEventListener('scroll', () => {
+      const i = Math.round(vsnapEl.scrollTop / vsnapEl.offsetHeight);
+      vsnapLabels.forEach((l, j) => l.classList.toggle('active', j === i));
+      vsnapIndex = i;
+    }, { passive: true });
+
+    // Auto-cycle every 3 seconds
+    let vsnapInterval = setInterval(() => {
+      vsnapGoTo((vsnapIndex + 1) % vsnapSlides.length);
+    }, 3000);
+
+    // Click labels — pause for 10s then resume
+    vsnapLabels.forEach(label => {
+      label.addEventListener('click', () => {
+        clearInterval(vsnapInterval);
+        vsnapGoTo(parseInt(label.dataset.index));
+        setTimeout(() => {
+          vsnapInterval = setInterval(() => {
+            vsnapGoTo((vsnapIndex + 1) % vsnapSlides.length);
+          }, 3000);
+        }, 10000);
+      });
+    });
+
+    // ========== GAMIFIED RESOLUTION ==========
+    const resTotal = document.getElementById('res-total');
+    const resResolved = document.getElementById('res-resolved');
+    const resGroup = document.getElementById('res-resolved-group');
+    let resRunning = false;
+
+    function animateCount(el, from, to, duration) {
+      const start = performance.now();
+      const step = (now) => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease out cubic
+        el.textContent = Math.round(from + (to - from) * eased);
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    function runResAnimation() {
+      if (resRunning) return;
+      resRunning = true;
+
+      // Count and pop
+      setTimeout(() => {
+        animateCount(resTotal, 187, 167, 1200);
+        animateCount(resResolved, 12, 32, 1200);
+        setTimeout(() => {
+          resGroup.classList.add('pop');
+          document.getElementById('gamified-res').classList.add('popped');
+        }, 800);
+
+        // Hold for 2s then reset
+        setTimeout(() => {
+          resGroup.classList.remove('pop');
+          document.getElementById('gamified-res').classList.remove('popped');
+          setTimeout(() => {
+            resTotal.textContent = '187';
+            resResolved.textContent = '12';
+            resRunning = false;
+          }, 600);
+        }, 3200);
+      }, 500);
+    }
+
+    // Trigger on view
+    const resObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) runResAnimation();
+      });
+    }, { threshold: 0.5 });
+    resObserver.observe(document.getElementById('gamified-res'));
+
+    // Also loop it
+    setInterval(() => {
+      const rect = document.getElementById('gamified-res').getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        runResAnimation();
+      }
+    }, 6000);
+
+    // ========== ITERATION 3 — AUTO-CYCLE ==========
+    const iter3 = document.getElementById('iter3-snap');
+    const iter3Slides = iter3.querySelectorAll('.iter3-slide');
+    let iter3Index = 0;
+
+    setInterval(() => {
+      iter3Index = (iter3Index + 1) % iter3Slides.length;
+      iter3.scrollTo({ top: iter3Index * iter3.offsetHeight, behavior: 'smooth' });
+    }, 3000);
+
+  </script>
+
+</body>
+</html>
