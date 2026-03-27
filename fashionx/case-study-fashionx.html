@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FashionX — Abigail Leyva</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --text: #1d1d1f; --text-secondary: #6e6e73; --bg: #ffffff; --bg-alt: #f5f5f7;
+      --accent: #c0392b; --border: #e5e5e7;
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body { font-family: var(--font-body); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; line-height: 1.6; }
+    
+    .case-nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(0,0,0,0.04); }
+    .case-nav-inner { max-width: 900px; margin: 0 auto; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+    .case-nav a { font-size: 0.8rem; color: var(--text-secondary); text-decoration: none; font-weight: 500; }
+    
+    .content { max-width: 680px; margin: 0 auto; padding: 0 2rem; }
+    
+    .case-hero { padding: 5rem 0 4rem; border-bottom: 1px solid var(--border); }
+    .case-meta { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .case-meta img { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; }
+    .case-meta span { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
+    
+    h1 { font-family: var(--font-display); font-size: clamp(2rem,4.5vw,2.8rem); font-weight: 400; line-height: 1.2; margin-bottom: 1rem; }
+    .case-subtitle { font-size: 1.1rem; font-weight: 300; color: var(--text-secondary); margin-bottom: 2rem; }
+
+    .stat-box { background: var(--bg-alt); border-radius: 12px; padding: 2rem; text-align: center; margin: 2rem 0; }
+    .stat-num { font-family: var(--font-display); font-size: 3.5rem; color: var(--accent); display: block; line-height: 1; }
+    .stat-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #a1a1a6; margin-top: 0.5rem; display: block; letter-spacing: 0.05em; }
+    
+    .case-article { padding: 3.5rem 0; }
+    h2 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; margin-top: 3.5rem; margin-bottom: 1rem; }
+    h3 { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-top: 3rem; margin-bottom: 0.75rem; }
+    p { font-size: 1rem; color: var(--text-secondary); margin-bottom: 1.25rem; }
+
+    .pipeline-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin: 2.5rem 0; }
+    .pipeline-step { background: #fafafa; border: 1px dashed var(--border); border-radius: 12px; padding: 1.5rem; position: relative; }
+    .step-num { position: absolute; top: 1.25rem; right: 1.25rem; font-family: var(--font-display); font-size: 2rem; color: var(--border); line-height: 1; }
+    .step-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; display: block; }
+    .step-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text); }
+    .step-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+
+    .case-asset { margin: 2.5rem 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-alt); text-align: center; }
+    .vstitcher-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--border); }
+    .vstitcher-grid img { width: 100%; height: auto; display: block; }
+    .vstitcher-grid img:first-child { border-right: 1px solid var(--border); }
+    .lookbook-img { width: 100%; height: auto; display: block; }
+    
+    .case-footer { padding: 3rem 0 4rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .case-footer a { font-size: 0.85rem; font-weight: 500; color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      .pipeline-grid, .vstitcher-grid { grid-template-columns: 1fr; }
+      .vstitcher-grid img:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+  <nav class="case-nav">
+    <div class="case-nav-inner">
+      <a href="../index.html">← Back</a>
+      <a href="../index.html">Abigail Leyva</a>
+    </div>
+  </nav>
+
+  <div class="content">
+    <section class="case-hero">
+      <div class="case-meta">
+        <img src="../browzwear.jpg">
+        <span>FashionX</span>
+      </div>
+      <h1>Virtual Threads & 3D Loops.</h1>
+      <p class="case-subtitle">Eliminating physical prototyping by moving the entire iteration loop into high-fidelity 3D simulation.</p>
+      
+      <div class="stat-box">
+        <span class="stat-num">75%</span>
+        <span class="stat-label">Reduction in sampling time</span>
+      </div>
+    </section>
+
+    <article class="case-article">
+      <h2>The Mission</h2>
+      <p>Traditional fashion development relies on slow, wasteful physical sampling. For this capsule collection, I used Browzwear VStitcher to move the entire iteration loop into a 3D environment, allowing for instant feedback on drape, fit, and pattern adjustments.</p>
+      
+      <div class="case-asset">
+        <div class="vstitcher-grid">
+          <img src="image_1.png" alt="3D VStitcher Render — Front View Fabric Drape">
+          <img src="image_2.png" alt="3D VStitcher Render — Detail View Fabric Drape">
+        </div>
+      </div>
+
+      <h3>Technical Execution</h3>
+      <h2>3D Production Pipeline.</h2>
+      
+      <div class="pipeline-grid">
+        <div class="pipeline-step">
+          <span class="step-num">01</span>
+          <span class="step-label">Digital Drapery</span>
+          <p class="step-title">Fabric Physics Simulation</p>
+          <p class="step-desc">Used VStitcher to simulate realistic fabric drape and fit on digital avatars, validating fit without physical material waste.</p>
+        </div>
+        
+        <div class="pipeline-step">
+          <span class="step-num">02</span>
+          <span class="step-label">Pattern-as-Code</span>
+          <p class="step-title">Non-Destructive Iteration</p>
+          <p class="step-desc">Created and refined 3D patterns and seams in real-time, bypassing the weeks-long wait for physical samples.</p>
+        </div>
+
+        <div class="pipeline-step" style="grid-column: span 1;">
+          <span class="step-num">03</span>
+          <span class="step-label">Virtual Output</span>
+          <p class="step-title">Sustainability via Tech</p>
+          <p class="step-desc">Finalized a digital lookbook and 3D renders that served as the "single source of truth" for production.</p>
+        </div>
+      </div>
+
+      <h3>The Win</h3>
+      <h2>Efficiency at Scale.</h2>
+      <p>By bypassing traditional prototyping, we achieved a cost-effective virtual development process that cut sampling time by 75%. This "design-as-code" approach allowed for rapid iteration on fine fit details and fabric simulations without a single yard of waste.</p>
+
+      <div class="case-asset">
+        <img src="lookbook.jpg" alt="Final Digital Lookbook" class="lookbook-img">
+      </div>
+    </article>
+
+    <div class="case-footer">
+      <a href="../index.html">← Back to home</a>
+      <p style="font-size: 0.75rem; color: #a1a1a6;">Reach out to discuss the 3D pipeline.</p>
+    </div>
+  </div>
+</body>
+</html>
