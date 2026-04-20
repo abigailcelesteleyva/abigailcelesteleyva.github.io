@@ -126,9 +126,18 @@
       transition: background-color 0.3s ease;
     }
 
+    /* Avatar area — wraps avatar + hint + picker */
+    .avatar-area {
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
     /* Avatar — sits outside the nav bar */
     .avatar-wrapper {
-      flex-shrink: 0;
       width: 80px;
       height: 80px;
       position: relative;
@@ -651,6 +660,251 @@
       50% { transform: scale(1.03); }
     }
 
+    /* customize hint — pill style */
+    .avatar-customize-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      background: var(--accent-softer);
+      border: 1px solid var(--accent-soft);
+      border-radius: 20px;
+      padding: 3px 10px;
+      cursor: none;
+      white-space: nowrap;
+      opacity: 0;
+      animation: hintEntrance 0.4s ease 2.2s forwards, hintAttention 0.7s ease 3.2s 2;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .avatar-customize-hint:hover {
+      background: var(--accent-soft);
+      transform: scale(1.05);
+    }
+    @keyframes hintEntrance {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes hintAttention {
+      0%,100% { transform: scale(1); }
+      25%     { transform: scale(1.1) rotate(-2deg); }
+      75%     { transform: scale(1.08) rotate(2deg); }
+    }
+
+    /* Accessory picker popover */
+    .accessory-picker {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 8px 32px var(--shadow-strong), 0 2px 8px var(--shadow);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .accessory-picker::before {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 9px; height: 9px;
+      background: var(--bg-elevated);
+      border-left: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+    }
+    .accessory-picker.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+    .acc-row { display: flex; gap: 6px; }
+    .acc-btn {
+      width: 40px; height: 40px;
+      border-radius: 11px;
+      border: 1.5px solid transparent;
+      background: var(--bg-alt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: none;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .acc-btn:hover {
+      background: var(--bg-elevated);
+      border-color: var(--border);
+      transform: scale(1.08);
+    }
+    .acc-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-softer);
+    }
+    .acc-picker-label {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: capitalize;
+      color: var(--text-tertiary);
+      text-align: center;
+      padding: 0 2px 2px;
+      transition: color 0.15s;
+      min-height: 14px;
+    }
+
+    /* Animate the inner wrapper only — never the positioned parent <g> */
+    .acc-inner { transform-box: fill-box; transform-origin: center; }
+    @keyframes accPop {
+      0%   { transform: scale(0.4); opacity: 0.4; }
+      60%  { transform: scale(1.25); }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+    .acc-inner.popping { animation: accPop 0.32s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+
+    /* ========== DRAW ACCESSORY MODAL ========== */
+    .draw-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .draw-overlay.open { opacity: 1; pointer-events: auto; }
+    .draw-modal {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 1.5rem;
+      width: 300px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+      transform: translateY(10px) scale(0.96);
+      transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .draw-overlay.open .draw-modal { transform: translateY(0) scale(1); }
+    .draw-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .draw-modal-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      color: var(--text);
+    }
+    .draw-modal-close {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px 8px;
+      cursor: none;
+      transition: color 0.2s, background 0.2s;
+    }
+    .draw-modal-close:hover { color: var(--text); background: var(--border); }
+    .draw-tools { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.75rem; }
+    .draw-colors { display: flex; gap: 6px; flex-wrap: wrap; }
+    .draw-color {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: none;
+      padding: 0;
+      transition: transform 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+    .draw-color:hover { transform: scale(1.2); }
+    .draw-color.active { border-color: var(--text); transform: scale(1.1); }
+    .draw-tool-btns { display: flex; gap: 6px; }
+    .draw-tool-btn {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-alt);
+      color: var(--text-secondary);
+      cursor: none;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .draw-tool-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .draw-tool-btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+    .draw-canvas-wrap { margin-bottom: 0.75rem; }
+    #draw-canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: transparent;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    .draw-canvas-bg {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-alt);
+    }
+    .draw-canvas-guide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .draw-canvas-guide svg { opacity: 0.12; }
+    .draw-canvas-hint { font-size: 0.58rem; color: var(--text-tertiary); text-align: center; margin-top: 5px; }
+    .draw-modal-footer { display: flex; justify-content: space-between; align-items: center; }
+    .draw-clear-small {
+      font-size: 0.62rem;
+      color: var(--text-tertiary);
+      background: none;
+      border: none;
+      cursor: none;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      padding: 0;
+    }
+    .draw-clear-small:hover { color: var(--accent); }
+    .draw-apply-btn {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      padding: 0.55rem 1.2rem;
+      cursor: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .draw-apply-btn:hover { opacity: 0.85; transform: scale(1.02); }
+    /* Success preview state */
+    .draw-success { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; padding: 0.5rem 0 0.25rem; }
+    .draw-success-preview { width: 110px; height: 116px; }
+    .draw-success-preview svg { width: 100%; height: 100%; display: block; }
+    .draw-success-label { font-family: var(--font-display); font-size: 1rem; color: var(--text); }
+
     /* ========== INLINE PANE THUMBNAIL ========== */
     .iframe-thumb-container {
       width: 100%;
@@ -768,6 +1022,7 @@
   <!-- HEADER -->
   <div class="site-header">
     <!-- Avatar with eye tracking -->
+    <div class="avatar-area">
     <div class="avatar-wrapper" id="avatar-wrapper">
       <span class="avatar-tooltip">Hi there!</span>
       <svg id="avatar" viewBox="0 0 100 105" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
@@ -780,18 +1035,19 @@
         <!-- One clean side-swept bang — single swoop -->
         <path d="M72 36 Q62 24 46 24 Q32 26 24 36 L24 44 Q28 34 40 30 Q54 28 68 34 Q72 36 72 36Z" fill="#3b2314" stroke="#2a1a0e" stroke-width="2" stroke-linejoin="round"/>
 
-        <!-- Flower in hair — 5-petal rose -->
-        <g transform="translate(74, 28)">
-          <!-- Petals -->
-          <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(0)"/>
-          <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(72)"/>
-          <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(144)"/>
-          <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(216)"/>
-          <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(288)"/>
-          <!-- Center -->
-          <circle cx="0" cy="0" r="2.5" fill="#e8b860"/>
-          <circle cx="-0.8" cy="-0.5" r="0.8" fill="#d4a040" opacity="0.6"/>
-          <circle cx="0.8" cy="0.5" r="0.8" fill="#d4a040" opacity="0.6"/>
+        <!-- Hair accessory — swappable via picker. Inner <g> is what gets animated
+             so CSS scale() never touches the parent translate() and jumps to 0,0. -->
+        <g id="hair-accessory" transform="translate(74, 28)">
+          <g class="acc-inner">
+            <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(0)"/>
+            <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(72)"/>
+            <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(144)"/>
+            <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(216)"/>
+            <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(288)"/>
+            <circle cx="0" cy="0" r="2.5" fill="#e8b860"/>
+            <circle cx="-0.8" cy="-0.5" r="0.8" fill="#d4a040" opacity="0.6"/>
+            <circle cx="0.8" cy="0.5" r="0.8" fill="#d4a040" opacity="0.6"/>
+          </g>
         </g>
 
         <!-- Open eyes group -->
@@ -823,6 +1079,37 @@
         </g>
       </svg>
     </div>
+
+    <!-- Customize hint -->
+    <button class="avatar-customize-hint" id="avatar-customize-hint" aria-label="Customize avatar accessory">customize</button>
+
+    <!-- Accessory picker popover -->
+    <div class="accessory-picker" id="accessory-picker" role="dialog" aria-label="Choose hair accessory">
+      <div class="acc-row">
+        <!-- Flower -->
+        <button class="acc-btn active" data-acc="flower" title="Flower" aria-label="Flower">
+          <svg viewBox="0 0 20 20" width="20" height="20"><g transform="translate(10,10)"><ellipse cx="0" cy="-4" rx="2.2" ry="3.2" fill="#d94040" transform="rotate(0)"/><ellipse cx="0" cy="-4" rx="2.2" ry="3.2" fill="#cc3636" transform="rotate(72)"/><ellipse cx="0" cy="-4" rx="2.2" ry="3.2" fill="#d94040" transform="rotate(144)"/><ellipse cx="0" cy="-4" rx="2.2" ry="3.2" fill="#cc3636" transform="rotate(216)"/><ellipse cx="0" cy="-4" rx="2.2" ry="3.2" fill="#d94040" transform="rotate(288)"/><circle cx="0" cy="0" r="1.8" fill="#e8b860"/></g></svg>
+        </button>
+        <!-- Bow -->
+        <button class="acc-btn" data-acc="bow" title="Bow" aria-label="Bow">
+          <svg viewBox="0 0 20 20" width="20" height="20"><g transform="translate(10,10)"><ellipse cx="-4" cy="-1.5" rx="4.5" ry="2.5" fill="#d94040" transform="rotate(-12 -4 -1.5)"/><ellipse cx="4" cy="-1.5" rx="4.5" ry="2.5" fill="#cc3636" transform="rotate(12 4 -1.5)"/><circle cx="0" cy="-1.5" r="2.2" fill="#b82020"/><circle cx="0" cy="-1.5" r="1" fill="#d94040"/></g></svg>
+        </button>
+        <!-- Star -->
+        <button class="acc-btn" data-acc="star" title="Star" aria-label="Star">
+          <svg viewBox="0 0 20 20" width="20" height="20"><g transform="translate(10,10)"><polygon points="0,-7 1.5,-2.5 6,-2.5 2.5,0.5 3.8,5 0,2.5 -3.8,5 -2.5,0.5 -6,-2.5 -1.5,-2.5" fill="#f0cc30"/></g></svg>
+        </button>
+        <!-- Pencil -->
+        <button class="acc-btn" data-acc="pencil" title="Pencil" aria-label="Pencil">
+          <svg viewBox="0 0 20 20" width="20" height="20"><g transform="translate(10,10) rotate(20)"><rect x="-2" y="-7" width="4" height="11" rx="1" fill="#f0cc40"/><rect x="-2" y="-7" width="4" height="1.8" rx="0.8" fill="#b0b0b8"/><rect x="-2" y="-5.2" width="4" height="1.8" fill="#e87070"/><polygon points="-2,4 2,4 0,7.5" fill="#e8d098"/><circle cx="0" cy="7.5" r="0.9" fill="#3b2314"/></g></svg>
+        </button>
+        <!-- Draw your own — rightmost, paint palette icon -->
+        <button class="acc-btn" id="acc-btn-draw" title="Customize" aria-label="Draw your own accessory">
+          <svg viewBox="0 0 20 20" width="20" height="20" fill="none"><path d="M10 3C6.69 3 4 5.69 4 9c0 2.76 2.24 5 5 5 .28 0 .5-.22.5-.5 0-.16-.08-.3-.14-.42-.08-.16-.14-.32-.14-.5 0-.55.45-1 1-1h1.19C13.37 11.58 15 10.1 15 8.09 15 5.27 12.76 3 10 3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="7.5" cy="8.5" r="1" fill="currentColor"/><circle cx="10" cy="6.5" r="1" fill="currentColor"/><circle cx="12.5" cy="8.5" r="1" fill="currentColor"/></svg>
+        </button>
+      </div>
+      <div class="acc-picker-label" id="acc-picker-label">flower</div>
+    </div>
+    </div><!-- end .avatar-area -->
 
     <!-- Nav bar -->
     <div class="nav-bar" id="nav-bar">
@@ -1195,6 +1482,52 @@
     </section>
   </main>
 
+  <!-- DRAW ACCESSORY MODAL -->
+  <div class="draw-overlay" id="draw-overlay">
+    <div class="draw-modal">
+      <div class="draw-modal-header">
+        <span class="draw-modal-title">draw your accessory</span>
+        <button class="draw-modal-close" id="draw-modal-close">✕</button>
+      </div>
+      <div class="draw-tools">
+        <div class="draw-colors" id="draw-colors">
+          <button class="draw-color active" data-color="#c0392b" style="background:#c0392b" title="Red"></button>
+          <button class="draw-color" data-color="#e8b860" style="background:#e8b860" title="Gold"></button>
+          <button class="draw-color" data-color="#3b2314" style="background:#3b2314" title="Brown"></button>
+          <button class="draw-color" data-color="#2F6FED" style="background:#2F6FED" title="Blue"></button>
+          <button class="draw-color" data-color="#16a34a" style="background:#16a34a" title="Green"></button>
+          <button class="draw-color" data-color="#e87070" style="background:#e87070" title="Pink"></button>
+          <button class="draw-color" data-color="#f5f5f7" style="background:#f5f5f7;border:1.5px solid #d4d4d8" title="White"></button>
+          <button class="draw-color" data-color="#1d1d1f" style="background:#1d1d1f" title="Black"></button>
+        </div>
+        <div class="draw-tool-btns">
+          <button class="draw-tool-btn active" id="tool-pen" data-size="4">pen</button>
+          <button class="draw-tool-btn" id="tool-thick" data-size="10">thick</button>
+          <button class="draw-tool-btn" id="tool-eraser" data-eraser="true" data-size="18">eraser</button>
+        </div>
+      </div>
+      <div class="draw-canvas-wrap">
+        <div class="draw-canvas-bg">
+          <!-- Faint guide circle showing the accessory zone -->
+          <div class="draw-canvas-guide">
+            <svg viewBox="0 0 200 200" width="200" height="200"><circle cx="100" cy="100" r="90" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 4"/><text x="100" y="104" text-anchor="middle" font-size="10" fill="currentColor" font-family="sans-serif" opacity="0.7">accessory area</text></svg>
+          </div>
+          <canvas id="draw-canvas" width="200" height="200"></canvas>
+        </div>
+        <p class="draw-canvas-hint">whatever you draw here becomes the hair clip</p>
+      </div>
+      <div class="draw-modal-footer">
+        <button class="draw-clear-small" id="draw-clear">clear canvas</button>
+        <button class="draw-apply-btn" id="draw-apply">Apply →</button>
+      </div>
+      <!-- Success state — hidden until apply -->
+      <div class="draw-success" id="draw-success" style="display:none">
+        <div class="draw-success-preview" id="draw-success-preview"></div>
+        <p class="draw-success-label">looking good</p>
+      </div>
+    </div>
+  </div>
+
   <!-- FLOATING SOCIAL ICONS -->
   <div class="floating-social">
     <a href="https://www.linkedin.com/in/abigailleyva" target="_blank" rel="noopener" aria-label="LinkedIn">
@@ -1249,7 +1582,7 @@
     });
 
     // Hover effect on interactive elements
-    document.querySelectorAll('a, button').forEach(el => {
+    document.querySelectorAll('a, button, .acc-btn').forEach(el => {
       el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
     });
@@ -1431,6 +1764,305 @@
 
     // Start with Abby active
     navName.classList.add('active');
+
+    // ========== ACCESSORY PICKER ==========
+    const accContent = {
+      flower: `
+        <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(0)"/>
+        <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(72)"/>
+        <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(144)"/>
+        <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(216)"/>
+        <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(288)"/>
+        <circle cx="0" cy="0" r="2.5" fill="#e8b860"/>
+        <circle cx="-0.8" cy="-0.5" r="0.8" fill="#d4a040" opacity="0.6"/>
+        <circle cx="0.8" cy="0.5" r="0.8" fill="#d4a040" opacity="0.6"/>`,
+      bow: `
+        <ellipse cx="-5.5" cy="-3" rx="6" ry="3.2" fill="#d94040" transform="rotate(-12 -5.5 -3)"/>
+        <ellipse cx="5.5" cy="-3" rx="6" ry="3.2" fill="#cc3636" transform="rotate(12 5.5 -3)"/>
+        <path d="M-1.5,0.5 Q-5,6 -7,8" stroke="#d94040" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M1.5,0.5 Q5,6 7,8" stroke="#cc3636" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="0" cy="-2" r="3" fill="#b82020"/>
+        <circle cx="0" cy="-2" r="1.3" fill="#d94040"/>`,
+      star: `
+        <polygon points="0,-8.5 2,-3 7.5,-3 3.2,0.8 5,6 0,3.2 -5,6 -3.2,0.8 -7.5,-3 -2,-3" fill="#f0cc30"/>
+        <polygon points="0,-5.5 1.2,-2 4.8,-2 2,0.4 3,3.8 0,2 -3,3.8 -2,0.4 -4.8,-2 -1.2,-2" fill="#f8e468" opacity="0.5"/>`,
+      moon: `
+        <path d="M-1,-8.5 Q7.5,-6 8,0 Q8,7 2.5,9.5 Q6.5,6.5 6,0 Q5.5,-6.5 -1,-8.5Z" fill="#c8d4f5"/>
+        <circle cx="6" cy="-4" r="1.5" fill="#a0b4e8" opacity="0.5"/>
+        <circle cx="7" cy="2.5" r="0.8" fill="#a0b4e8" opacity="0.35"/>`,
+      pencil: `
+        <g transform="rotate(20)">
+          <rect x="-2.5" y="-10" width="5" height="16" rx="1.5" fill="#f0cc40"/>
+          <rect x="-2.5" y="-10" width="5" height="2" rx="1" fill="#b0b0b8"/>
+          <rect x="-2.5" y="-8" width="5" height="2" fill="#e87070"/>
+          <line x1="-1.5" y1="-3" x2="1.5" y2="-3" stroke="#c8a820" stroke-width="0.6" opacity="0.5"/>
+          <line x1="-1.5" y1="0" x2="1.5" y2="0" stroke="#c8a820" stroke-width="0.6" opacity="0.5"/>
+          <line x1="-1.5" y1="3" x2="1.5" y2="3" stroke="#c8a820" stroke-width="0.6" opacity="0.5"/>
+          <polygon points="-2.5,6 2.5,6 0,10.5" fill="#e8d098"/>
+          <circle cx="0" cy="10.5" r="1.2" fill="#3b2314"/>
+        </g>`
+    };
+
+    const picker = document.getElementById('accessory-picker');
+    const pickerLabel = document.getElementById('acc-picker-label');
+    const customizeHint = document.getElementById('avatar-customize-hint');
+    const hairGroup = document.getElementById('hair-accessory');
+    let pickerOpen = false;
+    let currentAcc = sessionStorage.getItem('avatar-accessory') || 'flower';
+
+    function popInner() {
+      const inner = hairGroup.querySelector('.acc-inner');
+      if (!inner) return;
+      inner.classList.remove('popping');
+      void inner.offsetWidth;
+      inner.classList.add('popping');
+      setTimeout(() => inner.classList.remove('popping'), 320);
+    }
+
+    function setAccessory(name, animate = true) {
+      if (name === 'custom') {
+        try {
+          const saved = sessionStorage.getItem('avatar-accessory-custom');
+          if (saved) hairGroup.innerHTML = `<g class="acc-inner"><image href="${saved}" x="-14" y="-16" width="28" height="28"/></g>`;
+        } catch(err) {}
+        currentAcc = 'custom';
+        document.querySelectorAll('.acc-btn').forEach(b => b.classList.remove('active'));
+        const drawBtn = document.getElementById('acc-btn-draw');
+        if (drawBtn) drawBtn.classList.add('active');
+        pickerLabel.textContent = 'custom';
+        return;
+      }
+      hairGroup.innerHTML = `<g class="acc-inner">${accContent[name]}</g>`;
+      currentAcc = name;
+      sessionStorage.setItem('avatar-accessory', name);
+      document.querySelectorAll('.acc-btn').forEach(btn =>
+        btn.classList.toggle('active', btn.dataset.acc === name)
+      );
+      pickerLabel.textContent = name;
+      if (animate) popInner();
+    }
+
+    function openPicker() {
+      pickerOpen = true;
+      picker.classList.add('open');
+      customizeHint.classList.add('fade-out');
+      sessionStorage.setItem('avatar-customized', '1');
+    }
+    function closePicker() {
+      pickerOpen = false;
+      picker.classList.remove('open');
+    }
+
+    // Init: restore saved accessory
+    setAccessory(currentAcc, false);
+    if (sessionStorage.getItem('avatar-customized')) customizeHint.classList.add('fade-out');
+
+    // Hint click → open picker
+    customizeHint.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pickerOpen ? closePicker() : openPicker();
+    });
+
+    // Accessory button clicks
+    picker.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const btn = e.target.closest('.acc-btn');
+      if (btn) setAccessory(btn.dataset.acc);
+    });
+
+    // Hover label update
+    picker.querySelectorAll('.acc-btn').forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        pickerLabel.textContent = btn.id === 'acc-btn-draw' ? 'Customize' : btn.dataset.acc;
+      });
+      btn.addEventListener('mouseleave', () => {
+        pickerLabel.textContent = currentAcc === 'custom' ? 'custom' : currentAcc;
+      });
+    });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (pickerOpen && !picker.closest('.avatar-area').contains(e.target)) closePicker();
+    });
+
+    // ========== DRAW MODAL ==========
+    const drawOverlay = document.getElementById('draw-overlay');
+    const drawCanvas  = document.getElementById('draw-canvas');
+    const drawCtx     = drawCanvas.getContext('2d');
+    let drawColor = '#c0392b';
+    let drawSize  = 4;
+    let isEraser  = false;
+    let isDrawing = false;
+
+    function openDrawModal() {
+      closePicker();
+      drawOverlay.classList.add('open');
+    }
+    function closeDrawModal() { drawOverlay.classList.remove('open'); }
+
+    document.getElementById('acc-btn-draw').addEventListener('click', (e) => {
+      e.stopPropagation(); openDrawModal();
+    });
+    document.getElementById('draw-modal-close').addEventListener('click', (e) => {
+      e.stopPropagation(); closeDrawModal();
+    });
+    drawOverlay.addEventListener('click', (e) => { if (e.target === drawOverlay) closeDrawModal(); });
+    drawOverlay.querySelector('.draw-modal').addEventListener('click', (e) => e.stopPropagation());
+
+    // Color swatches
+    document.querySelectorAll('.draw-color').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.draw-color').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        drawColor = btn.dataset.color;
+        isEraser = false;
+        document.getElementById('tool-pen').classList.add('active');
+        document.getElementById('tool-thick').classList.remove('active');
+        document.getElementById('tool-eraser').classList.remove('active');
+        drawSize = 4;
+      });
+    });
+
+    // Tool buttons
+    document.getElementById('tool-pen').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.draw-tool-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tool-pen').classList.add('active');
+      drawSize = 4; isEraser = false;
+    });
+    document.getElementById('tool-thick').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.draw-tool-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tool-thick').classList.add('active');
+      drawSize = 10; isEraser = false;
+    });
+    document.getElementById('tool-eraser').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.draw-tool-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tool-eraser').classList.add('active');
+      drawSize = 18; isEraser = true;
+    });
+    document.getElementById('draw-clear').addEventListener('click', (e) => {
+      e.stopPropagation();
+      drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+    });
+
+    // Drawing
+    function getDrawPos(e) {
+      const rect = drawCanvas.getBoundingClientRect();
+      const sx = drawCanvas.width / rect.width;
+      const sy = drawCanvas.height / rect.height;
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: (cx - rect.left) * sx, y: (cy - rect.top) * sy };
+    }
+    drawCanvas.addEventListener('pointerdown', (e) => {
+      e.stopPropagation(); isDrawing = true;
+      const p = getDrawPos(e);
+      drawCtx.beginPath(); drawCtx.moveTo(p.x, p.y);
+    });
+    drawCanvas.addEventListener('pointermove', (e) => {
+      if (!isDrawing) return;
+      e.stopPropagation();
+      const p = getDrawPos(e);
+      drawCtx.globalCompositeOperation = isEraser ? 'destination-out' : 'source-over';
+      drawCtx.strokeStyle = drawColor;
+      drawCtx.lineWidth = drawSize;
+      drawCtx.lineCap = 'round'; drawCtx.lineJoin = 'round';
+      drawCtx.lineTo(p.x, p.y); drawCtx.stroke();
+      drawCtx.beginPath(); drawCtx.moveTo(p.x, p.y);
+    });
+    drawCanvas.addEventListener('pointerup', () => {
+      isDrawing = false;
+      drawCtx.globalCompositeOperation = 'source-over';
+    });
+
+    // Apply drawing as accessory — with success preview + fly-to-avatar animation
+    document.getElementById('draw-apply').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dataUrl = drawCanvas.toDataURL('image/png');
+
+      // 1. Apply to real avatar immediately
+      hairGroup.innerHTML = `<g class="acc-inner"><image href="${dataUrl}" x="-14" y="-16" width="28" height="28"/></g>`;
+      document.querySelectorAll('.acc-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('acc-btn-draw').classList.add('active');
+      pickerLabel.textContent = 'custom';
+      try { sessionStorage.setItem('avatar-accessory', 'custom'); sessionStorage.setItem('avatar-accessory-custom', dataUrl); } catch(err) {}
+
+      // 2. Swap modal to success state: show full avatar with new accessory
+      const drawingUI = [
+        document.querySelector('.draw-tools'),
+        document.querySelector('.draw-canvas-wrap'),
+        document.querySelector('.draw-modal-footer')
+      ];
+      drawingUI.forEach(el => { el.style.transition = 'opacity 0.2s'; el.style.opacity = '0'; });
+
+      const successDiv = document.getElementById('draw-success');
+      const successPreview = document.getElementById('draw-success-preview');
+
+      setTimeout(() => {
+        drawingUI.forEach(el => { el.style.display = 'none'; });
+        const avatarClone = document.getElementById('avatar').cloneNode(true);
+        avatarClone.removeAttribute('id');
+        avatarClone.style.cssText = 'width:100%;height:100%;animation:none;';
+        successPreview.innerHTML = '';
+        successPreview.appendChild(avatarClone);
+        successDiv.style.display = 'flex';
+      }, 200);
+
+      // 3. After showing preview (twice as long), fly to nav
+      setTimeout(() => {
+        const previewRect = successPreview.getBoundingClientRect();
+        const navRect = document.getElementById('avatar-wrapper').getBoundingClientRect();
+
+        // Clean clone — strip all animations so no acc-inner.popping jumps to 0,0
+        const flyClone = document.getElementById('avatar').cloneNode(true);
+        flyClone.removeAttribute('id');
+        flyClone.style.cssText = 'width:100%;height:100%;animation:none;display:block;';
+        flyClone.querySelectorAll('*').forEach(el => {
+          el.classList.remove('popping');
+          el.style.animation = 'none';
+        });
+
+        const flyEl = document.createElement('div');
+        flyEl.style.cssText = `
+          position:fixed;
+          left:${previewRect.left}px; top:${previewRect.top}px;
+          width:${previewRect.width}px; height:${previewRect.height}px;
+          z-index:9999; pointer-events:none;
+          transition:left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.4,0,.2,1),
+                     width .55s cubic-bezier(.4,0,.2,1),height .55s cubic-bezier(.4,0,.2,1),
+                     opacity .25s .35s;
+          overflow:hidden;
+        `;
+        flyEl.appendChild(flyClone);
+        document.body.appendChild(flyEl);
+
+        // Close modal as fly begins
+        closeDrawModal();
+
+        // Animate to nav avatar position
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          flyEl.style.left   = navRect.left   + 'px';
+          flyEl.style.top    = navRect.top    + 'px';
+          flyEl.style.width  = navRect.width  + 'px';
+          flyEl.style.height = navRect.height + 'px';
+          flyEl.style.opacity = '0';
+        }));
+
+        // Pop the real accessory on arrival, clean up fly element
+        setTimeout(() => { flyEl.remove(); popInner(); }, 600);
+
+        // Reset modal for next use
+        setTimeout(() => {
+          drawingUI.forEach(el => { el.style.display = ''; el.style.opacity = ''; el.style.transition = ''; });
+          successDiv.style.display = 'none';
+          successPreview.innerHTML = '';
+          drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+        }, 700);
+      }, 1600);
+    });
 
     // ========== AVATAR CLICK — CALMING MODE ==========
     const avatarWrapper = document.getElementById('avatar-wrapper');
