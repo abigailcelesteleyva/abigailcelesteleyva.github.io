@@ -1416,14 +1416,13 @@
 
     stage.addEventListener('click', () => {
       clearTimers();
-      if (step === 0) {
-        hintText.style.display = 'none';
-        goTo(1);
-        autoTimer1 = setTimeout(() => goTo(2), 2000);
-      } else {
-        goTo(0);
+      const next = (step + 1) % frames.length;
+      goTo(next);
+      if (next === 0) {
         dots.forEach(d => d.classList.remove('filled'));
         hintText.style.display = '';
+      } else {
+        hintText.style.display = 'none';
       }
     });
 

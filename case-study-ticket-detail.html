@@ -395,7 +395,12 @@
     .proto-stage { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; cursor: default; }
     .proto-frame-wrap { width: 860px; transform-origin: top left; position: relative; }
     .proto-frame-wrap iframe { width: 860px; border: none; display: none; background: #FEFEFE; }
-    .proto-frame-wrap iframe.active { display: block; }
+    .proto-frame-wrap iframe.active { display: block; animation: iframeFadeIn 0.12s ease forwards; }
+    :root[data-theme="dark"] .proto-frame-wrap iframe { background: #1a1a1d; }
+    @keyframes iframeFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
 
     /* Non-interactive embed — just shows the prototype */
     .proto-static { cursor: none; }
@@ -500,6 +505,9 @@
     }
     :root[data-theme="dark"] .proto-dot {
       background: rgba(255,255,255,0.22);
+    }
+    :root[data-theme="dark"] .proto-dot.filled {
+      background: var(--accent);
     }
     :root[data-theme="dark"] .timeline-mini-av {
       background: #2a2a2e !important;
@@ -631,7 +639,7 @@
       <div class="proto-wrap" id="proto-enrichment">
         <div class="proto-header">
           <span class="proto-label">Interactive</span>
-          <span class="proto-hint">Click to compare</span>
+          <span class="proto-hint">Click here</span>
           <div class="proto-dots">
             <span class="proto-dot filled"></span>
             <span class="proto-dot"></span>
