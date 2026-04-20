@@ -3,6 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  (function() {
+    try {
+      var t = window.parent.localStorage.getItem('theme') || localStorage.getItem('theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) {}
+  })();
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'theme') document.documentElement.setAttribute('data-theme', e.newValue);
+  });
+</script>
 <title>Ticket Pane — TKT-4093 (Per-Field Labels)</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,9 +34,30 @@
     --blue: #2F6FED;
     --blue-bg: rgba(47,111,237,0.10);
     --blue-txt: #2F6FED;
+    --warm-block: #F9F6F1;
     --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
   }
+
+  :root[data-theme="dark"] {
+    --cor: #ef6a5a;
+    --cor-bg: rgba(239,106,90,0.15);
+    --cor-txt: #ef6a5a;
+    --bg-primary: #1a1a1d;
+    --bg-secondary: #111113;
+    --bg-tertiary: #2a2a2e;
+    --text-primary: #f5f5f7;
+    --text-secondary: #c4c4c8;
+    --text-tertiary: #8e8e93;
+    --border: rgba(255,255,255,0.08);
+    --border-2: rgba(255,255,255,0.15);
+    --blue-bg: rgba(47,111,237,0.15);
+    --blue-txt: #7aa7f7;
+    --warm-block: #232326;
+  }
+
+  html { transition: background-color 0.3s ease, color 0.3s ease; }
+  html[data-theme="dark"] { color-scheme: dark; }
 
   body {
     font-family: var(--font-sans);
@@ -67,7 +100,7 @@
   }
 
   .ctx-block {
-    background: #F9F6F1;
+    background: var(--warm-block);
     border-radius: 8px;
     overflow: hidden;
   }
@@ -85,7 +118,7 @@
   }
 
   .res-block {
-    background: #F9F6F1; border-radius: 8px;
+    background: var(--warm-block); border-radius: 8px;
     padding: 12px 14px; display: flex; align-items: flex-start;
     justify-content: space-between; gap: 12px;
   }

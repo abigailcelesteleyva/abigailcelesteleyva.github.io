@@ -3,6 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  (function() {
+    try {
+      var t = window.parent.localStorage.getItem('theme') || localStorage.getItem('theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) {}
+  })();
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'theme') document.documentElement.setAttribute('data-theme', e.newValue);
+  });
+</script>
 <title>Ticket Pane — TKT-4092 (Slack)</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,9 +36,32 @@
     --blue-txt: #2F6FED;
     --green-bg: rgba(34,150,79,0.10);
     --green-txt: #22964F;
+    --warm-block: #F9F6F1;
     --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
   }
+
+  :root[data-theme="dark"] {
+    --cor: #ef6a5a;
+    --cor-bg: rgba(239,106,90,0.15);
+    --cor-txt: #ef6a5a;
+    --bg-primary: #1a1a1d;
+    --bg-secondary: #111113;
+    --bg-tertiary: #2a2a2e;
+    --text-primary: #f5f5f7;
+    --text-secondary: #c4c4c8;
+    --text-tertiary: #8e8e93;
+    --border: rgba(255,255,255,0.08);
+    --border-2: rgba(255,255,255,0.15);
+    --blue-bg: rgba(47,111,237,0.15);
+    --blue-txt: #7aa7f7;
+    --green-bg: rgba(34,150,79,0.15);
+    --green-txt: #4ade80;
+    --warm-block: #232326;
+  }
+
+  html { transition: background-color 0.3s ease, color 0.3s ease; }
+  html[data-theme="dark"] { color-scheme: dark; }
 
   body {
     font-family: var(--font-sans);
@@ -183,7 +218,7 @@
       <!-- Suggested resolution -->
       <div id="suggested-block">
         <div class="lbl" style="opacity:0.45">Suggested resolution</div>
-        <div id="res-card" style="background:#F9F6F1;border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;transition:all 0.4s ease">
+        <div id="res-card" style="background:var(--warm-block);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;transition:all 0.4s ease">
           <div style="flex:1;min-width:0">
             <a href="#" onclick="event.preventDefault()" style="font-size:13px;font-weight:500;color:var(--text-primary);text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(0,0,0,0.15);display:inline-flex;align-items:center;gap:4px;margin-bottom:6px">
               Okta MFA Reset
@@ -200,7 +235,7 @@
       <!-- Resolution (hidden initially, fades in after completion) -->
       <div id="resolution-block" style="display:none">
         <div class="lbl" style="opacity:0.45">Resolution</div>
-        <div style="background:#F9F6F1;border-radius:8px;padding:12px 14px">
+        <div style="background:var(--warm-block);border-radius:8px;padding:12px 14px">
           <p style="font-size:13px;line-height:1.55;color:var(--text-secondary);margin:0">Grant Fuhr's Okta account has been unlocked and a fresh MFA enrollment push was sent to his new device. Access restored.</p>
         </div>
       </div>
