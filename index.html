@@ -1021,13 +1021,189 @@
     }
 
     /* ========== RESPONSIVE ========== */
+
+    /* Hide custom cursor on touch devices */
+    @media (pointer: coarse) {
+      .cursor { display: none !important; }
+      body, a, button { cursor: auto; }
+    }
+
     @media (max-width: 640px) {
-      .site-header { padding: 1.25rem 1rem 0; gap: 1rem; }
-      .avatar-wrapper { width: 60px; height: 60px; }
-      .nav-bar { padding: 0.7rem 1rem; border-radius: 12px; }
-      .nav-name { font-size: 1rem; }
-      .nav-links { gap: 1.25rem; }
-      .nav-links a { font-size: 0.8rem; }
+      /* Header */
+      .site-header { padding: 1rem 1rem 0; gap: 0.75rem; }
+      .avatar-wrapper { width: 56px; height: 56px; }
+      .avatar-customize-hint { display: none; }
+      .nav-bar { padding: 0.65rem 1rem; border-radius: 12px; }
+      .nav-name { font-size: 0.95rem; }
+      .nav-links { gap: 1rem; }
+      .nav-links a { font-size: 0.78rem; }
+
+      /* Content alignment — remove the desktop avatar-offset indent */
+      .content-hero {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+      }
+
+      /* Hero */
+      .hero { padding: 3.5rem 0 3rem; }
+      .hero-headline { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+      .hero-body p { font-size: 0.95rem; }
+
+      /* Work cards */
+      .work-card-inner { padding: 1.25rem; }
+
+      /* Journey table — allow place column to wrap */
+      .jt-place { white-space: normal; text-align: left; padding-left: 0.5rem; font-size: 0.78rem; }
+      .journey-heading { font-size: 1.9rem; }
+
+      /* Floating social — move closer to edge so it doesn't cover content */
+      .floating-social { bottom: 1rem; right: 1rem; gap: 0.6rem; }
+      .floating-social a, .email-btn, .theme-toggle { width: 38px; height: 38px; }
+
+      /* Draw modal */
+      .draw-modal { width: min(300px, 90vw); }
+
+      /* Accessory picker — pin to left so it doesn't overflow screen edge */
+      .accessory-picker { left: 0; right: auto; transform: translateX(0) translateY(-6px); }
+      .accessory-picker.open { transform: translateX(0) translateY(0); }
+      .accessory-picker::before { left: 24px; transform: rotate(45deg); }
+    }
+
+    /* Slightly tighten layout on mid-range phones too */
+    @media (max-width: 480px) {
+      .nav-links a[href="AbigailCLeyva.pdf"] { display: none; }
+      .hero { padding: 2.5rem 0 2rem; }
+    }
+
+    /* ========== MOBILE VIEW ========== */
+    .mobile-view { display: none; }
+
+    .mobile-hero-section {
+      padding: 2.5rem 1.5rem 2rem;
+    }
+
+    .mobile-section {
+      padding: 0 1.5rem 2.25rem;
+    }
+    .mobile-section-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 0.65rem;
+    }
+    .mobile-section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin-bottom: 1.75rem;
+    }
+
+    .mobile-exp-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .mobile-exp-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.9rem;
+    }
+    .mobile-exp-logo {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mobile-exp-logo img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+    .mobile-exp-logo-placeholder {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
+    }
+    .mobile-exp-info { flex: 1; min-width: 0; }
+    .mobile-exp-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .mobile-exp-company {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .mobile-exp-date {
+      font-size: 0.72rem;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+    .mobile-exp-role {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 1px;
+      line-height: 1.4;
+    }
+
+    /* Dark mode: invert Amazon logo in mobile view too */
+    :root[data-theme="dark"] .mobile-exp-logo img[src="amazon-icon.png"] {
+      filter: invert(1) brightness(0.9);
+    }
+
+    .mobile-contact {
+      padding: 0.5rem 1.5rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    .mobile-contact-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      width: 100%;
+      padding: 0.85rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      font-family: var(--font-body);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text);
+      transition: border-color 0.2s, color 0.2s, box-shadow 0.2s, background 0.3s;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mobile-contact-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    @media (max-width: 640px) {
+      .content-hero { display: none; }
+      .floating-social { display: none; }
+      .mobile-view { display: block; }
     }
   </style>
 </head>
@@ -1499,6 +1675,180 @@
     </section>
   </main>
 
+  <!-- ========== MOBILE VIEW ========== -->
+  <div class="mobile-view">
+
+    <!-- Hero -->
+    <div class="mobile-hero-section">
+      <p class="hero-tag">
+        <svg class="hero-tag-flower" viewBox="-10 -10 20 20" width="14" height="14">
+          <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(0)"/>
+          <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(72)"/>
+          <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(144)"/>
+          <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(216)"/>
+          <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(288)"/>
+          <circle cx="0" cy="0" r="2.5" fill="#e8b860"/>
+        </svg>
+        UX Designer @ <a href="https://stlabs.com" target="_blank" rel="noopener" class="hero-tag-link">STLabs</a>
+      </p>
+      <h1 class="hero-headline"><span>From ambiguity to clarity.</span><br><span>AI-native. Human-centered.</span></h1>
+      <div class="hero-prev">
+        <p>Open on desktop to see Work</p>
+      </div>
+    </div>
+
+    <!-- Experience -->
+    <div class="mobile-section">
+      <p class="mobile-section-label">Experience</p>
+      <hr class="mobile-section-divider">
+      <div class="mobile-exp-list">
+
+        <div class="mobile-exp-item">
+          <div class="mobile-exp-logo">
+            <img src="stlabs-orange-icon.svg" alt="STLabs">
+          </div>
+          <div class="mobile-exp-info">
+            <div class="mobile-exp-top">
+              <span class="mobile-exp-company">STLabs</span>
+              <span class="mobile-exp-date">2025 – Present</span>
+            </div>
+            <p class="mobile-exp-role">UX Designer</p>
+          </div>
+        </div>
+
+        <div class="mobile-exp-item">
+          <div class="mobile-exp-logo">
+            <img src="salesforce-icon.png" alt="Salesforce">
+          </div>
+          <div class="mobile-exp-info">
+            <div class="mobile-exp-top">
+              <span class="mobile-exp-company">Salesforce</span>
+              <span class="mobile-exp-date">Summer 2024</span>
+            </div>
+            <p class="mobile-exp-role">Product Designer</p>
+          </div>
+        </div>
+
+        <div class="mobile-exp-item">
+          <div class="mobile-exp-logo">
+            <img src="stanford-student-enterprises.png" alt="Stanford Student Enterprises">
+          </div>
+          <div class="mobile-exp-info">
+            <div class="mobile-exp-top">
+              <span class="mobile-exp-company">Stanford Student Enterprises</span>
+              <span class="mobile-exp-date">Mar 2022 – Jun 2025</span>
+            </div>
+            <p class="mobile-exp-role">Lead UX Designer</p>
+          </div>
+        </div>
+
+        <div class="mobile-exp-item">
+          <div class="mobile-exp-logo">
+            <img src="amazon-icon.png" alt="Amazon">
+          </div>
+          <div class="mobile-exp-info">
+            <div class="mobile-exp-top">
+              <span class="mobile-exp-company">Amazon</span>
+              <span class="mobile-exp-date">Summer 2023</span>
+            </div>
+            <p class="mobile-exp-role">Product Designer</p>
+          </div>
+        </div>
+
+        <div class="mobile-exp-item">
+          <div class="mobile-exp-logo">
+            <img src="tina-healthcare.png" alt="Tina Healthcare">
+          </div>
+          <div class="mobile-exp-info">
+            <div class="mobile-exp-top">
+              <span class="mobile-exp-company">Tina Healthcare</span>
+              <span class="mobile-exp-date">Feb 2023 – Jun 2023</span>
+            </div>
+            <p class="mobile-exp-role">UX Researcher</p>
+          </div>
+        </div>
+
+        <div class="mobile-exp-item">
+          <div class="mobile-exp-logo">
+            <img src="treehacks.png" alt="TreeHacks">
+          </div>
+          <div class="mobile-exp-info">
+            <div class="mobile-exp-top">
+              <span class="mobile-exp-company">TreeHacks</span>
+              <span class="mobile-exp-date">Oct 2022 – Feb 2023</span>
+            </div>
+            <p class="mobile-exp-role">Design Lead</p>
+          </div>
+        </div>
+
+        <div class="mobile-exp-item">
+          <div class="mobile-exp-logo">
+            <img src="yami.jpg" alt="Yami" style="border-radius:6px;">
+          </div>
+          <div class="mobile-exp-info">
+            <div class="mobile-exp-top">
+              <span class="mobile-exp-company">Yami</span>
+              <span class="mobile-exp-date">Summer 2022</span>
+            </div>
+            <p class="mobile-exp-role">Growth Designer</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Education -->
+    <div class="mobile-section">
+      <p class="mobile-section-label">Education</p>
+      <hr class="mobile-section-divider">
+      <div class="mobile-exp-list">
+
+        <div class="mobile-exp-item">
+          <div class="mobile-exp-logo">
+            <img src="stanford.png" alt="Stanford">
+          </div>
+          <div class="mobile-exp-info">
+            <div class="mobile-exp-top">
+              <span class="mobile-exp-company">Stanford University</span>
+            </div>
+            <p class="mobile-exp-role">M.S. Computer Science</p>
+          </div>
+        </div>
+
+        <div class="mobile-exp-item">
+          <div class="mobile-exp-logo">
+            <img src="stanford.png" alt="Stanford">
+          </div>
+          <div class="mobile-exp-info">
+            <div class="mobile-exp-top">
+              <span class="mobile-exp-company">Stanford University</span>
+            </div>
+            <p class="mobile-exp-role">B.S. Product Design</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="mobile-contact">
+      <a href="https://www.linkedin.com/in/abigailleyva" target="_blank" rel="noopener" class="mobile-contact-btn">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+        LinkedIn
+      </a>
+      <button class="mobile-contact-btn" id="mobile-copy-email">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        <span id="mobile-email-label">Copy Email</span>
+      </button>
+      <a href="AbigailCLeyva.pdf" target="_blank" rel="noopener" class="mobile-contact-btn primary">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/></svg>
+        Resume
+      </a>
+    </div>
+
+  </div>
+  <!-- ========== END MOBILE VIEW ========== -->
+
   <!-- DRAW ACCESSORY MODAL -->
   <div class="draw-overlay" id="draw-overlay">
     <div class="draw-modal">
@@ -1744,6 +2094,13 @@
       const tooltip = document.getElementById('copy-tooltip');
       tooltip.classList.add('show');
       setTimeout(() => tooltip.classList.remove('show'), 1500);
+    });
+
+    document.getElementById('mobile-copy-email').addEventListener('click', () => {
+      navigator.clipboard.writeText('abigailcleyva@gmail.com');
+      const label = document.getElementById('mobile-email-label');
+      label.textContent = 'Copied!';
+      setTimeout(() => { label.textContent = 'Copy Email'; }, 1500);
     });
 
     // ========== NAV ACTIVE STATE ==========
@@ -2252,8 +2609,7 @@
       // Dummy passcode — update when ready
       if (val === '1234') {
         hidePasscode();
-        // Link to case study when ready
-        // window.location.href = 'amazon/case-study-amazon.html';
+        window.location.href = 'amazon/case-study-amazon.html';
       } else {
         document.getElementById('passcode-error').textContent = 'Incorrect passcode.';
         document.getElementById('passcode-input').value = '';

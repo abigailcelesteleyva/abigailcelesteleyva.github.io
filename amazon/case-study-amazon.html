@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="icon" type="image/png" sizes="180x180" href="../favicon.png">
+  <link rel="apple-touch-icon" href="../favicon.png">
+  <title>Investigations Dashboard Redesign — Abigail Leyva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --text: #1d1d1f; --text-secondary: #6e6e73; --text-tertiary: #a1a1a6;
+      --bg: #ffffff; --bg-nav: rgba(255,255,255,0.92); --bg-nav-inner: rgba(255,255,255,0.9);
+      --bg-alt: #f5f5f7; --bg-elevated: #ffffff;
+      --accent: #c0392b; --accent-soft: rgba(192,57,43,0.15); --accent-softer: rgba(192,57,43,0.08);
+      --border: #e5e5e7; --border-soft: rgba(0,0,0,0.06);
+      --shadow: rgba(0,0,0,0.04); --shadow-strong: rgba(0,0,0,0.06); --shadow-hover: rgba(192,57,43,0.12);
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      /* Amazon dashboard palette */
+      --amz-bg: #0f1319; --amz-surface: #181d27; --amz-surface2: #1e2436;
+      --amz-border: rgba(255,255,255,0.08); --amz-text: #e8eaf0;
+      --amz-text2: #8b92a8; --amz-orange: #ff9900; --amz-orange-soft: rgba(255,153,0,0.15);
+      --amz-green: #2ea86a; --amz-green-soft: rgba(46,168,106,0.15);
+      --amz-red: #e05252; --amz-red-soft: rgba(224,82,82,0.15);
+      --amz-yellow: #d4a017; --amz-yellow-soft: rgba(212,160,23,0.15);
+    }
+    :root[data-theme="dark"] {
+      --text: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #6e6e73;
+      --bg: #0e0e10; --bg-nav: rgba(14,14,16,0.85); --bg-nav-inner: rgba(22,22,26,0.85);
+      --bg-alt: #18181b; --bg-elevated: #1a1a1d;
+      --accent: #ef6a5a; --accent-soft: rgba(239,106,90,0.18); --accent-softer: rgba(239,106,90,0.10);
+      --border: #2a2a2e; --border-soft: rgba(255,255,255,0.08);
+      --shadow: rgba(0,0,0,0.4); --shadow-strong: rgba(0,0,0,0.5); --shadow-hover: rgba(239,106,90,0.25);
+    }
+
+    html { color-scheme: light; scroll-behavior: smooth; transition: background-color 0.3s ease; }
+    html[data-theme="dark"] { color-scheme: dark; }
+    ::selection { background: var(--accent-soft); color: var(--text); }
+    body { font-family: var(--font-body); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; font-size: 16px; line-height: 1.6; cursor: none; transition: background-color 0.3s ease, color 0.3s ease; }
+    a, button { cursor: none; }
+
+    /* ── Cursor ── */
+    .cursor { position: fixed; top: 0; left: 0; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.2s, height 0.2s, opacity 0.2s; opacity: 0; }
+    .cursor.visible { opacity: 1; }
+    .cursor.hover { width: 40px; height: 40px; background: var(--accent-soft); border: 2px solid var(--accent); }
+
+    /* ── Header ── */
+    .site-header { position: sticky; top: 0; z-index: 100; max-width: 980px; margin: 0 auto; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1.5rem; background: var(--bg-nav); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transition: background-color 0.3s; }
+    .avatar-area { flex-shrink: 0; position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .avatar-wrapper { width: 80px; height: 80px; position: relative; cursor: none; }
+    .avatar-wrapper svg { transition: transform 0.2s; animation: avatarBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) 1s both; }
+    .avatar-wrapper:hover svg { transform: scale(1.05); }
+    @keyframes avatarBounce { 0%{transform:translateY(0)}40%{transform:translateY(-8px)}60%{transform:translateY(-3px)}80%{transform:translateY(-5px)}100%{transform:translateY(0)} }
+    .avatar-tooltip { position: absolute; right: calc(100% + 10px); top: 50%; white-space: nowrap; font-size: 0.7rem; font-weight: 500; color: var(--accent); letter-spacing: 0.02em; opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateY(-50%) translateX(5px); pointer-events: none; }
+    .avatar-wrapper:hover .avatar-tooltip { opacity: 1; transform: translateY(-50%) translateX(0); }
+    .avatar-wrapper.calming svg { animation: gentleBreathe 2s ease-in-out infinite; }
+    @keyframes gentleBreathe { 0%,100%{transform:scale(1)}50%{transform:scale(1.03)} }
+    .acc-inner { transform-box: fill-box; transform-origin: center; }
+    @keyframes accPop { 0%{transform:scale(0.4);opacity:0.4}60%{transform:scale(1.25)}100%{transform:scale(1);opacity:1} }
+    .acc-inner.popping { animation: accPop 0.32s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+    .petal { position: fixed; width: 12px; height: 12px; pointer-events: none; z-index: 9998; opacity: 0; animation: petalFall var(--duration,3s) ease-out forwards; }
+    .petal svg { width: 100%; height: 100%; }
+    @keyframes petalFall { 0%{opacity:0;transform:translate(0,0) rotate(0deg) scale(0.5)}10%{opacity:1;transform:translate(var(--dx1),var(--dy1)) rotate(45deg) scale(1)}100%{opacity:0;transform:translate(var(--dx2),var(--dy2)) rotate(var(--rot)) scale(0.6)} }
+    .nav-bar { flex: 1; display: flex; align-items: center; justify-content: space-between; background: var(--bg-nav-inner); border: 1px solid var(--border-soft); border-radius: 14px; padding: 0.85rem 1.5rem; box-shadow: 0 2px 12px var(--shadow); position: relative; transition: background-color 0.3s, border-color 0.3s; }
+    .nav-bar-left { display: flex; align-items: center; gap: 0.6rem; }
+    .nav-name { font-family: var(--font-display); font-size: 1.15rem; color: var(--accent); text-decoration: none; transition: opacity 0.2s; position: relative; padding-bottom: 4px; }
+    .nav-name:hover { opacity: 0.7; }
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a { font-size: 0.85rem; font-weight: 400; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; position: relative; padding-bottom: 4px; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); font-weight: 500; }
+    .nav-links a.active::after { content: ''; position: absolute; left: 0; bottom: -2px; width: 100%; height: 6px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 6'%3E%3Cpath d='M0 3 Q5 0 10 3 Q15 6 20 3 Q25 0 30 3' fill='none' stroke='%23c0392b' stroke-width='1.5'/%3E%3C/svg%3E") repeat-x; background-size: 30px 6px; }
+    :root[data-theme="dark"] .nav-links a.active::after { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 6'%3E%3Cpath d='M0 3 Q5 0 10 3 Q15 6 20 3 Q25 0 30 3' fill='none' stroke='%23ef6a5a' stroke-width='1.5'/%3E%3C/svg%3E") repeat-x; background-size: 30px 6px; }
+
+    /* ── Theme toggle ── */
+    .theme-toggle { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-secondary); cursor: none; padding: 0; transition: color 0.2s, border-color 0.2s, background 0.3s, box-shadow 0.2s; }
+    .theme-toggle:hover { color: var(--accent); border-color: var(--accent); box-shadow: 0 2px 12px var(--shadow-hover); }
+    .theme-toggle svg { width: 18px; height: 18px; transition: transform 0.5s cubic-bezier(.4,1.4,.6,1); }
+    .theme-toggle .icon-sun { display: none; }
+    :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+    :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+    /* ── Floating social ── */
+    .floating-social { position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; z-index: 90; }
+    .social-divider { width: 4px; height: 4px; border-radius: 50%; background: var(--text-tertiary); opacity: 0.5; margin: 0.25rem 0; flex-shrink: 0; }
+    .floating-social a { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-secondary); transition: color 0.2s, border-color 0.2s, box-shadow 0.2s, background-color 0.3s; cursor: none; }
+    .floating-social a:hover, .floating-social .email-btn:hover { color: var(--accent); border-color: var(--accent); box-shadow: 0 2px 12px var(--shadow-hover); }
+    .email-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-secondary); transition: color 0.2s, border-color 0.2s, box-shadow 0.2s, background-color 0.3s; cursor: none; position: relative; }
+    .copy-tooltip { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); font-size: 0.7rem; font-weight: 500; color: var(--accent); background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 6px; padding: 0.3rem 0.6rem; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .copy-tooltip.show { opacity: 1; }
+
+    /* ── Case study layout ── */
+    .content { max-width: 680px; margin: 0 auto; padding: 0 2rem; }
+    .case-hero { padding: 5rem 0 4rem; border-bottom: 1px solid var(--border); }
+    .case-meta { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .case-meta img { width: 18px; height: 18px; object-fit: contain; }
+    .case-meta span { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
+    .case-hero h1 { font-family: var(--font-display); font-size: clamp(2rem,4.5vw,2.8rem); font-weight: 400; line-height: 1.2; color: var(--text); margin-bottom: 1rem; }
+    .case-subtitle { font-size: 1.1rem; font-weight: 300; line-height: 1.6; color: var(--text-secondary); max-width: 560px; margin-bottom: 2rem; }
+    .case-details { display: flex; gap: 3rem; flex-wrap: wrap; }
+    .case-detail { display: flex; flex-direction: column; gap: 0.15rem; }
+    .case-detail-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); }
+    .case-detail-value { font-size: 0.85rem; color: var(--text); }
+    .case-article { padding: 3.5rem 0; }
+    .case-article h2 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--text); margin-top: 3.5rem; margin-bottom: 1rem; }
+    .case-article h2:first-child { margin-top: 0; }
+    .case-article h3 { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-top: 3rem; margin-bottom: 0.75rem; }
+    .case-article p { font-size: 1rem; line-height: 1.8; color: var(--text-secondary); margin-bottom: 1.25rem; }
+    .callout { border-left: 2px solid var(--accent); padding: 0.4rem 0 0.4rem 1rem; margin: 1.25rem 0; }
+    .callout p { font-size: 0.9rem; font-style: italic; color: var(--text); line-height: 1.5; margin-bottom: 0; display: inline; }
+    .callout .callout-attr { font-size: 0.75rem; font-style: normal; color: var(--text-tertiary); display: inline; margin-left: 0.3rem; }
+    .insight { background: var(--bg-alt); border-radius: 10px; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .insight-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+    .insight p { font-size: 0.95rem; color: var(--text); margin-bottom: 0; }
+    .case-divider { border: none; border-top: 1px solid var(--border); margin: 3rem 0; }
+    .case-footer { padding: 3rem 0 4rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .case-footer a { font-size: 0.85rem; font-weight: 500; color: var(--accent); text-decoration: none; transition: opacity 0.2s; }
+    .case-footer a:hover { opacity: 0.7; }
+    .case-footer span { font-size: 0.75rem; color: var(--text-tertiary); }
+
+    /* ── Story sequence ── */
+    .story-sequence { display: flex; flex-direction: column; gap: 0.75rem; margin: 2rem 0; }
+    .story-beat { background: var(--bg-alt); border-radius: 10px; padding: 1rem 1.25rem; border-left: 3px solid transparent; transition: border-color 0.3s; }
+    .story-beat.accent { border-left-color: var(--accent); }
+    .story-beat.warning { border-left-color: #e09030; }
+    .story-beat-time { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 0.3rem; }
+    .story-beat p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0; }
+    .story-beat strong { color: var(--text); }
+
+    /* ── Stats row ── */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
+    .stat-card { background: var(--bg-alt); border-radius: 12px; padding: 1.25rem; text-align: center; }
+    .stat-number { font-family: var(--font-display); font-size: 2.2rem; color: var(--accent); line-height: 1; margin-bottom: 0.4rem; }
+    .stat-label { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; }
+
+    /* ── Persona cards ── */
+    .persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; }
+    .persona-card { background: var(--bg-alt); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); }
+    .persona-name { font-family: var(--font-display); font-size: 1.2rem; color: var(--text); margin-bottom: 0.25rem; }
+    .persona-role { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 1rem; }
+    .persona-need { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; }
+    .persona-quote { font-size: 0.82rem; font-style: italic; color: var(--text); border-left: 2px solid var(--accent); padding-left: 0.75rem; margin-top: 0.75rem; line-height: 1.5; }
+
+    /* ── Pain point journey ── */
+    .pain-journey { display: flex; flex-direction: column; gap: 0; margin: 2rem 0; }
+    .pain-step { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+    .pain-step:last-child { border-bottom: none; }
+    .pain-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+    .pain-content h4 { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; }
+    .pain-content p { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0; line-height: 1.5; }
+
+    /* ── Demo wrapper — shadcn preview style ── */
+    .demo-wrap { margin: 2.5rem 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--shad-border); background: var(--shad-bg); }
+    .demo-header { padding: 0.55rem 1rem; display: flex; align-items: center; justify-content: space-between; background: var(--shad-card); border-bottom: 1px solid var(--shad-border); }
+    .demo-label { font-size: 0.68rem; font-weight: 500; color: var(--shad-muted); display: flex; align-items: center; gap: 6px; }
+    .demo-label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--shad-muted2); flex-shrink: 0; }
+    .demo-hint { font-size: 0.68rem; color: var(--shad-muted2); }
+    /* shadcn-style underline tabs */
+    .demo-tab-row { display: flex; gap: 0; border-bottom: none; }
+    .demo-tab { font-size: 0.72rem; font-weight: 400; color: var(--shad-muted2); background: none; border: none; border-bottom: 1.5px solid transparent; padding: 0.3rem 0.75rem 0.25rem; cursor: none; transition: color 0.15s, border-color 0.15s; }
+    .demo-tab.active { color: var(--shad-text); border-bottom-color: var(--shad-text); }
+    .demo-tab:hover { color: var(--shad-muted); }
+
+    /* ── Dashboard shell — for both before/after ── */
+    .amz-dashboard { background: var(--shad-bg); padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .amz-dashboard.amz-before { background: var(--amz-bg); }
+    .amz-section-title { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--shad-muted2); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .amz-section-title::after { content: ''; flex: 1; height: 1px; background: var(--shad-border); }
+    .amz-dashboard.amz-before .amz-section-title { color: var(--amz-text2); }
+    .amz-dashboard.amz-before .amz-section-title::after { background: var(--amz-border); }
+
+    /* Old table (before) */
+    .amz-old-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .amz-old-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--amz-text2); border-bottom: 1px solid var(--amz-border); }
+    .amz-old-table td { padding: 9px 12px; border-bottom: 1px solid var(--amz-border); color: var(--amz-text); font-size: 12px; }
+    .amz-old-table tr:hover td { background: rgba(255,255,255,0.03); }
+    .amz-old-table td:first-child { font-family: monospace; color: var(--amz-text2); font-size: 11px; }
+    .amz-old-overload { text-align: center; padding: 12px; color: var(--amz-text2); font-size: 11px; border-top: 1px dashed rgba(255,255,255,0.06); }
+
+    /* ── shadcn/ui-inspired dashboard tokens ── */
+    :root {
+      --shad-bg: #09090b;
+      --shad-card: #18181b;
+      --shad-surface: #27272a;
+      --shad-border: #3f3f46;
+      --shad-text: #fafafa;
+      --shad-muted: #a1a1aa;
+      --shad-muted2: #71717a;
+      --shad-red: #f87171; --shad-red-bg: rgba(248,113,113,0.1);
+      --shad-amber: #fb923c; --shad-amber-bg: rgba(251,146,60,0.1);
+      --shad-yellow: #fbbf24; --shad-yellow-bg: rgba(251,191,36,0.08);
+      --shad-green: #86efac; --shad-green-bg: rgba(134,239,172,0.08);
+    }
+
+    /* ── Priority cases — shadcn card list ── */
+    .shad-dashboard { background: var(--shad-bg); padding: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; }
+
+    /* Pinned section */
+    .shad-pinned-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--shad-muted); margin-bottom: 8px; }
+    .shad-pinned-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+    /* Pinned card (shadcn Card) */
+    .shad-card { background: var(--shad-card); border: 1px solid var(--shad-border); border-radius: 8px; overflow: hidden; }
+    .shad-card-header { padding: 12px 14px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .shad-card-title { font-size: 13px; font-weight: 600; color: var(--shad-text); line-height: 1.35; flex: 1; }
+    .shad-card-id { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 10px; color: var(--shad-muted); letter-spacing: 0.03em; margin-top: 2px; }
+    .shad-card-body { padding: 8px 14px 12px; }
+    .shad-card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .shad-badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; border: 1px solid; padding: 1px 7px; font-size: 10.5px; font-weight: 500; white-space: nowrap; }
+    .shad-badge-red { background: var(--shad-red-bg); border-color: rgba(248,113,113,0.25); color: var(--shad-red); }
+    .shad-badge-amber { background: var(--shad-amber-bg); border-color: rgba(251,146,60,0.25); color: var(--shad-amber); }
+    .shad-badge-yellow { background: var(--shad-yellow-bg); border-color: rgba(251,191,36,0.2); color: var(--shad-yellow); }
+    .shad-badge-green { background: var(--shad-green-bg); border-color: rgba(134,239,172,0.2); color: var(--shad-green); }
+    .shad-badge-muted { background: rgba(63,63,70,0.5); border-color: var(--shad-border); color: var(--shad-muted); }
+    .shad-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .shad-card-summary { font-size: 11.5px; color: var(--shad-muted); line-height: 1.55; margin-bottom: 8px; }
+    .shad-card-update { font-size: 11px; color: var(--shad-muted); line-height: 1.5; padding: 7px 10px; background: var(--shad-surface); border-radius: 6px; margin-bottom: 10px; }
+    .shad-card-update-label { font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--shad-muted2); margin-bottom: 2px; }
+    .shad-kv-row { display: flex; gap: 16px; margin-bottom: 10px; flex-wrap: wrap; }
+    .shad-kv { display: flex; flex-direction: column; gap: 1px; }
+    .shad-kv-key { font-size: 9.5px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--shad-muted2); }
+    .shad-kv-val { font-size: 11.5px; color: var(--shad-text); }
+    .shad-card-footer { padding: 8px 14px; border-top: 1px solid var(--shad-border); background: rgba(24,24,27,0.5); display: flex; align-items: center; justify-content: space-between; }
+    .shad-btn-group { display: flex; gap: 6px; }
+    .shad-btn { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 6px; border: 1px solid; cursor: pointer; transition: background 0.15s; font-family: inherit; }
+    .shad-btn-primary { background: var(--shad-text); color: var(--shad-bg); border-color: var(--shad-text); }
+    .shad-btn-primary:hover { background: #e4e4e7; border-color: #e4e4e7; }
+    .shad-btn-ghost { background: transparent; color: var(--shad-muted); border-color: var(--shad-border); }
+    .shad-btn-ghost:hover { background: var(--shad-surface); color: var(--shad-text); }
+    .shad-unpin-btn { background: none; border: none; cursor: pointer; color: var(--shad-muted2); font-size: 16px; line-height: 1; padding: 2px; transition: color 0.15s; }
+    .shad-unpin-btn:hover { color: var(--shad-text); }
+
+    /* All cases table (shadcn Table) */
+    .shad-table-wrap { border: 1px solid var(--shad-border); border-radius: 8px; overflow: hidden; }
+    .shad-table-header { padding: 10px 14px; border-bottom: 1px solid var(--shad-border); display: flex; align-items: center; justify-content: space-between; }
+    .shad-table-title { font-size: 12px; font-weight: 600; color: var(--shad-text); }
+    .shad-table-count { font-size: 11px; color: var(--shad-muted); }
+    .shad-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .shad-table thead th { padding: 8px 12px; text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--shad-muted); border-bottom: 1px solid var(--shad-border); background: var(--shad-card); white-space: nowrap; }
+    .shad-table thead th:first-child { width: 32px; }
+    .shad-table tbody td { padding: 9px 12px; border-bottom: 1px solid rgba(63,63,70,0.5); color: var(--shad-text); vertical-align: middle; background: var(--shad-bg); transition: background 0.1s; }
+    .shad-table tbody tr:last-child td { border-bottom: none; }
+    .shad-table tbody tr:hover td { background: var(--shad-card); }
+    .shad-table tbody tr.row-pinned td { background: rgba(251,146,60,0.03); }
+    .shad-mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 10.5px; color: var(--shad-muted); letter-spacing: 0.02em; }
+    .shad-pin-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; color: var(--shad-muted2); border-radius: 4px; transition: color 0.15s, background 0.15s; }
+    .shad-pin-btn:hover { background: var(--shad-surface); color: var(--shad-text); }
+    .shad-pin-btn.pinned { color: var(--shad-amber); }
+    .shad-section-sep { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--shad-muted2); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .shad-section-sep::after { content: ''; flex: 1; height: 1px; background: var(--shad-border); }
+
+    /* Hover tooltip demo — shadcn table + popover */
+    .amz-case-log { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .amz-case-log th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--shad-muted2); border-bottom: 1px solid var(--shad-border); background: var(--shad-card); }
+    .amz-case-log td { padding: 9px 12px; border-bottom: 1px solid rgba(63,63,70,0.5); color: var(--shad-text); background: var(--shad-bg); transition: background 0.1s; }
+    .amz-case-log tbody tr:last-child td { border-bottom: none; }
+    .amz-case-log tr:hover td { background: var(--shad-card); }
+    .amz-case-id-link { font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: var(--shad-text); text-decoration: underline; text-decoration-color: var(--shad-border); text-underline-offset: 3px; cursor: pointer; transition: text-decoration-color 0.15s; letter-spacing: 0.02em; }
+    .amz-case-id-link:hover { text-decoration-color: var(--shad-muted); }
+    .amz-tooltip-wrapper { position: relative; display: inline-block; }
+    /* shadcn Popover */
+    .amz-tooltip { position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-40%); background: var(--shad-card); border: 1px solid var(--shad-border); border-radius: 8px; padding: 12px 14px; width: 232px; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.12s; box-shadow: 0 4px 16px rgba(0,0,0,0.5); font-size: 12px; }
+    .amz-tooltip.visible { opacity: 1; }
+    .amz-tooltip-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 4px 0; border-bottom: 1px solid rgba(63,63,70,0.4); }
+    .amz-tooltip-row:first-child { padding-top: 0; }
+    .amz-tooltip-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .amz-tooltip-key { font-size: 10px; font-weight: 500; color: var(--shad-muted2); white-space: nowrap; padding-top: 1px; }
+    .amz-tooltip-val { font-size: 11px; color: var(--shad-text); text-align: right; line-height: 1.45; }
+
+    /* Investigation timeline — shadcn step track */
+    .amz-flow { display: flex; align-items: flex-start; padding: 20px 0 8px; position: relative; }
+    .amz-flow::before { content: ''; position: absolute; top: 32px; left: 24px; right: 24px; height: 1px; background: var(--shad-border); z-index: 0; }
+    .amz-flow-step { flex: 1; position: relative; cursor: pointer; text-align: center; z-index: 1; }
+    .amz-flow-connector { display: none; }
+    .amz-flow-box { padding: 0 6px 8px; transition: opacity 0.18s; }
+    .amz-flow-step:not(.selected):not(:hover) .amz-flow-box { opacity: 0.5; }
+    .amz-flow-node { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--shad-border); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; background: var(--shad-bg); position: relative; z-index: 1; transition: border-color 0.2s, background 0.2s; }
+    .amz-flow-step.ok .amz-flow-node { border-color: var(--shad-green); background: var(--shad-green-bg); }
+    .amz-flow-step.bottleneck .amz-flow-node { border-color: var(--shad-red); background: var(--shad-red-bg); }
+    .amz-flow-step.selected:not(.ok):not(.bottleneck) .amz-flow-node { border-color: var(--shad-muted); background: var(--shad-surface); }
+    /* node icons via pseudo-elements */
+    .amz-flow-step.ok .amz-flow-node::after { content: ''; display: block; width: 7px; height: 4.5px; border-left: 1.5px solid var(--shad-green); border-bottom: 1.5px solid var(--shad-green); transform: rotate(-45deg) translateY(-1px); }
+    .amz-flow-step.bottleneck .amz-flow-node::after { content: ''; display: block; width: 8px; height: 1.5px; background: var(--shad-red); border-radius: 1px; }
+    .amz-flow-step:not(.ok):not(.bottleneck) .amz-flow-node::after { content: ''; display: block; width: 5px; height: 5px; border-radius: 50%; background: var(--shad-border); }
+    .amz-flow-label { font-size: 10px; font-weight: 500; color: var(--shad-muted); line-height: 1.35; }
+    .amz-flow-status { font-size: 9px; margin-top: 2px; color: var(--shad-muted2); }
+    .amz-flow-status.ok { color: var(--shad-green); }
+    .amz-flow-status.bottleneck { color: var(--shad-red); }
+    .amz-flow-detail { background: var(--shad-card); border-top: 1px solid var(--shad-border); padding: 12px 16px; font-size: 12px; display: none; }
+    .amz-flow-detail.visible { display: block; }
+    .amz-flow-detail-title { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--shad-muted); margin-bottom: 5px; }
+    .amz-flow-detail p { font-size: 11.5px; color: var(--shad-muted); line-height: 1.6; margin-bottom: 0; }
+
+    /* SUS metric */
+    .sus-metric { display: flex; align-items: center; gap: 2rem; margin: 2rem 0; padding: 1.5rem; background: var(--bg-alt); border-radius: 12px; }
+    .sus-score { text-align: center; }
+    .sus-score-num { font-family: var(--font-display); font-size: 2.8rem; line-height: 1; margin-bottom: 0.25rem; }
+    .sus-score-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); }
+    .sus-arrow { font-size: 1.5rem; color: var(--text-tertiary); }
+    .sus-before .sus-score-num { color: var(--text-tertiary); }
+    .sus-after .sus-score-num { color: var(--accent); }
+    .sus-context { flex: 1; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* Iteration cards */
+    .iteration-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1.5rem 0; }
+    .iter-card { background: var(--bg-alt); border: 1.5px solid var(--border); border-radius: 10px; padding: 1rem; }
+    .iter-card.selected { border-color: var(--accent); background: var(--accent-softer); }
+    .iter-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 0.5rem; }
+    .iter-label.selected-label { color: var(--accent); }
+    .iter-title { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.35rem; }
+    .iter-desc { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.45; }
+    .iter-verdict { font-size: 0.7rem; font-weight: 600; margin-top: 0.5rem; }
+    .iter-verdict.pass { color: #2ea86a; }
+    .iter-verdict.fail { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .site-header { padding: 1.25rem 1rem 0; gap: 1rem; }
+      .avatar-wrapper { width: 60px; height: 60px; }
+      .nav-bar { padding: 0.7rem 1rem; border-radius: 12px; }
+      .nav-name { font-size: 1rem; }
+      .nav-links { gap: 1.25rem; }
+      .nav-links a { font-size: 0.8rem; }
+      .stats-row { grid-template-columns: 1fr; }
+      .persona-grid { grid-template-columns: 1fr; }
+      .iteration-grid { grid-template-columns: 1fr; }
+      .sus-metric { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+
+  <div class="site-header">
+    <div class="avatar-area">
+    <div class="avatar-wrapper" id="avatar-wrapper">
+      <span class="avatar-tooltip"></span>
+      <svg id="avatar" viewBox="0 0 100 105" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+        <path d="M18 44 Q18 16 50 12 Q82 16 82 44 L84 80 Q84 92 76 96 Q72 98 70 90 Q68 80 68 70 L68 58 L32 58 L32 70 Q32 80 30 90 Q28 98 24 96 Q16 92 16 80Z" fill="#3b2314" stroke="#2a1a0e" stroke-width="2.5" stroke-linejoin="round"/>
+        <ellipse cx="50" cy="54" rx="27" ry="25" fill="#e4c4a8" stroke="#2a1a0e" stroke-width="2.5"/>
+        <path d="M72 36 Q62 24 46 24 Q32 26 24 36 L24 44 Q28 34 40 30 Q54 28 68 34 Q72 36 72 36Z" fill="#3b2314" stroke="#2a1a0e" stroke-width="2" stroke-linejoin="round"/>
+        <g id="hair-accessory" transform="translate(74, 28)">
+          <g class="acc-inner">
+            <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(0)"/>
+            <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(72)"/>
+            <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(144)"/>
+            <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#cc3636" transform="rotate(216)"/>
+            <ellipse cx="0" cy="-5" rx="3.2" ry="4.5" fill="#d94040" transform="rotate(288)"/>
+            <circle cx="0" cy="0" r="2.5" fill="#e8b860"/>
+          </g>
+        </g>
+        <g id="eyes-open">
+          <ellipse cx="39" cy="54" rx="7" ry="7.5" fill="white" stroke="#2a1a0e" stroke-width="1.5"/>
+          <ellipse cx="61" cy="54" rx="7" ry="7.5" fill="white" stroke="#2a1a0e" stroke-width="1.5"/>
+          <line x1="33" y1="49" x2="31" y2="46" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="36" y1="47.5" x2="35" y2="44.5" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="39" y1="47" x2="39" y2="44" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="42" y1="47.5" x2="43" y2="44.5" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="58" y1="47.5" x2="57" y2="44.5" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="61" y1="47" x2="61" y2="44" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="64" y1="47.5" x2="65" y2="44.5" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="67" y1="49" x2="69" y2="46" stroke="#2a1a0e" stroke-width="1.2" stroke-linecap="round"/>
+          <circle id="pupil-left" cx="39" cy="54" r="3.5" fill="#4a2c1a"/>
+          <circle id="pupil-right" cx="61" cy="54" r="3.5" fill="#4a2c1a"/>
+          <circle cx="37" cy="52" r="1.2" fill="white"/>
+          <circle cx="59" cy="52" r="1.2" fill="white"/>
+        </g>
+        <g id="eyes-closed" style="display:none">
+          <path d="M32 54 Q39 58 46 54" stroke="#2a1a0e" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M54 54 Q61 58 68 54" stroke="#2a1a0e" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </div>
+    </div>
+
+    <div class="nav-bar" id="nav-bar">
+<div class="nav-bar-left">
+        <a href="../index.html" class="nav-name">Abigail</a>
+      </div>
+      <div class="nav-links">
+        <a href="../index.html#work" class="active">Work</a>
+        <a href="../index.html#journey">Journey</a>
+        <a href="../AbigailCLeyva.pdf" target="_blank" rel="noopener">Resume</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <section class="case-hero">
+      <div class="case-meta">
+        <img src="../amazon-icon.png" alt="Amazon" style="mix-blend-mode:multiply">
+        <span>Amazon — Investigations Dashboard</span>
+      </div>
+      <h1>Giving investigators their inner Sherlock Holmes back.</h1>
+      <p class="case-subtitle">Redesigning the Investigations Dashboard inside an existing Case Management System — to help security investigators prioritize, track, and act without friction.</p>
+      <div class="case-details">
+        <div class="case-detail"><span class="case-detail-label">Role</span><span class="case-detail-value">UX Design Intern</span></div>
+        <div class="case-detail"><span class="case-detail-label">Timeline</span><span class="case-detail-value">Summer 2024</span></div>
+        <div class="case-detail"><span class="case-detail-label">Type</span><span class="case-detail-value">0→1 Feature Design</span></div>
+        <div class="case-detail"><span class="case-detail-label">Focus</span><span class="case-detail-value">Enterprise UX, Workflow Design</span></div>
+      </div>
+    </section>
+
+    <article class="case-article">
+
+      <!-- THE STORY -->
+      <h3>The setup</h3>
+      <h2>An unreleased product just went public.</h2>
+      <p>Imagine a brand-new Amazon Echo — one nobody is supposed to see yet — suddenly shows up on the internet. Engineers have poured months into it. Legal is panicking. Someone needs to figure out exactly how it happened and fast.</p>
+
+      <div class="story-sequence">
+        <div class="story-beat accent">
+          <div class="story-beat-time">Day 0</div>
+          <p>Photos of an <strong>unreleased Amazon Echo</strong> appear online. The product hasn't been announced. How did this get out?</p>
+        </div>
+        <div class="story-beat">
+          <div class="story-beat-time">12 hours later</div>
+          <p>A security investigator — let's call her <strong>Lisa</strong> — gets assigned to find the source of the leak before more information escapes.</p>
+        </div>
+        <div class="story-beat warning">
+          <div class="story-beat-time">Day 1, morning</div>
+          <p>Lisa opens the Investigations Dashboard. She has <strong>17 active cases</strong>. She doesn't know where to start. The tool she relies on most is actively working against her.</p>
+        </div>
+      </div>
+
+      <p>That's the problem I was brought in to solve during my summer internship at Amazon.</p>
+
+      <!-- DISCOVERY -->
+      <h3>Discovery</h3>
+      <h2>The system was making investigators feel like they were guessing.</h2>
+      <p>I ran surveys and conducted interviews with 18 security investigators to understand their day-to-day reality. What I found was a pattern of anxiety and workaround culture — people adapting themselves to a broken tool instead of the tool adapting to them.</p>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-number">17</div>
+          <div class="stat-label">Average active cases per investigator at any given time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">50%+</div>
+          <div class="stat-label">Of investigators find it hard to collaborate with supporting teams</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">~0</div>
+          <div class="stat-label">Investigators who primarily used the dashboard to start their day</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p>"I feel like I'm guessing what to do next. I just open cases randomly and hope I pick the right one."</p>
+        <span class="callout-attr">— Security Investigator, survey response</span>
+      </div>
+
+      <p>The top challenges surfaced across nearly every interview: <strong>case prioritization</strong>, <strong>tracking progress</strong> across many cases, and <strong>contacting related teams</strong> when bottlenecks emerged.</p>
+
+      <!-- DEFINING -->
+      <h3>Defining</h3>
+      <h2>Two investigators, the same broken tool.</h2>
+      <p>From my research, two distinct profiles emerged with overlapping pain points but different root frustrations.</p>
+
+      <div class="persona-grid">
+        <div class="persona-card">
+          <div class="persona-name">Lisa</div>
+          <div class="persona-role">Senior Investigator</div>
+          <div class="persona-need">Needs to quickly prioritize her caseload and track progress across all of them. Currently digs into each case individually to understand status — a process that can take her entire morning.</div>
+          <div class="persona-quote">"I spend more time figuring out what to work on than actually working."</div>
+        </div>
+        <div class="persona-card">
+          <div class="persona-name">Raj</div>
+          <div class="persona-role">Mid-level Investigator</div>
+          <div class="persona-need">Has been flagged for missing SLA deadlines — not because he's slow, but because he never knew his cases were bottlenecked. By the time he realized, it was too late.</div>
+          <div class="persona-quote">"I got in trouble for something I didn't even know was happening."</div>
+        </div>
+      </div>
+
+      <p>Mapping their user journeys revealed three shared moments of failure:</p>
+
+      <div class="pain-journey">
+        <div class="pain-step">
+          <div class="pain-num">1</div>
+          <div class="pain-content">
+            <h4>Logging in — no starting point</h4>
+            <p>The dashboard shows a wall of case IDs and subjects. Nothing about status, urgency, or what needs attention today. Investigators have to memorize which numbers map to which cases.</p>
+          </div>
+        </div>
+        <div class="pain-step">
+          <div class="pain-num">2</div>
+          <div class="pain-content">
+            <h4>Case prioritization — forced guessing</h4>
+            <p>With 17 average active cases, there's no system for surfacing what's most critical. Investigators click through cases one by one, hoping to stumble onto something urgent.</p>
+          </div>
+        </div>
+        <div class="pain-step">
+          <div class="pain-num">3</div>
+          <div class="pain-content">
+            <h4>Tracking progress — invisible bottlenecks</h4>
+            <p>Cases blocked on other teams showed no visual signal. Raj's SLA breaches happened because nothing in the UI communicated that a case had stalled.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- OLD SYSTEM -->
+      <h3>The old system</h3>
+      <h2>Tables stacked on tables.</h2>
+      <p>Before proposing anything, I audited the existing dashboard. The fundamental problem: every case was represented as a row in a table, with only the case ID and subject visible. Nothing else.</p>
+
+      <div class="demo-wrap">
+        <div class="demo-header">
+          <span class="demo-label">Before — existing system</span>
+          <span class="demo-hint">Scroll to feel the cognitive load</span>
+        </div>
+        <div class="amz-dashboard amz-before" style="max-height:260px;overflow-y:auto;">
+          <div class="amz-section-title">All Cases (17)</div>
+          <table class="amz-old-table">
+            <thead><tr><th>Case ID</th><th>Subject</th><th>Opened</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>SEC-2847</td><td>Unreleased Product Photo Leak</td><td>Apr 2</td><td>Active</td></tr>
+              <tr><td>SEC-2831</td><td>Unauthorized Data Access — AWS</td><td>Mar 29</td><td>Active</td></tr>
+              <tr><td>SEC-2819</td><td>Supplier NDA Breach Investigation</td><td>Mar 25</td><td>Active</td></tr>
+              <tr><td>SEC-2807</td><td>Insider Threat — Finance Team</td><td>Mar 20</td><td>Active</td></tr>
+              <tr><td>SEC-2794</td><td>Third-Party Vendor Access Audit</td><td>Mar 15</td><td>Active</td></tr>
+              <tr><td>SEC-2781</td><td>Phishing Campaign — EU Region</td><td>Mar 10</td><td>Active</td></tr>
+              <tr><td>SEC-2770</td><td>Code Repository Exfiltration</td><td>Mar 6</td><td>Active</td></tr>
+              <tr><td>SEC-2762</td><td>Employee Device Compromise</td><td>Mar 1</td><td>Active</td></tr>
+              <tr><td>SEC-2751</td><td>Access Control Policy Violation</td><td>Feb 25</td><td>Active</td></tr>
+              <tr><td>SEC-2743</td><td>Social Engineering Attempt — HR</td><td>Feb 20</td><td>Active</td></tr>
+            </tbody>
+          </table>
+          <div class="amz-old-overload">+ 7 more cases not shown · No priority indicators · No status details · No next steps</div>
+        </div>
+      </div>
+
+      <p>The audit logs were just as unhelpful — timestamped entries with no context. And there was <strong>no visual distinction between a P1 case that needed immediate action and a low-priority case from three weeks ago</strong>. Everything looked the same.</p>
+
+      <div class="insight">
+        <p class="insight-label">The core problem</p>
+        <p>The system was built around data storage, not decision support. It showed investigators everything equally, which meant it helped them with nothing specifically.</p>
+      </div>
+
+      <!-- FEATURE 1 -->
+      <h3>Feature 1 — Case prioritization</h3>
+      <h2>Give investigators control over their signal-to-noise ratio.</h2>
+      <p>The goal: let investigators pin or star specific cases to get focused updates — reducing the cognitive burden of managing 17 cases while surfacing what actually matters for the day.</p>
+      <p>I explored three design directions, each with different information density and interaction models.</p>
+
+      <div class="iteration-grid">
+        <div class="iter-card">
+          <div class="iter-label">Design A</div>
+          <div class="iter-title">Minimal flag + modal</div>
+          <div class="iter-desc">A star icon on each row. Clicking it flags the case; details open in a modal overlay.</div>
+          <div class="iter-verdict fail">✕ Too many clicks to get useful info</div>
+        </div>
+        <div class="iter-card selected">
+          <div class="iter-label selected-label">Design B — Selected</div>
+          <div class="iter-title">Inline priority cards</div>
+          <div class="iter-desc">Starred cases surface as rich cards at the top — status, summary, latest update, next step, and lead in one view.</div>
+          <div class="iter-verdict pass">✓ A/B preference + data sufficiency tests</div>
+        </div>
+        <div class="iter-card">
+          <div class="iter-label">Design C</div>
+          <div class="iter-title">Full sidebar panel</div>
+          <div class="iter-desc">A persistent right-hand panel showing starred cases. Rich but took up too much real estate.</div>
+          <div class="iter-verdict fail">✕ Reduced space for active case work</div>
+        </div>
+      </div>
+
+      <p>Design B was validated through A/B preference tests with 12 investigators and critical data sufficiency tests — confirming that the information displayed was the minimum needed to act without opening the case. Engineers then implemented it; I ran usability tests (time-to-action, information clarity, error rate).</p>
+
+      <div class="demo-wrap">
+        <div class="demo-header">
+          <span class="demo-label">Priority cases</span>
+          <span class="demo-hint">Pin a case to surface it</span>
+        </div>
+        <div class="shad-dashboard" id="priority-demo">
+          <div id="starred-area" style="display:none;margin-bottom:16px;">
+            <div class="shad-section-sep" id="priority-section-title">Pinned (0)</div>
+            <div class="shad-pinned-list" id="starred-cards"></div>
+          </div>
+          <div id="all-cases-wrap"></div>
+        </div>
+      </div>
+
+      <div class="sus-metric">
+        <div class="sus-score sus-before">
+          <div class="sus-score-num">61</div>
+          <div class="sus-score-label">SUS Before</div>
+        </div>
+        <div class="sus-arrow">→</div>
+        <div class="sus-score sus-after">
+          <div class="sus-score-num">88</div>
+          <div class="sus-score-label">SUS After</div>
+        </div>
+        <div class="sus-context">
+          Usability jumped from <strong>"Ok" (61)</strong> to <strong>"Excellent" (88)</strong> on the System Usability Scale — a 44% improvement. Time-to-first-action dropped significantly; information clarity errors fell to near zero across test sessions.
+        </div>
+      </div>
+
+      <!-- FEATURE 2 -->
+      <h3>Feature 2 — Case transparency</h3>
+      <h2>The answer was already in the case log — just invisible.</h2>
+      <p>Investigators needed a way to quickly learn about cases they hadn't opened recently. Three approaches were explored: hover tooltips, inline cards, and pop-up overlays. The question was density vs. disruption.</p>
+
+      <div class="iteration-grid">
+        <div class="iter-card">
+          <div class="iter-label">Option A</div>
+          <div class="iter-title">Sparse tooltip</div>
+          <div class="iter-desc">Status + subject only. Fast to scan, but left too many questions unanswered.</div>
+          <div class="iter-verdict fail">✕ Not enough info to triage</div>
+        </div>
+        <div class="iter-card">
+          <div class="iter-label">Option B</div>
+          <div class="iter-title">Medium tooltip</div>
+          <div class="iter-desc">Added case lead. Better, but investigators still had to open the case for next steps.</div>
+          <div class="iter-verdict fail">✕ Still required a follow-up click</div>
+        </div>
+        <div class="iter-card selected">
+          <div class="iter-label selected-label">Option C — Selected</div>
+          <div class="iter-title">Dense tooltip</div>
+          <div class="iter-desc">Status, summary, lead, and next step. Enough to fully triage without opening the case.</div>
+          <div class="iter-verdict pass">✓ Workflow interrupt + backlog triage tests</div>
+        </div>
+      </div>
+
+      <div class="insight">
+        <p class="insight-label">Key finding</p>
+        <p>The dense hover provided enough information to triage and dismiss alerts with minimal clicks, confirming its role as a non-disruptive triage tool. Investigators were significantly faster at bottleneck management compared to any pop-up or card solution tested.</p>
+      </div>
+
+      <div class="demo-wrap">
+        <div class="demo-header">
+          <span class="demo-label">Case log hover</span>
+          <div class="demo-tab-row">
+            <button class="demo-tab active" data-density="dense" onclick="setTooltipDensity('dense')">Dense</button>
+            <button class="demo-tab" data-density="medium" onclick="setTooltipDensity('medium')">Medium</button>
+            <button class="demo-tab" data-density="sparse" onclick="setTooltipDensity('sparse')">Sparse</button>
+          </div>
+        </div>
+        <div class="amz-dashboard">
+          <div class="amz-section-title">Case log — hover a case ID</div>
+          <table class="amz-case-log">
+            <thead><tr><th>Case ID</th><th>Subject</th><th>Opened</th><th>Lead</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="amz-tooltip-wrapper">
+                    <span class="amz-case-id-link" onmouseenter="showTip('tip1')" onmouseleave="hideTip('tip1')">SEC-2847</span>
+                    <div class="amz-tooltip" id="tip1"></div>
+                  </div>
+                </td>
+                <td style="font-size:12px">Unreleased Product Photo Leak</td>
+                <td style="font-size:11px">Apr 2</td>
+                <td style="font-size:11px">L. Chen</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="amz-tooltip-wrapper">
+                    <span class="amz-case-id-link" onmouseenter="showTip('tip2')" onmouseleave="hideTip('tip2')">SEC-2831</span>
+                    <div class="amz-tooltip" id="tip2"></div>
+                  </div>
+                </td>
+                <td style="font-size:12px">Unauthorized Data Access — AWS</td>
+                <td style="font-size:11px">Mar 29</td>
+                <td style="font-size:11px">R. Patel</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="amz-tooltip-wrapper">
+                    <span class="amz-case-id-link" onmouseenter="showTip('tip3')" onmouseleave="hideTip('tip3')">SEC-2819</span>
+                    <div class="amz-tooltip" id="tip3"></div>
+                  </div>
+                </td>
+                <td style="font-size:12px">Supplier NDA Breach Investigation</td>
+                <td style="font-size:11px">Mar 25</td>
+                <td style="font-size:11px">L. Chen</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FEATURE 3 -->
+      <h3>Feature 3 — Bottleneck visibility</h3>
+      <h2>Investigators didn't need to find the bottleneck. They needed to understand it.</h2>
+      <p>Early in research I assumed the problem was investigators couldn't identify bottlenecked cases. I was wrong. They knew cases were stalled — what they didn't know was <em>where</em> in the process the stall was occurring and who owned it.</p>
+
+      <p>I designed a process flow visualization embedded within each case, showing the investigation lifecycle as discrete stages with clear ownership and status signals. Click a stage below to see what an investigator would see.</p>
+
+      <div class="demo-wrap">
+        <div class="demo-header">
+          <span class="demo-label">Investigation timeline</span>
+          <span class="demo-hint">Click any stage</span>
+        </div>
+        <div class="amz-dashboard">
+          <div class="amz-section-title">SEC-2847 · Investigation Timeline</div>
+          <div style="background:var(--shad-card);border:1px solid var(--shad-border);border-radius:8px;overflow:hidden;">
+          <div style="padding:12px 16px 0;">
+          <div class="amz-flow" id="flow-demo">
+            <div class="amz-flow-step ok" data-step="0" onclick="selectStep(0)">
+              <div class="amz-flow-box">
+                <div class="amz-flow-node">01</div>
+                <div class="amz-flow-label">Report Filed</div>
+                <div class="amz-flow-status ok">Complete</div>
+              </div>
+              <div class="amz-flow-connector"></div>
+            </div>
+            <div class="amz-flow-step ok" data-step="1" onclick="selectStep(1)">
+              <div class="amz-flow-box">
+                <div class="amz-flow-node">02</div>
+                <div class="amz-flow-label">Evidence Collection</div>
+                <div class="amz-flow-status ok">Complete</div>
+              </div>
+              <div class="amz-flow-connector"></div>
+            </div>
+            <div class="amz-flow-step bottleneck" data-step="2" onclick="selectStep(2)">
+              <div class="amz-flow-box">
+                <div class="amz-flow-node">03</div>
+                <div class="amz-flow-label">Team Coordination</div>
+                <div class="amz-flow-status bottleneck">Bottlenecked</div>
+              </div>
+              <div class="amz-flow-connector"></div>
+            </div>
+            <div class="amz-flow-step bottleneck" data-step="3" onclick="selectStep(3)">
+              <div class="amz-flow-box">
+                <div class="amz-flow-node">04</div>
+                <div class="amz-flow-label">Legal Review</div>
+                <div class="amz-flow-status bottleneck">Blocked</div>
+              </div>
+              <div class="amz-flow-connector"></div>
+            </div>
+            <div class="amz-flow-step" data-step="4" onclick="selectStep(4)">
+              <div class="amz-flow-box">
+                <div class="amz-flow-node">05</div>
+                <div class="amz-flow-label">Resolution</div>
+                <div class="amz-flow-status at-risk">Not Started</div>
+              </div>
+            </div>
+          </div>
+          </div></div>
+          <div id="flow-detail" class="amz-flow-detail"></div>
+          </div>
+        </div>
+
+      <p>This component was validated through concept testing and usability testing. The middle-density design — showing the bottlenecked stage with team ownership and days-stalled context — was consistently preferred. Investigators described it as "finally seeing where the fire actually is."</p>
+
+      <hr class="case-divider">
+
+      <!-- OUTCOMES -->
+      <h3>Outcomes</h3>
+      <h2>Lisa found her Sherlock Holmes again.</h2>
+      <p>Across all three features, the redesigned dashboard showed substantial improvements in every usability dimension measured. The system went from something investigators actively avoided to a primary tool for starting and managing their day.</p>
+
+      <div class="insight">
+        <p class="insight-label">Measured results</p>
+        <p><strong>SUS 61 → 88</strong> — system usability across all features. <strong>Time-to-first-action</strong> dropped significantly on priority cases. <strong>Bottleneck identification</strong> dropped from "unknown" to correctly located within the first interaction for 100% of test participants.</p>
+      </div>
+
+      <!-- REFLECTION -->
+      <h2>What I learned.</h2>
+      <p><strong>User-centered design is only as good as the research behind it.</strong> The bottleneck insight — that investigators needed location, not detection — only came from going deeper than surface-level complaints. If I'd stopped at "they can't find bottlenecks," I would have built the wrong thing.</p>
+      <p><strong>Iteration isn't just changing the design.</strong> Each round of testing with investigators produced specific, actionable feedback that changed not just the visuals but the underlying information hierarchy. The SUS jump from 61 to 88 didn't come from polish — it came from repeatedly asking "does this actually reduce your decision-making time?"</p>
+      <p><strong>Collaboration across functions changes what you build.</strong> Working closely with engineers shaped what was feasible; working with investigators shaped what was necessary. Neither alone would have produced the same outcome.</p>
+
+    </article>
+
+    <div class="case-footer">
+      <a href="../index.html">← Back to home</a>
+      <span>Abigail Leyva · 2024</span>
+    </div>
+
+  </div>
+
+  <!-- FLOATING SOCIAL ICONS -->
+  <div class="floating-social">
+    <a href="https://www.linkedin.com/in/abigailleyva" target="_blank" rel="noopener" aria-label="LinkedIn">
+      <svg viewBox="0 0 24 24" width="20" height="20"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z" fill="currentColor"/></svg>
+    </a>
+    <button class="email-btn" id="copy-email" aria-label="Copy email">
+      <svg viewBox="0 0 24 24" width="20" height="20"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/></svg>
+      <span class="copy-tooltip" id="copy-tooltip">Copied!</span>
+    </button>
+    <span class="social-divider" aria-hidden="true"></span>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M3 12h2M19 12h2M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>
+    </button>
+  </div>
+
+  <script>
+    // ========== THEME ==========
+    (function initTheme() {
+      var saved = localStorage.getItem('theme');
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', saved || (prefersDark ? 'dark' : 'light'));
+    })();
+    document.addEventListener('DOMContentLoaded', function() {
+      var btn = document.getElementById('theme-toggle');
+      if (btn) btn.addEventListener('click', function() {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+      });
+    });
+
+    // ========== CURSOR ==========
+    const cursor = document.getElementById('cursor');
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      cursor.style.left = mouseX + 'px'; cursor.style.top = mouseY + 'px';
+      cursor.classList.add('visible');
+    });
+    document.addEventListener('mouseleave', () => cursor.classList.remove('visible'));
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+
+
+    // ========== EMAIL COPY ==========
+    document.getElementById('copy-email').addEventListener('click', () => {
+      navigator.clipboard.writeText('abigailcleyva@gmail.com');
+      const tip = document.getElementById('copy-tooltip');
+      tip.classList.add('show');
+      setTimeout(() => tip.classList.remove('show'), 1500);
+    });
+
+    // ========== AVATAR ==========
+    const avatarWrapper = document.getElementById('avatar-wrapper');
+    const eyesOpen = document.getElementById('eyes-open');
+    const eyesClosed = document.getElementById('eyes-closed');
+    let isCalming = false;
+    avatarWrapper.addEventListener('click', () => {
+      if (isCalming) return; isCalming = true;
+      eyesOpen.style.display = 'none'; eyesClosed.style.display = 'block';
+      avatarWrapper.classList.add('calming');
+      const tip = avatarWrapper.querySelector('.avatar-tooltip');
+      tip.textContent = '✿'; tip.style.opacity = '1';
+      scatterPetals();
+      setTimeout(() => { eyesOpen.style.display = 'block'; eyesClosed.style.display = 'none'; avatarWrapper.classList.remove('calming'); tip.textContent = ''; tip.style.opacity = ''; isCalming = false; }, 3500);
+    });
+    function scatterPetals() {
+      const r = avatarWrapper.getBoundingClientRect();
+      const ox = r.left + r.width/2, oy = r.top + r.height/2;
+      const colors = ['#d94040','#cc3636','#e8b860','#d45d5d','#e07070'];
+      for (let i = 0; i < 12; i++) {
+        const p = document.createElement('div'); p.className = 'petal';
+        const angle = Math.PI*2*i/12+(Math.random()-0.5)*0.5;
+        const d1=30+Math.random()*40, d2=80+Math.random()*120;
+        const dx1=Math.cos(angle)*d1, dy1=Math.sin(angle)*d1;
+        const dx2=Math.cos(angle)*d2, dy2=Math.sin(angle)*d2+60+Math.random()*80;
+        const dur=2+Math.random()*1.5, sz=8+Math.random()*10;
+        const col=colors[Math.floor(Math.random()*colors.length)];
+        p.style.left=ox+'px'; p.style.top=oy+'px'; p.style.width=sz+'px'; p.style.height=sz+'px';
+        p.style.setProperty('--dx1',dx1+'px'); p.style.setProperty('--dy1',dy1+'px');
+        p.style.setProperty('--dx2',dx2+'px'); p.style.setProperty('--dy2',dy2+'px');
+        p.style.setProperty('--rot',(Math.random()-0.5)*360+'deg');
+        p.style.setProperty('--duration',dur+'s');
+        p.style.animationDelay=Math.random()*0.3+'s';
+        p.innerHTML=`<svg viewBox="0 0 12 12"><ellipse cx="6" cy="4" rx="4" ry="5.5" fill="${col}" opacity="0.85" transform="rotate(${Math.random()*40-20} 6 6)"/></svg>`;
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(),(dur+0.5)*1000);
+      }
+    }
+    let lastBlink = 0;
+    function blink() {
+      const now = Date.now();
+      if (isCalming || now - lastBlink < 800) return;
+      lastBlink = now;
+      eyesOpen.style.display='none'; eyesClosed.style.display='block';
+      setTimeout(()=>{ if(!isCalming){eyesOpen.style.display='block';eyesClosed.style.display='none';} },150);
+    }
+    window.addEventListener('scroll', ()=>{ clearTimeout(window._blinkT); window._blinkT=setTimeout(blink,50); }, {passive:true});
+    document.addEventListener('click', ()=>blink());
+    const avatar = document.getElementById('avatar');
+    const pupilLeft = document.getElementById('pupil-left');
+    const pupilRight = document.getElementById('pupil-right');
+    function updateEyes() {
+      const rect = avatar.getBoundingClientRect();
+      const ax=rect.left+rect.width/2, ay=rect.top+rect.height/2;
+      const dx=mouseX-ax, dy=mouseY-ay, dist=Math.sqrt(dx*dx+dy*dy);
+      const ratio=Math.min(dist,300)/300, mx=(dx/(dist||1))*3*ratio, my=(dy/(dist||1))*3*ratio;
+      pupilLeft.setAttribute('cx',39+mx); pupilLeft.setAttribute('cy',54+my);
+      pupilRight.setAttribute('cx',61+mx); pupilRight.setAttribute('cy',54+my);
+      requestAnimationFrame(updateEyes);
+    }
+    requestAnimationFrame(updateEyes);
+
+    // ========== SCROLL PHRASES ==========
+    const SCROLL_PHRASES = {
+      third: ["thanks for being here","glad you came!","means a lot, really","so happy you're here!","welcome, truly","hi, welcome!","thanks for visiting","glad you're reading!"],
+      two_thirds: ["almost there!","don't leave now!","one more scroll","the end is cute!","last bit, promise","so close omg!","nearly, nearly","last part!"]
+    };
+    function pickPhrase(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+    function showTooltip(text) {
+      const tip = avatarWrapper.querySelector('.avatar-tooltip');
+      tip.textContent = text; tip.style.opacity='1'; tip.style.transform='translateY(-50%) translateX(0)';
+      setTimeout(()=>{ tip.style.opacity=''; tip.style.transform=''; },2500);
+    }
+    let shownThird=false, shownTwo=false;
+    window.addEventListener('scroll',()=>{
+      const st=document.documentElement.scrollTop, sh=document.documentElement.scrollHeight-document.documentElement.clientHeight;
+      const p=sh>0?st/sh:0;
+      if(!shownThird&&p>=0.33){shownThird=true;showTooltip(pickPhrase(SCROLL_PHRASES.third));}
+      if(!shownTwo&&p>=0.66){shownTwo=true;showTooltip(pickPhrase(SCROLL_PHRASES.two_thirds));}
+    },{passive:true});
+
+    // ========== RESTORE HAIR ACCESSORY (session-only) ==========
+    (function() {
+      var name = sessionStorage.getItem('avatar-accessory');
+      if (!name || name === 'flower') return;
+      var g = document.getElementById('hair-accessory');
+      if (!g) return;
+      var acc = { bow: '<g class="acc-inner"><ellipse cx="-5.5" cy="-3" rx="6" ry="3.2" fill="#d94040" transform="rotate(-12 -5.5 -3)"/><ellipse cx="5.5" cy="-3" rx="6" ry="3.2" fill="#cc3636" transform="rotate(12 5.5 -3)"/><path d="M-1.5,0.5 Q-5,6 -7,8" stroke="#d94040" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M1.5,0.5 Q5,6 7,8" stroke="#cc3636" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="0" cy="-2" r="3" fill="#b82020"/><circle cx="0" cy="-2" r="1.3" fill="#d94040"/></g>', star: '<g class="acc-inner"><polygon points="0,-8.5 2,-3 7.5,-3 3.2,0.8 5,6 0,3.2 -5,6 -3.2,0.8 -7.5,-3 -2,-3" fill="#f0cc30"/></g>', pencil: '<g class="acc-inner"><g transform="rotate(20)"><rect x="-2.5" y="-10" width="5" height="16" rx="1.5" fill="#f0cc40"/><rect x="-2.5" y="-10" width="5" height="2" rx="1" fill="#b0b0b8"/><rect x="-2.5" y="-8" width="5" height="2" fill="#e87070"/><polygon points="-2.5,6 2.5,6 0,10.5" fill="#e8d098"/><circle cx="0" cy="10.5" r="1.2" fill="#3b2314"/></g></g>' };
+      if (name === 'custom') { var d = sessionStorage.getItem('avatar-accessory-custom'); if (d) g.innerHTML = '<g class="acc-inner"><image href="' + d + '" x="-14" y="-16" width="28" height="28"/></g>'; return; }
+      if (acc[name]) g.innerHTML = acc[name];
+    })();
+
+    // ========== PRIORITY CASES COMPONENT ==========
+    const cases = [
+      { id:'SEC-2847', title:'Unreleased Product Photo Leak', summary:'Echo device images appeared on a third-party tech blog 48h before embargo lift. Source unknown.', update:'Supplier access logs pulled — reviewing 3 flagged accounts.', priority:'P1', status:'Investigating', lead:'L. Chen', sla:'2h remaining', starred:false },
+      { id:'SEC-2831', title:'Unauthorized AWS Data Access', summary:'Abnormal API calls from deprovisioned IAM role. Accessed 4 S3 buckets in eu-west-1.', update:'IAM role revoked. Waiting on CloudTrail export from infra team.', priority:'P2', status:'Bottlenecked', lead:'R. Patel', sla:'6h remaining', starred:false },
+      { id:'SEC-2819', title:'Supplier NDA Breach', summary:'Confidential roadmap details shared externally by third-party vendor. Legal notified.', update:'Vendor contract pulled. Scheduling call with legal for escalation path.', priority:'P2', status:'Active', lead:'L. Chen', sla:'1d remaining', starred:false },
+    ];
+
+    function priorityBadge(p) {
+      if (p === 'P1') return `<span class="shad-badge shad-badge-red"><span class="shad-badge-dot"></span>P1 · Critical</span>`;
+      if (p === 'P2') return `<span class="shad-badge shad-badge-yellow"><span class="shad-badge-dot"></span>P2 · High</span>`;
+      return `<span class="shad-badge shad-badge-muted">P3</span>`;
+    }
+    function statusBadge(s) {
+      if (s === 'Bottlenecked') return `<span class="shad-badge shad-badge-red">${s}</span>`;
+      if (s === 'Investigating') return `<span class="shad-badge shad-badge-amber">${s}</span>`;
+      return `<span class="shad-badge shad-badge-green">${s}</span>`;
+    }
+    function slaColor(s) { return s.startsWith('2h') || s.startsWith('1h') ? 'color:var(--shad-red)' : s.startsWith('6h') ? 'color:var(--shad-amber)' : ''; }
+
+    function renderTableRow(c) {
+      return `<tr class="${c.starred ? 'row-pinned' : ''}" id="row-${c.id}">
+        <td>
+          <button class="shad-pin-btn${c.starred ? ' pinned' : ''}" onclick="toggleStar('${c.id}')" title="${c.starred ? 'Unpin' : 'Pin'}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="${c.starred ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1z"/></svg>
+          </button>
+        </td>
+        <td>${priorityBadge(c.priority)}</td>
+        <td><span class="shad-mono">${c.id}</span></td>
+        <td style="font-size:12px;color:var(--shad-text);max-width:180px">${c.title}</td>
+        <td>${statusBadge(c.status)}</td>
+        <td style="font-size:11px;color:var(--shad-muted)">${c.lead}</td>
+        <td style="font-size:11px;font-weight:500;${slaColor(c.sla)}">${c.sla}</td>
+      </tr>`;
+    }
+
+    function renderPinnedCard(c) {
+      return `<div class="shad-card" id="pinned-${c.id}">
+        <div class="shad-card-header">
+          <div style="flex:1">
+            <div class="shad-card-id">${c.id}</div>
+            <div class="shad-card-title">${c.title}</div>
+          </div>
+          <button class="shad-unpin-btn" onclick="toggleStar('${c.id}')" title="Unpin">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <div class="shad-card-body">
+          <div class="shad-card-meta">
+            ${priorityBadge(c.priority)}
+            ${statusBadge(c.status)}
+          </div>
+          <div class="shad-kv-row">
+            <div class="shad-kv"><span class="shad-kv-key">Assigned</span><span class="shad-kv-val">${c.lead}</span></div>
+            <div class="shad-kv"><span class="shad-kv-key">SLA</span><span class="shad-kv-val" style="${slaColor(c.sla)}">${c.sla}</span></div>
+          </div>
+          <div class="shad-card-summary">${c.summary}</div>
+          <div class="shad-card-update"><div class="shad-card-update-label">Latest update</div>${c.update}</div>
+        </div>
+        <div class="shad-card-footer">
+          <div class="shad-btn-group">
+            <button class="shad-btn shad-btn-primary" onclick="event.stopPropagation()">Open case</button>
+            <button class="shad-btn shad-btn-ghost" onclick="event.stopPropagation()">Message lead</button>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function renderPriorityDemo() {
+      const starred = cases.filter(c => c.starred);
+      const titleEl = document.getElementById('priority-section-title');
+      const starredArea = document.getElementById('starred-area');
+      const starredCards = document.getElementById('starred-cards');
+      const allWrap = document.getElementById('all-cases-wrap');
+
+      titleEl.textContent = `Pinned (${starred.length})`;
+      if (starred.length > 0) {
+        starredArea.style.display = 'block';
+        starredCards.innerHTML = starred.map(renderPinnedCard).join('');
+      } else {
+        starredArea.style.display = 'none';
+      }
+
+      allWrap.innerHTML = `<div class="shad-table-wrap">
+        <div class="shad-table-header">
+          <span class="shad-table-title">All investigations</span>
+          <span class="shad-table-count">${cases.length} cases</span>
+        </div>
+        <table class="shad-table">
+          <thead><tr>
+            <th></th><th>Priority</th><th>Case ID</th><th>Title</th><th>Status</th><th>Lead</th><th>SLA</th>
+          </tr></thead>
+          <tbody>${cases.map(renderTableRow).join('')}</tbody>
+        </table>
+      </div>`;
+    }
+
+    function toggleStar(id) {
+      const c = cases.find(x => x.id === id);
+      if (c) { c.starred = !c.starred; renderPriorityDemo(); }
+    }
+
+    renderPriorityDemo();
+
+    // ========== TOOLTIP DEMO ==========
+    let tooltipDensity = 'dense';
+    const tooltipData = {
+      'tip1': { status:'Investigating', summary:'Echo device leak — 3 flagged supplier accounts.', lead:'L. Chen', nextStep:'Complete access log review by EOD.' },
+      'tip2': { status:'Bottlenecked', summary:'Deprovisioned IAM role accessed 4 S3 buckets.', lead:'R. Patel', nextStep:'Waiting on CloudTrail export from infra team.' },
+      'tip3': { status:'Active', summary:'Vendor shared confidential roadmap externally.', lead:'L. Chen', nextStep:'Schedule legal escalation call.' },
+    };
+
+    function buildTooltipHTML(id) {
+      const d = tooltipData[id];
+      if (tooltipDensity === 'sparse') return `<div class="amz-tooltip-row"><span class="amz-tooltip-key">Status</span><span class="amz-tooltip-val">${d.status}</span></div>`;
+      if (tooltipDensity === 'medium') return `<div class="amz-tooltip-row"><span class="amz-tooltip-key">Status</span><span class="amz-tooltip-val">${d.status}</span></div><div class="amz-tooltip-row"><span class="amz-tooltip-key">Lead</span><span class="amz-tooltip-val">${d.lead}</span></div>`;
+      return `<div class="amz-tooltip-row"><span class="amz-tooltip-key">Status</span><span class="amz-tooltip-val">${d.status}</span></div><div class="amz-tooltip-row"><span class="amz-tooltip-key">Summary</span><span class="amz-tooltip-val" style="max-width:140px">${d.summary}</span></div><div class="amz-tooltip-row"><span class="amz-tooltip-key">Lead</span><span class="amz-tooltip-val">${d.lead}</span></div><div class="amz-tooltip-row"><span class="amz-tooltip-key">Next step</span><span class="amz-tooltip-val" style="max-width:140px;color:var(--shad-green)">${d.nextStep}</span></div>`;
+    }
+
+    function showTip(id) { const el=document.getElementById(id); if(el){el.innerHTML=buildTooltipHTML(id);el.classList.add('visible');} }
+    function hideTip(id) { const el=document.getElementById(id); if(el) el.classList.remove('visible'); }
+    function setTooltipDensity(d) {
+      tooltipDensity = d;
+      document.querySelectorAll('.demo-tab').forEach(t=>t.classList.toggle('active',t.dataset.density===d));
+      ['tip1','tip2','tip3'].forEach(id=>{ const el=document.getElementById(id); if(el&&el.classList.contains('visible')){ el.innerHTML=buildTooltipHTML(id); } });
+    }
+
+    // ========== BOTTLENECK FLOW ==========
+    const flowDetails = [
+      { title:'Report Filed', status:'ok', msg:'Case created Apr 2 at 09:14 AM. All required fields completed. No issues.' },
+      { title:'Evidence Collection', status:'ok', msg:'Access logs from Supplier Portal and internal systems pulled. 3 flagged accounts identified. Completed Apr 3.' },
+      { title:'Team Coordination — Bottleneck', status:'bottleneck', msg:'Waiting on response from Supplier Risk team (3 days, no reply). SLA breach risk in 2h. Escalation recommended via: supplier-risk-escalations@amazon.com' },
+      { title:'Legal Review — Blocked', status:'bottleneck', msg:'Legal cannot begin review until Supplier Risk completes coordination step. Cascading block — this step is delayed by the previous bottleneck, not a separate issue.' },
+      { title:'Resolution', status:'pending', msg:'Not yet reached. Expected timeline: 2–3 days from Legal Review completion, assuming no further bottlenecks.' },
+    ];
+
+    function selectStep(i) {
+      document.querySelectorAll('.amz-flow-step').forEach((s,j)=>{
+        s.classList.toggle('selected', j===i);
+      });
+      const detail = document.getElementById('flow-detail');
+      const d = flowDetails[i];
+      const color = d.status==='ok'?'var(--shad-green)':d.status==='bottleneck'?'var(--shad-red)':'var(--shad-muted)';
+      detail.innerHTML = `<div class="amz-flow-detail-title" style="color:${color}">${d.title}</div><p>${d.msg}</p>`;
+      detail.classList.add('visible');
+    }
+    // Auto-select the first bottleneck on load
+    setTimeout(()=>selectStep(2), 800);
+
+  </script>
+
+</body>
+</html>
