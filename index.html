@@ -114,16 +114,20 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      width: 100%;
+      background: var(--bg-nav);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: background-color 0.3s ease;
+    }
+
+    .site-header-inner {
       max-width: 980px;
       margin: 0 auto;
       padding: 1.5rem 2rem;
       display: flex;
       align-items: center;
       gap: 1.5rem;
-      background: var(--bg-nav);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      transition: background-color 0.3s ease;
     }
 
     /* Avatar area — wraps avatar + hint + picker */
@@ -1030,7 +1034,7 @@
 
     @media (max-width: 640px) {
       /* Header */
-      .site-header { padding: 1rem 1rem 0; gap: 0.75rem; }
+      .site-header-inner { padding: 1rem 1rem 0; gap: 0.75rem; }
       .avatar-wrapper { width: 56px; height: 56px; }
       .avatar-customize-hint { display: none; }
       .nav-bar { padding: 0.65rem 1rem; border-radius: 12px; }
@@ -1208,6 +1212,151 @@
       .content-hero { display: none; }
       .floating-social { display: none; }
       .mobile-view { display: block; }
+      .play-section { display: none; }
+    }
+
+    /* ========== PLAY SECTION ========== */
+    .play-section {
+      width: 100%;
+      padding: 80px 60px 100px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      scroll-margin-top: 120px;
+    }
+
+    .play-header {
+      max-width: 680px;
+      margin: 0 auto 48px;
+      text-align: center;
+    }
+
+    .play-heading {
+      font-family: var(--font-display);
+      font-size: 2.6rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .play-sub {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .play-grid {
+      columns: 4;
+      column-gap: 14px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .play-card {
+      break-inside: avoid;
+      margin-bottom: 14px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-soft);
+      cursor: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+    }
+
+    /* Wide cards span 2 columns */
+    .play-card--wide {
+      column-span: 2;
+    }
+
+    .play-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px var(--shadow-strong);
+    }
+
+    .play-card-img {
+      width: 100%;
+      background: var(--border);
+    }
+
+    .play-card--short .play-card-img  { aspect-ratio: 4 / 3; }
+    .play-card--medium .play-card-img { aspect-ratio: 3 / 4; }
+    .play-card--tall .play-card-img   { aspect-ratio: 2 / 3; }
+
+    /* Collage layout for wide multi-photo cards */
+    .play-collage {
+      display: flex;
+      gap: 6px;
+      padding: 6px 6px 0;
+      height: 340px;
+    }
+
+    .play-collage-hero {
+      flex: 2;
+      background: var(--border);
+      border-radius: 10px;
+      height: 100%;
+    }
+
+    .play-collage-stack {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      height: 100%;
+    }
+
+    .play-collage-thumb {
+      flex: 1;
+      background: var(--border);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .play-collage-thumb--more {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease;
+    }
+
+    .play-card--wide:hover .play-collage-thumb--more {
+      background: var(--accent-softer);
+      border-color: var(--accent-soft);
+    }
+
+    .play-collage-thumb--more span {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
+    }
+
+    .play-card--wide:hover .play-collage-thumb--more span {
+      color: var(--accent);
+    }
+
+    .play-card-info {
+      padding: 12px 14px 14px;
+    }
+
+    .play-card-tag {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .play-card-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.4;
     }
   </style>
 </head>
@@ -1218,6 +1367,7 @@
 
   <!-- HEADER -->
   <div class="site-header">
+  <div class="site-header-inner">
     <!-- Avatar with eye tracking -->
     <div class="avatar-area">
     <div class="avatar-wrapper" id="avatar-wrapper">
@@ -1316,9 +1466,11 @@
       <div class="nav-links">
         <a href="#work">Work</a>
         <a href="#journey">Journey</a>
+        <a href="play.html">Play</a>
         <a href="AbigailCLeyva.pdf" target="_blank" rel="noopener">Resume</a>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- HERO -->
@@ -1679,6 +1831,107 @@
     </section>
   </main>
 
+  <!-- ========== PLAY SECTION ==========
+  <section id="play" class="play-section">
+    <div class="play-header">
+      <h2 class="play-heading">Play</h2>
+      <p class="play-sub">Personal projects, experiments, and things made for fun.</p>
+    </div>
+    <div class="play-grid">
+
+      WIDE: Everlasting Bloom — 7 photos, collage layout -->
+      <!-- <div class="play-card play-card--wide" onclick="openPlayGallery('Everlasting Bloom Lamp', 7)">
+        <div class="play-collage">
+          <div class="play-collage-hero"></div>
+          <div class="play-collage-stack">
+            <div class="play-collage-thumb"></div>
+            <div class="play-collage-thumb"></div>
+            <div class="play-collage-thumb play-collage-thumb--more">
+              <span>+5</span>
+            </div>
+          </div>
+        </div>
+        <div class="play-card-info">
+          <span class="play-card-tag">3D / Physical</span>
+          <p class="play-card-title">Everlasting Bloom Lamp</p>
+        </div>
+      </div> -->
+
+      <!-- SINGLE: Generative Art — 1 photo -->
+      <!-- <div class="play-card play-card--short" onclick="openPlayGallery('Generative Art', 1)">
+        <div class="play-card-img"></div>
+        <div class="play-card-info">
+          <span class="play-card-tag">Code</span>
+          <p class="play-card-title">Generative Art</p>
+        </div>
+      </div> -->
+
+      <!-- SINGLE: Film Rolls — 1 photo, tall
+      <div class="play-card play-card--tall" onclick="openPlayGallery('Film Rolls \'24', 1)">
+        <div class="play-card-img"></div>
+        <div class="play-card-info">
+          <span class="play-card-tag">Photography</span>
+          <p class="play-card-title">Film Rolls '24</p>
+        </div>
+      </div> -->
+
+      <!-- WIDE: Ceramics — 4 photos
+      <div class="play-card play-card--wide" onclick="openPlayGallery('Ceramics Studio', 4)">
+        <div class="play-collage">
+          <div class="play-collage-hero"></div>
+          <div class="play-collage-stack">
+            <div class="play-collage-thumb"></div>
+            <div class="play-collage-thumb"></div>
+            <div class="play-collage-thumb play-collage-thumb--more">
+              <span>+2</span>
+            </div>
+          </div>
+        </div>
+        <div class="play-card-info">
+          <span class="play-card-tag">Craft</span>
+          <p class="play-card-title">Ceramics Studio</p>
+        </div>
+      </div> -->
+
+      <!-- SINGLE: Brand Explorations -->
+      <!-- <div class="play-card play-card--medium" onclick="openPlayGallery('Brand Explorations', 1)">
+        <div class="play-card-img"></div>
+        <div class="play-card-info">
+          <span class="play-card-tag">Design</span>
+          <p class="play-card-title">Brand Explorations</p>
+        </div>
+      </div>
+
+      <!-- SINGLE: Micro-animations -->
+      <!-- <div class="play-card play-card--short" onclick="openPlayGallery('Micro-animations', 1)">
+        <div class="play-card-img"></div>
+        <div class="play-card-info">
+          <span class="play-card-tag">Motion</span>
+          <p class="play-card-title">Micro-animations</p>
+        </div>
+      </div> --> 
+
+      <!-- SINGLE: Textile Experiments
+      <div class="play-card play-card--tall" onclick="openPlayGallery('Textile Experiments', 1)">
+        <div class="play-card-img"></div>
+        <div class="play-card-info">
+          <span class="play-card-tag">Weaving</span>
+          <p class="play-card-title">Textile Experiments</p>
+        </div>
+      </div>
+
+      <!-- SINGLE: Creative Tools -->
+      <!-- <div class="play-card play-card--medium" onclick="openPlayGallery('Creative Tools', 1)">
+        <div class="play-card-img"></div>
+        <div class="play-card-info">
+          <span class="play-card-tag">Code</span>
+          <p class="play-card-title">Creative Tools</p>
+        </div>
+      </div>
+
+    </div>
+  </section> --> 
+
   <!-- ========== MOBILE VIEW ========== -->
   <div class="mobile-view">
 
@@ -1897,6 +2150,29 @@
         <p class="draw-success-label">looking good</p>
       </div>
     </div>
+  </div>
+
+  <!-- PLAY LIGHTBOX -->
+  <div id="play-lightbox" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;">
+    <div style="position:relative;width:100%;max-width:860px;padding:0 48px;">
+      <!-- Main image -->
+      <div id="play-lb-img" style="width:100%;aspect-ratio:4/3;background:#2a2a2a;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+        <span id="play-lb-placeholder" style="font-size:0.8rem;color:#666;letter-spacing:0.05em;">photo placeholder</span>
+      </div>
+      <!-- Counter + title -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;">
+        <div>
+          <p id="play-lb-title" style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:#fff;margin-bottom:2px;"></p>
+          <p id="play-lb-counter" style="font-size:0.75rem;color:#888;"></p>
+        </div>
+        <button id="play-lb-close" style="background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:none;display:flex;align-items:center;justify-content:center;transition:background 0.15s ease;">✕</button>
+      </div>
+      <!-- Thumbnail strip -->
+      <div id="play-lb-thumbs" style="display:flex;gap:8px;margin-top:14px;overflow-x:auto;padding-bottom:4px;"></div>
+    </div>
+    <!-- Prev / Next -->
+    <button id="play-lb-prev" style="position:fixed;left:24px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.1);border:none;color:#fff;width:44px;height:44px;border-radius:50%;font-size:1.2rem;cursor:none;transition:background 0.15s ease;">‹</button>
+    <button id="play-lb-next" style="position:fixed;right:24px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.1);border:none;color:#fff;width:44px;height:44px;border-radius:50%;font-size:1.2rem;cursor:none;transition:background 0.15s ease;">›</button>
   </div>
 
   <!-- FLOATING SOCIAL ICONS -->
@@ -2566,30 +2842,28 @@
 
     // ========== EYE TRACKING ==========
     const avatar = document.getElementById('avatar');
-    const pupilLeft = document.getElementById('pupil-left');
+    const pupilLeft  = document.getElementById('pupil-left');
     const pupilRight = document.getElementById('pupil-right');
-    const MAX_MOVE = 3; // max pixels the pupil can move from center
+    const EYE_CX_MAIN = [39, 61], EYE_CY_MAIN = 54;
+    const MAX_X_MAIN = 2.8, MAX_Y_MAIN = 3.2;
 
     function updateEyes() {
-      const rect = avatar.getBoundingClientRect();
-      const avatarCenterX = rect.left + rect.width / 2;
-      const avatarCenterY = rect.top + rect.height / 2;
+      const rect  = avatar.getBoundingClientRect();
+      const scaleX = 100 / rect.width;
+      const scaleY = 105 / rect.height;
+      const localX = (mouseX - rect.left) * scaleX;
+      const localY = (mouseY - rect.top)  * scaleY;
 
-      // Calculate angle from avatar center to mouse
-      const dx = mouseX - avatarCenterX;
-      const dy = mouseY - avatarCenterY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const clampedDist = Math.min(dist, 300);
-      const ratio = clampedDist / 300;
-
-      const moveX = (dx / (dist || 1)) * MAX_MOVE * ratio;
-      const moveY = (dy / (dist || 1)) * MAX_MOVE * ratio;
-
-      // Left eye center: 39, 54 | Right eye center: 61, 54
-      pupilLeft.setAttribute('cx', 39 + moveX);
-      pupilLeft.setAttribute('cy', 54 + moveY);
-      pupilRight.setAttribute('cx', 61 + moveX);
-      pupilRight.setAttribute('cy', 54 + moveY);
+      EYE_CX_MAIN.forEach((ecx, i) => {
+        const dx = localX - ecx;
+        const dy = localY - EYE_CY_MAIN;
+        const ex = dx / MAX_X_MAIN, ey = dy / MAX_Y_MAIN;
+        const len = Math.sqrt(ex * ex + ey * ey);
+        const s = len > 1 ? 1 / len : 1;
+        const pupil = i === 0 ? pupilLeft : pupilRight;
+        pupil.setAttribute('cx', ecx + ex * s * MAX_X_MAIN);
+        pupil.setAttribute('cy', EYE_CY_MAIN + ey * s * MAX_Y_MAIN);
+      });
 
       requestAnimationFrame(updateEyes);
     }
@@ -2622,6 +2896,70 @@
     // Close on backdrop click
     document.getElementById('passcode-modal').addEventListener('click', function(e) {
       if (e.target === this) hidePasscode();
+    });
+
+    // ========== PLAY GALLERY LIGHTBOX ==========
+    var playLB = {
+      title: '',
+      total: 0,
+      current: 0,
+    };
+
+    function openPlayGallery(title, count) {
+      playLB.title = title;
+      playLB.total = count;
+      playLB.current = 0;
+      renderPlayLightbox();
+      var lb = document.getElementById('play-lightbox');
+      lb.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePlayGallery() {
+      document.getElementById('play-lightbox').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function renderPlayLightbox() {
+      document.getElementById('play-lb-title').textContent = playLB.title;
+      document.getElementById('play-lb-counter').textContent = (playLB.current + 1) + ' of ' + playLB.total;
+      document.getElementById('play-lb-placeholder').textContent = 'photo ' + (playLB.current + 1) + ' — placeholder';
+
+      // Thumbnail strip
+      var strip = document.getElementById('play-lb-thumbs');
+      strip.innerHTML = '';
+      for (var i = 0; i < playLB.total; i++) {
+        var thumb = document.createElement('div');
+        thumb.style.cssText = 'flex-shrink:0;width:64px;height:48px;border-radius:8px;background:#2a2a2a;cursor:none;border:2px solid ' + (i === playLB.current ? '#fff' : 'transparent') + ';transition:border-color 0.15s ease;opacity:' + (i === playLB.current ? '1' : '0.5') + ';';
+        (function(idx) {
+          thumb.addEventListener('click', function(e) { e.stopPropagation(); playLB.current = idx; renderPlayLightbox(); });
+        })(i);
+        strip.appendChild(thumb);
+      }
+
+      // Hide prev/next if only 1 photo
+      document.getElementById('play-lb-prev').style.display = playLB.total > 1 ? 'flex' : 'none';
+      document.getElementById('play-lb-next').style.display = playLB.total > 1 ? 'flex' : 'none';
+    }
+
+    document.getElementById('play-lb-close').addEventListener('click', closePlayGallery);
+    document.getElementById('play-lb-prev').addEventListener('click', function() {
+      playLB.current = (playLB.current - 1 + playLB.total) % playLB.total;
+      renderPlayLightbox();
+    });
+    document.getElementById('play-lb-next').addEventListener('click', function() {
+      playLB.current = (playLB.current + 1) % playLB.total;
+      renderPlayLightbox();
+    });
+    document.getElementById('play-lightbox').addEventListener('click', function(e) {
+      if (e.target === this) closePlayGallery();
+    });
+    document.addEventListener('keydown', function(e) {
+      var lb = document.getElementById('play-lightbox');
+      if (lb.style.display === 'none') return;
+      if (e.key === 'Escape') closePlayGallery();
+      if (e.key === 'ArrowLeft') { playLB.current = (playLB.current - 1 + playLB.total) % playLB.total; renderPlayLightbox(); }
+      if (e.key === 'ArrowRight') { playLB.current = (playLB.current + 1) % playLB.total; renderPlayLightbox(); }
     });
   </script>
 
