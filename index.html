@@ -66,7 +66,7 @@
       --squiggle-color: %23ef6a5a;
     }
 
-    html { color-scheme: light; transition: background-color 0.3s ease; }
+    html { color-scheme: light; transition: background-color 0.3s ease; overflow-anchor: none; }
     html[data-theme="dark"] { color-scheme: dark; }
 
     html { scroll-behavior: smooth; }
@@ -926,10 +926,10 @@
     /* ========== INLINE PANE THUMBNAIL ========== */
     .iframe-thumb-container {
       width: 100%;
+      height: 315px;
       overflow: hidden;
       background: var(--bg-alt);
       pointer-events: none;
-      /* JS sets explicit height; contain:layout stops children affecting outer layout */
       contain: layout paint;
     }
     :root[data-theme="dark"] .iframe-thumb-container { background: #0a0a0c; }
@@ -953,14 +953,17 @@
     }
     .iframe-thumb {
       width: 100%;
+      height: 315px;
+      overflow: hidden;
+      position: relative;
     }
     .pane-scale-wrapper {
-      transform: scale(0.65);
-      transform-origin: top center;
+      position: absolute;
+      top: 0;
+      left: 0;
       width: calc(100% / 0.65);
-      margin-left: calc((100% - 100% / 0.65) / 2);
-      padding-bottom: 0;
-      overflow: hidden; /* trap timeline row additions inside the scaled wrapper */
+      transform: scale(0.65);
+      transform-origin: top left;
     }
     .pane-ticket-embed {
       margin-bottom: 0 !important;
@@ -1465,7 +1468,7 @@
       <a href="#" class="nav-name">Abigail</a>
       <div class="nav-links">
         <a href="#work">Work</a>
-        <a href="#journey">Journey</a>
+        <a href="journey.html">About</a>
         <a href="play.html">Play</a>
         <a href="AbigailCLeyva.pdf" target="_blank" rel="noopener">Resume</a>
       </div>
@@ -1551,7 +1554,7 @@
           <div class="work-card-preview iframe-thumb-container">
             <div class="iframe-thumb" id="pane-thumb">
               <div class="pane-scale-wrapper">
-              <div class="pane-ticket-embed">
+              <div class="pane-ticket-embed" style="height:460px;overflow:hidden;">
                 <!-- Header -->
                 <div style="padding:14px 16px 10px">
                   <div style="display:flex;align-items:flex-start;gap:12px">
@@ -1674,6 +1677,24 @@
           </div>
         </div>
       </div>
+
+      <!-- Project card — Inspect Panel -->
+      <div class="work-card">
+        <div class="work-card-inner">
+          <p class="work-label">Inspect Panel</p>
+          <h2 class="work-title">Making cluster intelligence visible.</h2>
+          <p class="work-desc">Three components, one question: why are these tickets together? Designing the panel that gives operators temporal, environmental, and outlier context at a glance.</p>
+
+          <div class="work-card-preview" style="height:315px; position:relative; overflow:hidden; border-radius:8px;">
+            <iframe src="drill_down/full-panel.html" frameborder="0" scrolling="no" title="Full Inspect Panel" style="display:block; pointer-events:none; position:absolute; top:0; left:0; width:150%; height:480px; transform:scale(0.667); transform-origin:top left;"></iframe>
+            <div style="position:absolute;inset:0;"></div>
+          </div>
+
+          <div class="work-card-footer">
+            <a href="case-study-inspect.html" class="read-more">Read more →</a>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- SALESFORCE -->
@@ -1772,29 +1793,6 @@
 
 
 
-    <section class="work-section" id="fashionx">
-      <div class="company-header">
-        <img src="browzwear.jpg" alt="Browzwear" class="company-header-icon" style="width:20px; height:20px; object-fit:contain; border-radius:4px;">
-        <span>Browzwear X FashionX</span>
-      </div>
-      <hr class="divider">
-
-      <div class="work-card">
-        <div class="work-card-inner">
-          <p class="work-label">3D Design-as-Code</p>
-          <h2 class="work-title">Virtual Threads: 75% Faster Sampling.</h2>
-          <p class="work-desc">Architected a digital capsule collection using Browzwear VStitcher, cutting sampling time by 75%. Developed 3D patterns and realistic fabric simulations on avatars to eliminate the need for physical prototypes.</p>
-
-          <div class="work-card-preview" style="margin-bottom: 1.5rem; border-radius: 8px; overflow: hidden; border: 1px solid var(--border);">
-            <img src="fashionx/image_3.png" alt="FashionX 3D Render" style="width:100%; height:auto; display:block;">
-          </div>
-
-          <div class="work-card-footer">
-            <a href="fashionx/case-study-fashionx.html" class="read-more">Read More →</a>
-          </div>
-        </div>
-      </div>
-    </section>
 
 
 
@@ -2326,48 +2324,22 @@
       setTimeout(paneRunWorkflow, 1200);
     }
 
-    // Measure max height upfront (show resolution block temporarily to get full height)
+    // Measure max height upfront at the tallest possible state (resolution block + all 3 animation rows)
     // then lock the container before any animation runs
     (function lockPaneThumbnailHeight() {
       var wrapper = document.querySelector('.iframe-thumb-container');
       var sug = document.getElementById('pane-suggested-block');
       var res = document.getElementById('pane-resolution-block');
-      if (!wrapper || !sug || !res) return;
+      var tl  = document.getElementById('pane-tl');
+      if (!wrapper || !sug || !res || !tl) return;
 
-      // Temporarily show resolution block (the taller state) to measure max height
-      sug.style.display = 'none';
-      res.style.display = 'block';
+      var fakeRowHTML = '<div class="pane-tl-row"><div class="pane-tl-spine"><div class="pane-tl-dot"></div><div class="pane-tl-line"></div></div><div class="pane-tl-content"><span class="pane-tl-text">placeholder</span></div></div>';
 
-      // Let browser paint, then measure and lock
-      requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-          var h = wrapper.scrollHeight;
-          wrapper.style.height = h + 'px';
+      wrapper.style.height = '315px';
 
-          // Restore to initial state
-          sug.style.display = '';
-          sug.style.opacity = '1';
-          res.style.display = 'none';
-
-          // Now start the animation
-          setTimeout(paneRunWorkflow, 1200);
-          setInterval(paneAutoLoop, 8000);
-        });
-      });
-
-      // Re-lock on resize
-      window.addEventListener('resize', function() {
-        sug.style.display = 'none';
-        res.style.display = 'block';
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            wrapper.style.height = wrapper.scrollHeight + 'px';
-            sug.style.display = '';
-            sug.style.opacity = '1';
-            res.style.display = 'none';
-          });
-        });
-      }, { passive: true });
+      // Start the animation
+      setTimeout(paneRunWorkflow, 1200);
+      setInterval(paneAutoLoop, 8000);
     })();
     document.getElementById('copy-email').addEventListener('click', () => {
       navigator.clipboard.writeText('abigailcleyva@gmail.com');

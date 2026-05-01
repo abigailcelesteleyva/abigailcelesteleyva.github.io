@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Common Attributes — Iteration 1</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1C1410;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 24px;
+      color: #E8E0D0;
+    }
+    .label    { font-size: 11px; color: #8A7A6A; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+    .sublabel { font-size: 12px; color: #6A5A4A; margin-top: 3px; margin-bottom: 18px; }
+    .attr-row { margin-bottom: 18px; }
+    .attr-header {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 7px;
+    }
+    .attr-name { font-size: 13px; color: #E8E0D0; font-weight: 500; }
+    .attr-pct  { font-size: 12px; color: #8A7A6A; }
+    .bar-track {
+      height: 6px; background: rgba(255,255,255,0.04); border-radius: 99px; overflow: hidden;
+      margin-bottom: 5px;
+    }
+    .bar-fill  { height: 100%; border-radius: 99px; background: #E8833A; }
+    .attr-meta { display: flex; justify-content: space-between; }
+    .attr-val  { font-size: 11px; color: #6A5A4A; font-family: monospace; }
+    .attr-src  { font-size: 10px; color: #4A3A2A; }
+    .divider   { height: 1px; background: #2A2010; margin: 18px 0; }
+    .weak-toggle {
+      background: none; border: none; cursor: pointer;
+      font-size: 12px; color: #4A3A2A; font-family: inherit; padding: 0;
+      display: flex; align-items: center; gap: 4px; margin-top: 4px;
+    }
+    .weak-toggle:hover { color: #6A5A4A; }
+    .info-btn {
+      background: none; border: none; cursor: pointer; color: #4A3A2A;
+      font-size: 13px; padding: 0; line-height: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+    <span class="label">Common Attributes</span>
+    <button class="info-btn">ⓘ</button>
+  </div>
+  <p class="sublabel">21 of 24 tickets share these patterns</p>
+
+  <!-- VPN Gateway -->
+  <div class="attr-row">
+    <div class="attr-header">
+      <span class="attr-name">VPN Gateway</span>
+      <span class="attr-pct">96% · 23 of 24</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" style="width:96%;"></div></div>
+    <div class="attr-meta">
+      <span class="attr-val">gw-us-east-02</span>
+      <span class="attr-src">CrowdStrike</span>
+    </div>
+  </div>
+
+  <!-- VPN Client Version -->
+  <div class="attr-row">
+    <div class="attr-header">
+      <span class="attr-name">VPN Client Version</span>
+      <span class="attr-pct">88% · 21 of 24</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" style="width:88%;"></div></div>
+    <div class="attr-meta">
+      <span class="attr-val">v6.3.1</span>
+      <span class="attr-src">Jamf</span>
+    </div>
+  </div>
+
+  <!-- OS Version -->
+  <div class="attr-row">
+    <div class="attr-header">
+      <span class="attr-name">OS Version</span>
+      <span class="attr-pct">79% · 19 of 24</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" style="width:79%; opacity:0.7;"></div></div>
+    <div class="attr-meta">
+      <span class="attr-val">macOS 14.3</span>
+      <span class="attr-src">Jamf</span>
+    </div>
+  </div>
+
+  <!-- Device Enrollment -->
+  <div class="attr-row">
+    <div class="attr-header">
+      <span class="attr-name">Device Enrollment</span>
+      <span class="attr-pct">75% · 18 of 24</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" style="width:75%; opacity:0.55;"></div></div>
+    <div class="attr-meta">
+      <span class="attr-val">Corporate MDM</span>
+      <span class="attr-src">Jamf</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <button class="weak-toggle" id="weak-btn" onclick="toggleWeak()">Show 2 weak signals ↓</button>
+
+  <div id="weak-signals" style="display:none; margin-top:14px;">
+    <div class="attr-row">
+      <div class="attr-header">
+        <span class="attr-name">Office Location</span>
+        <span class="attr-pct">58% · 14 of 24</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:58%; opacity:0.35;"></div></div>
+      <div class="attr-meta">
+        <span class="attr-val">Boston HQ</span>
+        <span class="attr-src">Okta</span>
+      </div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-header">
+        <span class="attr-name">Auth Method</span>
+        <span class="attr-pct">54% · 13 of 24</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:54%; opacity:0.3;"></div></div>
+      <div class="attr-meta">
+        <span class="attr-val">OIDC</span>
+        <span class="attr-src">Okta</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleWeak() {
+      const el  = document.getElementById('weak-signals');
+      const btn = document.getElementById('weak-btn');
+      const show = el.style.display === 'none';
+      el.style.display = show ? 'block' : 'none';
+      btn.textContent = show ? 'Hide weak signals ↑' : 'Show 2 weak signals ↓';
+    }
+  </script>
+</body>
+</html>

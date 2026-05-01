@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STLabs · Volume Timeline · VPN Cluster</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #1C1410;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2A2010; border-radius: 2px; }
+
+    @keyframes dotBlink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.25; }
+    }
+    .live-dot { animation: dotBlink 1.8s ease-in-out infinite; }
+
+    @keyframes tailPulse {
+      0%, 100% { opacity: 0.5; }
+      50%       { opacity: 1; }
+    }
+    .live-tail { animation: tailPulse 1.8s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const C = {
+  orange:  '#E8833A',
+  label:   '#8A7A6A',
+  body:    '#E8E0D0',
+  muted:   '#6A5A4A',
+  amber:   '#D48A2A',
+  green:   '#5A8A5A',
+  panelBg: '#1C1410',
+  card:    '#252018',
+  divider: '#2A2010',
+};
+
+function makeBuckets(counts, startHour, startMin) {
+  return counts.map((count, i) => {
+    const totalMin = startHour * 60 + startMin + i;
+    const h   = Math.floor(totalMin / 60);
+    const m   = totalMin % 60;
+    const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return { count, label: `${h12}:${String(m).padStart(2,'0')}` };
+  });
+}
+
+/* ── Ghost cluster — a typical previous VPN cluster, same bucket size ── */
+const GHOST_TYPICAL = makeBuckets(
+  [0,0,1,2,4,7,10,8,5,3,1,0,0],
+  9, 42
+);
+
+/* ── States ── */
+const ALL_STATES = [
+  {
+    id: 'with-ghost-tapering',
+    stateLabel: 'With comparable cluster · tapering',
+    live: true,
+    trend: 'tapering',
+    /* peak at minute ~30 so start/peak/now labels have breathing room */
+    full: makeBuckets(
+      [0,0,0,1,1,1,2,2,3,3,4,4,5,6,7,8,9,10,11,12,12,11,10,9,8,7,6,5,4,3,
+       2,2,1,1,1,1,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      9, 0
+    ),
+    ghost: makeBuckets(
+      [0,0,0,1,1,2,3,5,7,9,10,9,7,5,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      9, 0
+    ),
+    ghostLabel: 'Nov 12 VPN cluster',
+  },
+  {
+    id: 'with-ghost-escalating',
+    stateLabel: 'With comparable cluster · escalating',
+    live: true,
+    trend: 'escalating',
+    full: makeBuckets(
+      [0,0,1,1,2,3,4,6,9,11,14,16],
+      9, 42
+    ),
+    ghost: GHOST_TYPICAL,
+    ghostLabel: 'Nov 12 VPN cluster',
+  },
+  {
+    id: 'no-ghost',
+    stateLabel: 'No comparable cluster · new pattern',
+    live: true,
+    trend: 'escalating',
+    full: makeBuckets(
+      [0,0,1,1,2,3,4,6,9,11,14,16],
+      9, 42
+    ),
+    ghost: null,
+    ghostLabel: null,
+  },
+  {
+    id: 'resolved-with-ghost',
+    stateLabel: 'Resolved · with comparable cluster',
+    live: false,
+    trend: 'resolved',
+    full: makeBuckets(
+      [0,1,3,8,12,9,6,3,1,0,0,0],
+      9, 42
+    ),
+    ghost: GHOST_TYPICAL,
+    ghostLabel: 'Nov 12 VPN cluster',
+  },
+];
+
+/* ── Seed for the ticking live demo — escalating ── */
+const LIVE_SEED = makeBuckets([0,0,1,1,2,3,4,6,9,11], 9, 42);
+const LIVE_INCOMING = [14, 16, 13, 10, 7, 4, 2, 1, 1, 0, 0, 0]; // future buckets arrive one by one
+
+const RANGE_OPTS = [
+  { key: 'full', minBuckets: 0  },
+  { key: '1h',   minBuckets: 60 },
+  { key: '30m',  minBuckets: 30 },
+];
+
+function availableRanges(n) {
+  return RANGE_OPTS.filter(r => n >= r.minBuckets).map(r => r.key);
+}
+
+function rebucket(buckets, rangeKey, live) {
+  let slice = rangeKey === '1h' ? buckets.slice(-60)
+            : rangeKey === '30m' ? buckets.slice(-30)
+            : buckets;
+
+  if (!live) {
+    let last = slice.length - 1;
+    while (last > 0 && slice[last].count === 0) last--;
+    slice = slice.slice(0, last + 2);
+  }
+
+  const MAX_PTS = 40;
+  if (slice.length <= MAX_PTS) return slice;
+  const step = Math.ceil(slice.length / MAX_PTS);
+  return Array.from({ length: Math.ceil(slice.length / step) }, (_, i) => {
+    const chunk = slice.slice(i * step, (i + 1) * step);
+    const avg   = chunk.reduce((a, b) => a + b.count, 0) / chunk.length;
+    return { ...chunk[0], count: Math.round(avg) };
+  });
+}
+
+/*
+  Slice the ghost to the same time window as the current buckets.
+  Both series are 1-bucket-per-minute starting from index 0 = cluster start.
+  When we show the last N buckets of the current series, we show the same
+  N buckets of the ghost — same relative position in the cluster lifecycle.
+  If the ghost is shorter than the window, pad the tail with zeros.
+*/
+function sliceGhost(ghost, rangeKey, currentFullLength, live) {
+  if (!ghost) return null;
+
+  const windowSize = rangeKey === '1h'  ? 60
+                   : rangeKey === '30m' ? 30
+                   : currentFullLength;
+
+  /* same offset the current series uses */
+  const startIdx = Math.max(0, currentFullLength - windowSize);
+  let slice = ghost.slice(startIdx, startIdx + windowSize);
+
+  /* pad if ghost ended before window fills */
+  if (slice.length < windowSize) {
+    const pad = Array(windowSize - slice.length).fill({ count: 0, label: '' });
+    slice = [...slice, ...pad];
+  }
+
+  /* trim trailing zeros for resolved (matches rebucket behaviour) */
+  if (!live) {
+    let last = slice.length - 1;
+    while (last > 0 && slice[last].count === 0) last--;
+    slice = slice.slice(0, last + 2);
+  }
+
+  /* downsample with the same logic as rebucket */
+  const MAX_PTS = 40;
+  if (slice.length <= MAX_PTS) return slice;
+  const step = Math.ceil(slice.length / MAX_PTS);
+  return Array.from({ length: Math.ceil(slice.length / step) }, (_, i) => {
+    const chunk = slice.slice(i * step, (i + 1) * step);
+    const avg   = chunk.reduce((a, b) => a + b.count, 0) / chunk.length;
+    return { ...chunk[0], count: Math.round(avg) };
+  });
+}
+
+/* ── SVG chart ── */
+function LineChart({ buckets, ghost, ghostLabel, live, height }) {
+  const [hoverIdx, setHoverIdx]     = React.useState(null);
+  const [tooltipPos, setTooltipPos] = React.useState(null);
+  const [ghostHover, setGhostHover] = React.useState(false);
+  const containerRef = React.useRef(null);
+  const [W, setW]    = React.useState(340);
+
+  React.useEffect(() => {
+    if (!containerRef.current) return;
+    const ro = new ResizeObserver(e => setW(e[0].contentRect.width));
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  const H     = height;
+  const PAD_T = 8;
+  const n     = buckets.length;
+
+  /* ghost is already sliced + aligned upstream — same length as buckets */
+  const alignedGhost = ghost;
+
+  /* scale both series on the same max so ghost is directly comparable */
+  const allCounts = [
+    ...buckets.map(b => b.count),
+    ...(alignedGhost ? alignedGhost.map(b => b.count) : []),
+  ];
+  const maxVal = Math.max(...allCounts, 1);
+
+  function xPos(i) { return n < 2 ? 0 : (i / (n - 1)) * W; }
+  function yPos(v) { return PAD_T + (1 - v / maxVal) * (H - PAD_T); }
+
+  function stepPath(pts) {
+    if (pts.length < 2) return '';
+    let d = `M ${pts[0][0]} ${pts[0][1]}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const midX = (pts[i][0] + pts[i+1][0]) / 2;
+      d += ` H ${midX} V ${pts[i+1][1]} H ${pts[i+1][0]}`;
+    }
+    return d;
+  }
+
+  const pts      = buckets.map((b, i) => [xPos(i), yPos(b.count)]);
+  const linePath = stepPath(pts);
+  const baseline = yPos(0);
+  const areaPath = linePath + ` V ${baseline} H ${pts[0][0]} Z`;
+
+  const ghostPts      = alignedGhost ? alignedGhost.map((b, i) => [xPos(i), yPos(b.count)]) : null;
+  const ghostLinePath = ghostPts ? stepPath(ghostPts) : null;
+
+  const lastPt = pts[pts.length - 1];
+  const slotW  = n > 1 ? W / (n - 1) : W;
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        style={{ width: '100%', height, display: 'block', overflow: 'visible' }}
+        onMouseLeave={() => { setHoverIdx(null); setTooltipPos(null); setGhostHover(false); }}
+      >
+        <defs>
+          <linearGradient id={`ag-${live}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stopColor="#6B9FD4" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#6B9FD4" stopOpacity="0.01" />
+          </linearGradient>
+        </defs>
+
+        {/* ghost line — rendered under everything */}
+        {ghostLinePath && (
+          <path
+            d={ghostLinePath}
+            fill="none"
+            stroke="#A89B8A"
+            strokeWidth="1"
+            strokeDasharray="3 3"
+            strokeOpacity={ghostHover ? 0.7 : 0.3}
+            style={{ transition: 'stroke-opacity 0.2s', cursor: 'default' }}
+            onMouseEnter={() => setGhostHover(true)}
+            onMouseLeave={() => setGhostHover(false)}
+          />
+        )}
+
+        {/* current area fill */}
+        <path d={areaPath} fill={`url(#ag-${live})`} />
+
+        {/* current line */}
+        <path
+          d={linePath}
+          fill="none"
+          stroke="#6B9FD4"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        {/* hover crosshair */}
+        {hoverIdx !== null && (
+          <>
+            <line
+              x1={xPos(hoverIdx)} y1={PAD_T}
+              x2={xPos(hoverIdx)} y2={H}
+              stroke={C.muted} strokeWidth="1" strokeDasharray="3 3"
+            />
+            <circle
+              cx={xPos(hoverIdx)} cy={yPos(buckets[hoverIdx].count)}
+              r="3" fill="#6B9FD4" stroke={C.panelBg} strokeWidth="1.5"
+            />
+          </>
+        )}
+
+        {/* live tail dot */}
+        {live && (
+          <circle
+            className="live-tail"
+            cx={lastPt[0]} cy={lastPt[1]}
+            r="3" fill="#6B9FD4" stroke={C.panelBg} strokeWidth="1.5"
+          />
+        )}
+
+        {/* hover slots */}
+        {buckets.map((b, i) => (
+          <rect
+            key={i}
+            x={xPos(i) - slotW / 2} y={0}
+            width={slotW} height={H}
+            fill="transparent"
+            style={{ cursor: 'default' }}
+            onMouseEnter={e => {
+              setHoverIdx(i);
+              setTooltipPos({ x: e.clientX, y: e.clientY });
+            }}
+          />
+        ))}
+      </svg>
+
+      {/* ghost hover label — appears bottom-right of chart */}
+      {ghost && ghostHover && (
+        <div style={{
+          position: 'absolute', bottom: 0, right: 0,
+          fontSize: 10, color: C.muted,
+          background: C.panelBg,
+          padding: '2px 4px',
+          pointerEvents: 'none',
+          letterSpacing: '0.01em',
+        }}>
+          {ghostLabel}
+        </div>
+      )}
+
+      {/* bucket tooltip */}
+      {hoverIdx !== null && tooltipPos && (
+        <div style={{
+          position: 'fixed',
+          left: tooltipPos.x + 12, top: tooltipPos.y - 8,
+          background: '#191208', border: `1px solid ${C.divider}`,
+          borderRadius: 6, padding: '6px 10px',
+          pointerEvents: 'none', zIndex: 999,
+        }}>
+          <div style={{ fontSize: 11, color: C.body, fontWeight: 500, lineHeight: 1.5 }}>
+            {buckets[hoverIdx].label}
+          </div>
+          <div style={{ fontSize: 11, color: C.label, lineHeight: 1.5 }}>
+            {buckets[hoverIdx].count} ticket{buckets[hoverIdx].count !== 1 ? 's' : ''}
+            {hoverIdx === buckets.length - 1 && live ? ' so far' : ''}
+          </div>
+          {alignedGhost && alignedGhost[hoverIdx] && alignedGhost[hoverIdx].count > 0 && (
+            <div style={{ fontSize: 10, color: C.muted, lineHeight: 1.5, marginTop: 2 }}>
+              {alignedGhost[hoverIdx].count} typical
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── X-axis ── */
+function XAxis({ buckets, live, trend }) {
+  const n = buckets.length;
+  if (n < 2) return null;
+
+  const peakIdx  = buckets.reduce((best, b, i) => b.count > buckets[best].count ? i : best, 0);
+  const peakIsNow = peakIdx === n - 1; // peak is at the rightmost point — still escalating
+  const pastPeak  = !peakIsNow && peakIdx > 0;
+
+  /* Find last non-zero bucket for resolved end marker */
+  let endIdx = n - 1;
+  if (!live) {
+    while (endIdx > 0 && buckets[endIdx].count === 0) endIdx--;
+  }
+
+  const labels = [];
+
+  /* Start — always */
+  labels.push({ index: 0, label: buckets[0].label, align: 'left' });
+
+  /* Peak — only when clearly behind us (not live escalating) */
+  if (pastPeak && peakIdx < n - 1) {
+    labels.push({
+      index: peakIdx,
+      label: buckets[peakIdx].label + ' ↓',
+      align: 'center',
+      isPeak: true,
+    });
+  }
+
+  /* Right edge — "now" if live, end time if resolved */
+  if (live) {
+    labels.push({ index: n - 1, label: 'now', align: 'right', isNow: true });
+  } else {
+    labels.push({ index: endIdx, label: buckets[endIdx].label, align: 'right' });
+  }
+
+  function leftPct(index) {
+    return `${(index / (n - 1)) * 100}%`;
+  }
+
+  function translateX(align) {
+    return align === 'left' ? 'none'
+         : align === 'right' ? 'translateX(-100%)'
+         : 'translateX(-50%)';
+  }
+
+  return (
+    <div style={{ position: 'relative', height: 18, marginTop: 5 }}>
+      {labels.map(({ index, label, align, isNow, isPeak }) => (
+        <div key={label} style={{
+          position: 'absolute',
+          left: leftPct(index),
+          transform: translateX(align),
+          fontSize: 10,
+          color: isNow ? C.orange : isPeak ? C.label : C.muted,
+          fontWeight: isNow ? 500 : 400,
+          whiteSpace: 'nowrap',
+          display: 'flex', alignItems: 'center', gap: 4,
+        }}>
+          {isNow && (
+            <span className="live-dot" style={{
+              width: 5, height: 5, borderRadius: '50%',
+              background: C.orange, display: 'inline-block', flexShrink: 0,
+            }} />
+          )}
+          {label}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Range pills ── */
+function RangePills({ selected, onChange, ranges }) {
+  const labels = { full: 'all', '1h': '1h', '30m': '30m' };
+  return (
+    <div style={{ display: 'flex', gap: 2, marginTop: 12 }}>
+      {ranges.map(r => (
+        <button key={r} onClick={() => onChange(r)} style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          fontSize: 11,
+          fontWeight: selected === r ? 600 : 400,
+          color: selected === r ? C.body : C.muted,
+          padding: '3px 8px', borderRadius: 4,
+          borderBottom: selected === r ? `1.5px solid #6B9FD4` : '1.5px solid transparent',
+          transition: 'color 0.15s, border-color 0.15s',
+          letterSpacing: '0.02em',
+        }}>
+          {labels[r]}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ── Main ── */
+function VolumeTimeline({ state }) {
+  const [range, setRange] = React.useState('full');
+  const { live, full, ghost, ghostLabel } = state;
+  const ranges       = availableRanges(full.length);
+  const buckets      = rebucket(full, range, live);
+  const slicedGhost  = ghost ? sliceGhost(ghost, range, full.length, live) : null;
+
+  return (
+    <div style={{ background: C.panelBg, padding: '16px 18px' }}>
+
+      {/* header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 11, color: C.label, fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            Ticket Rate
+          </span>
+          {live && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span className="live-dot" style={{ width: 5, height: 5, borderRadius: '50%', background: C.orange, display: 'inline-block' }} />
+              <span style={{ fontSize: 10, color: C.muted }}>live</span>
+            </span>
+          )}
+        </div>
+
+        {/* ghost legend — only when comparable cluster exists */}
+        {ghost ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <svg width="16" height="8" style={{ flexShrink: 0 }}>
+              <line x1="0" y1="4" x2="16" y2="4" stroke="#A89B8A" strokeWidth="1" strokeDasharray="3 3" strokeOpacity="0.5" />
+            </svg>
+            <span style={{ fontSize: 10, color: '#A89B8A' }}>{ghostLabel}</span>
+          </div>
+        ) : (
+          <span style={{ fontSize: 10, color: C.muted, fontStyle: 'italic' }}>no prior match</span>
+        )}
+      </div>
+
+      <LineChart
+        buckets={buckets}
+        ghost={slicedGhost}
+        ghostLabel={ghostLabel}
+        live={live}
+        height={80}
+      />
+      <XAxis buckets={buckets} live={live} trend={state.trend} />
+      <RangePills selected={range} onChange={setRange} ranges={ranges} />
+    </div>
+  );
+}
+
+/* ── Live ticking demo ── */
+function LiveDemo() {
+  const [buckets, setBuckets] = React.useState(LIVE_SEED);
+  const [incomingIdx, setIncomingIdx] = React.useState(0);
+  const [done, setDone] = React.useState(false);
+
+  React.useEffect(() => {
+    if (done) return;
+    const id = setInterval(() => {
+      setIncomingIdx(prev => {
+        const next = prev + 1;
+        if (next >= LIVE_INCOMING.length) {
+          setDone(true);
+          return prev;
+        }
+        const totalMin = 9 * 60 + 42 + LIVE_SEED.length + next;
+        const h   = Math.floor(totalMin / 60);
+        const m   = totalMin % 60;
+        const h12 = h > 12 ? h - 12 : h;
+        const newBucket = { count: LIVE_INCOMING[next], label: `${h12}:${String(m).padStart(2,'0')}` };
+        setBuckets(b => [...b, newBucket]);
+        return next;
+      });
+    }, 1500);
+    return () => clearInterval(id);
+  }, [done]);
+
+  const ghost = makeBuckets([0,0,1,2,4,7,9,8,5,3,1,0,0], 9, 42);
+
+  const state = {
+    live: !done,
+    trend: done ? 'resolved' : 'escalating',
+    full: buckets,
+    ghost,
+    ghostLabel: 'Nov 12 VPN cluster',
+  };
+
+  return <VolumeTimeline state={state} />;
+}
+
+/* ── Mount ── */
+const taperState = ALL_STATES.find(s => s.id === 'with-ghost-tapering');
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <VolumeTimeline state={taperState} />
+);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Volume — Iteration 1</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1C1410;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 24px;
+    }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+    .label  { font-size: 11px; color: #8A7A6A; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+    .badge  {
+      font-size: 11px; color: #5A8A5A;
+      display: flex; align-items: center; gap: 5px; cursor: pointer;
+    }
+    .badge-text { font-size: 11px; }
+    .chevron { font-size: 10px; color: #6A5A4A; }
+    .sublabel { font-size: 11px; color: #4A3A2A; margin-bottom: 14px; }
+    .chart-wrap { position: relative; height: 110px; margin-bottom: 8px; }
+    .bar-group { display: flex; align-items: flex-end; gap: 3px; height: 100%; }
+    .bar {
+      flex: 1; border-radius: 2px 2px 0 0;
+      transition: opacity 0.15s;
+    }
+    .annotation {
+      position: absolute;
+      top: 0; bottom: 0;
+      border-left: 1px dashed #3A2A1A;
+      display: flex; flex-direction: column; align-items: flex-start;
+    }
+    .annotation-label {
+      font-size: 10px; color: #4A3A2A;
+      white-space: nowrap;
+      background: #1C1410;
+      padding: 0 4px;
+      margin-top: 4px;
+      margin-left: 4px;
+    }
+    .xaxis { display: flex; justify-content: space-between; margin-top: 2px; }
+    .xaxis span { font-size: 10px; color: #4A3A2A; }
+    .xaxis .now { color: #E8833A; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+    .live-dot {
+      width: 5px; height: 5px; border-radius: 50%; background: #E8833A;
+      animation: blink 1.8s ease-in-out infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <span class="label">Volume</span>
+    </div>
+    <div class="badge">
+      <span class="badge-text">tapering ↓</span>
+      <span class="chevron">∨</span>
+    </div>
+  </div>
+  <p class="sublabel">Last 30 min · 51 tickets</p>
+
+  <div class="chart-wrap" id="chart-wrap">
+    <div class="bar-group" id="bars"></div>
+    <div class="annotation" id="annotation">
+      <span class="annotation-label">Gateway failover detected</span>
+    </div>
+  </div>
+
+  <div class="xaxis">
+    <span>9:42</span>
+    <span>9:46</span>
+    <span class="now"><span class="live-dot"></span>now</span>
+  </div>
+
+  <script>
+    const heights = [8, 14, 22, 36, 62, 100, 88, 72, 55, 40, 28, 18, 12];
+    const colors  = heights.map((h, i) => {
+      const opacity = 0.35 + 0.65 * (h / 100);
+      return `rgba(232,131,58,${opacity.toFixed(2)})`;
+    });
+
+    const barsEl = document.getElementById('bars');
+    heights.forEach((h, i) => {
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = h + '%';
+      bar.style.background = colors[i];
+      barsEl.appendChild(bar);
+    });
+
+    /* Position annotation at the 7th bar (peak area) */
+    const annotEl = document.getElementById('annotation');
+    const totalBars = heights.length;
+    const annoPct = (6.5 / (totalBars - 1)) * 100;
+    annotEl.style.left = annoPct + '%';
+  </script>
+</body>
+</html>

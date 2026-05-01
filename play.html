@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Serif+Display:ital@0;1&family=VT323&family=Caveat:wght@500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     *, *::before, *::after, a, button, input, select, textarea { cursor: none !important; }
@@ -928,6 +929,77 @@
     }
     .mp-mute-hint.hidden { opacity: 0; }
 
+    /* ── Letter Dump ── */
+    #letter-dump-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: #0e0c0a;
+      display: none;
+      flex-direction: column;
+    }
+    #ld-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    #ld-text-input {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: rgba(250,248,244,0.75);
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      text-align: center;
+      width: min(560px, 80vw);
+      letter-spacing: 0.01em;
+    }
+    #ld-text-input::placeholder { color: rgba(250,248,244,0.18); }
+    #ld-close {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      z-index: 20;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: rgba(250,248,244,0.6);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    #ld-close:hover { background: rgba(255,255,255,0.16); color: #faf8f4; }
+    #ld-clear {
+      position: fixed;
+      top: 20px;
+      right: 68px;
+      z-index: 20;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(250,248,244,0.35);
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 18px;
+      font-size: 0.7rem;
+      font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    #ld-clear:hover { background: rgba(255,255,255,0.1); color: rgba(250,248,244,0.7); }
+
     .mp-tape {
       background: #ddd4b0;
       padding: 3px 12px;
@@ -1030,6 +1102,40 @@
         </div>
       </div>
 
+      <!-- SINGLE: Letter Dump -->
+      <div class="play-card play-card--stretch" onclick="openLetterDump()">
+        <div class="play-card-img play-card--stretch" style="background:#1a1612; min-height:240px; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;">
+          <div style="font-family:'DM Serif Display',serif; color:#faf8f4; font-size:2.6rem; line-height:1.1; text-align:left; padding:24px; position:relative; z-index:1; transform:rotate(-1.5deg);">
+            <span style="color:#c0392b;">d</span>ear<br>world,
+          </div>
+          <div style="position:absolute;bottom:14px;right:18px;font-size:0.6rem;color:rgba(250,248,244,0.25);letter-spacing:0.12em;font-family:'DM Sans',sans-serif;">DUMP YOUR LETTERS</div>
+        </div>
+        <div class="play-card-info">
+          <span class="play-card-tag">Interactive</span>
+          <p class="play-card-title">Letter Dump</p>
+        </div>
+      </div>
+
+      <!-- WIDE: TreeHacks — 2 photos -->
+      <div class="play-card play-card--wide" onclick="openLightbox('TreeHacks', TREEHACKS_PHOTOS, 'Illustrated Stanford\'s iconic landmarks for TreeHacks — Stanford\'s largest hackathon. Traced from reference photos, built in vector, then styled into the brand system.')">
+        <div class="play-collage">
+          <div class="play-collage-hero" style="flex:5;background:url('play/treehacks/main.jpg') center/contain no-repeat; background-color:#F4FFF6;"></div>
+        </div>
+        <div class="play-card-info">
+          <span class="play-card-tag">Illustration</span>
+          <p class="play-card-title">TreeHacks Brand Illustrations</p>
+        </div>
+      </div>
+
+      <!-- SINGLE: Digital Art — Midnight Garden -->
+      <div class="play-card play-card--stretch" onclick="openLightbox('Midnight Garden', ['play/digital_art/midnight_star_garden.png'], 'A nocturnal study of organic crimson forms and gold accents, balancing high-contrast textures with a sense of calm.')">
+        <div class="play-card-img play-card--stretch" style="background:url('play/digital_art/midnight_star_garden.png') center/cover no-repeat;"></div>
+        <div class="play-card-info">
+          <span class="play-card-tag">Digital Art</span>
+          <p class="play-card-title">Midnight Garden</p>
+        </div>
+      </div>
+
       <!-- SINGLE col: Music Player -->
       <div class="play-card play-card--stretch" onclick="openMusicPlayer()">
         <div class="mp-thumb">
@@ -1064,37 +1170,8 @@
           </div>
         </div>
         <div class="play-card-info">
-          <span class="play-card-tag">Music</span>
+          <span class="play-card-tag">Interactive</span>
           <p class="play-card-title">Abby's Spring Set</p>
-        </div>
-      </div>
-
-      <!-- WIDE: TreeHacks — 2 photos -->
-      <div class="play-card play-card--wide" onclick="openLightbox('TreeHacks', TREEHACKS_PHOTOS, 'Illustrated Stanford\'s iconic landmarks for TreeHacks — Stanford\'s largest hackathon. Traced from reference photos, built in vector, then styled into the brand system.')">
-        <div class="play-collage">
-          <div class="play-collage-hero" style="flex:5;background:url('play/treehacks/main.jpg') center/contain no-repeat; background-color:#F4FFF6;"></div>
-        </div>
-        <div class="play-card-info">
-          <span class="play-card-tag">Illustration</span>
-          <p class="play-card-title">TreeHacks Brand Illustrations</p>
-        </div>
-      </div>
-
-      <!-- SINGLE: Digital Art — Midnight Garden -->
-      <div class="play-card play-card--stretch" onclick="openLightbox('Midnight Garden', ['play/digital_art/midnight_star_garden.png'], 'A nocturnal study of organic crimson forms and gold accents, balancing high-contrast textures with a sense of calm.')">
-        <div class="play-card-img play-card--stretch" style="background:url('play/digital_art/midnight_star_garden.png') center/cover no-repeat;"></div>
-        <div class="play-card-info">
-          <span class="play-card-tag">Digital Art</span>
-          <p class="play-card-title">Midnight Garden</p>
-        </div>
-      </div>
-
-      <!-- SINGLE: Mycelium Lamp -->
-      <div class="play-card play-card--short play-card--stretch" onclick="openLightbox('Mycelium Lamp', ['play/mycelium_lamp/mycelium_lamp.png','play/mycelium_lamp/process.png'], 'A clay and washi paper lamp inspired by the fibrous, interconnected lattice of subterranean mycelium. It serves as a study of organic architecture, capturing the delicate beauty of fungal networks.')">
-        <div class="play-card-img" style="background:url('play/mycelium_lamp/mycelium_lamp.png') center/cover no-repeat;"></div>
-        <div class="play-card-info">
-          <span class="play-card-tag">3D / Physical</span>
-          <p class="play-card-title">Mycelium Lamp</p>
         </div>
       </div>
 
@@ -1115,6 +1192,15 @@
         <div class="play-card-info">
           <span class="play-card-tag">Craft</span>
           <p class="play-card-title">Dachshund Sweater</p>
+        </div>
+      </div>
+
+      <!-- SINGLE: Mycelium Lamp -->
+      <div class="play-card play-card--short play-card--stretch" onclick="openLightbox('Mycelium Lamp', ['play/mycelium_lamp/mycelium_lamp.png','play/mycelium_lamp/process.png'], 'A clay and washi paper lamp inspired by the fibrous, interconnected lattice of subterranean mycelium. It serves as a study of organic architecture, capturing the delicate beauty of fungal networks.')">
+        <div class="play-card-img" style="background:url('play/mycelium_lamp/mycelium_lamp.png') center/cover no-repeat;"></div>
+        <div class="play-card-info">
+          <span class="play-card-tag">3D / Physical</span>
+          <p class="play-card-title">Mycelium Lamp</p>
         </div>
       </div>
 
@@ -1152,6 +1238,14 @@
     </div>
     <a href="index.html" style="font-size:0.8rem;color:var(--ink-lighter);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-lighter)'">← back to portfolio</a>
   </footer>
+
+  <!-- Letter Dump Modal -->
+  <div id="letter-dump-modal">
+    <canvas id="ld-canvas"></canvas>
+    <input id="ld-text-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type here...">
+    <button id="ld-clear" onclick="ldClear()">clear</button>
+    <button id="ld-close" onclick="closeLetterDump()">✕</button>
+  </div>
 
   <!-- Music Player Modal -->
   <div id="music-modal" onclick="if(event.target===this)closeMusicPlayer()">
@@ -1526,6 +1620,163 @@
       if (document.getElementById('music-modal').style.display !== 'flex') return;
       if (e.key === 'Escape') closeMusicPlayer();
       if (e.key === ' ') { e.preventDefault(); mpTogglePlay(); }
+    });
+    // ── Letter Dump ──
+    const ld = {
+      engine: null, runner: null, ctx: null, raf: null,
+      W: 0, H: 0, typed: 0,
+      offscreen: document.createElement('canvas'),
+    };
+
+    const LD_COLORS = ['#faf8f4','#e8d5c4','#c0392b','#d4512a','#a8bfc9','#d4c5a9','#c9a898'];
+    const LD_SIZES  = [28, 32, 36, 40, 46];
+
+    function openLetterDump() {
+      const modal = document.getElementById('letter-dump-modal');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      ldInit();
+      const input = document.getElementById('ld-text-input');
+      const demo = 'helloooooo';
+      let i = 0;
+      const typeInterval = setInterval(() => {
+        input.value = demo.slice(0, ++i);
+        if (i === demo.length) {
+          clearInterval(typeInterval);
+          setTimeout(() => ldDumpWord(), 400);
+        }
+      }, 90);
+    }
+
+    function closeLetterDump() {
+      document.getElementById('letter-dump-modal').style.display = 'none';
+      document.body.style.overflow = '';
+      ldDestroy();
+    }
+
+    function ldInit() {
+      const canvas = document.getElementById('ld-canvas');
+      ld.W = window.innerWidth;
+      ld.H = window.innerHeight;
+      canvas.width  = ld.W;
+      canvas.height = ld.H;
+      ld.ctx = canvas.getContext('2d');
+      ld.typed = 0;
+
+      ld.engine = Matter.Engine.create({ gravity: { y: 1.6 } });
+      ld.runner = Matter.Runner.create();
+
+      const thick = 60;
+      const ground = Matter.Bodies.rectangle(ld.W / 2, ld.H + thick / 2, ld.W * 3, thick, { isStatic: true, label: '__wall__' });
+      const wallL  = Matter.Bodies.rectangle(-thick / 2, ld.H / 2, thick, ld.H * 3, { isStatic: true, label: '__wall__' });
+      const wallR  = Matter.Bodies.rectangle(ld.W + thick / 2, ld.H / 2, thick, ld.H * 3, { isStatic: true, label: '__wall__' });
+      Matter.Composite.add(ld.engine.world, [ground, wallL, wallR]);
+
+      Matter.Runner.run(ld.runner, ld.engine);
+      ldRenderLoop();
+    }
+
+    function ldDestroy() {
+      if (ld.raf) { cancelAnimationFrame(ld.raf); ld.raf = null; }
+      if (ld.runner) { Matter.Runner.stop(ld.runner); ld.runner = null; }
+      if (ld.engine) { Matter.Engine.clear(ld.engine); ld.engine = null; }
+      ld.typed = 0;
+    }
+
+    function ldClear() {
+      if (!ld.engine) return;
+      const all = Matter.Composite.allBodies(ld.engine.world);
+      all.forEach(b => { if (!b.isStatic) Matter.Composite.remove(ld.engine.world, b); });
+      ld.typed = 0;
+      document.getElementById('ld-text-input').focus();
+    }
+
+    function ldDumpWord() {
+      const input = document.getElementById('ld-text-input');
+      const word = input.value;
+      if (!word) return;
+      input.value = '';
+
+      const spawnY = ld.H / 2;
+      const fontSize = 36; // measure at a fixed size then scale per char
+      ld.ctx.font = `bold ${fontSize}px 'DM Serif Display', serif`;
+
+      // measure cumulative widths to find each char's center x
+      let totalWidth = 0;
+      const widths = word.split('').map(ch => {
+        const w = ld.ctx.measureText(ch).width;
+        totalWidth += w;
+        return w;
+      });
+
+      let cursor = ld.W / 2 - totalWidth / 2;
+      const positions = widths.map(w => {
+        const cx = cursor + w / 2;
+        cursor += w;
+        return cx;
+      });
+
+      word.split('').forEach((ch, i) => {
+        setTimeout(() => ldSpawnChar(ch, positions[i], spawnY), i * 55);
+      });
+      ld.typed += word.length;
+      input.focus();
+    }
+
+    function ldSpawnChar(char, spawnX, spawnY) {
+      if (!ld.engine) return;
+      const fontSize = LD_SIZES[Math.floor(Math.random() * LD_SIZES.length)];
+      const color    = LD_COLORS[Math.floor(Math.random() * LD_COLORS.length)];
+
+      ld.ctx.font = `bold ${fontSize}px 'DM Serif Display', serif`;
+      const tw = ld.ctx.measureText(char).width;
+      const bw = Math.max(tw * 0.9, fontSize * 0.3);
+      const bh = fontSize * 0.85;
+
+      const body = Matter.Bodies.rectangle(spawnX, spawnY, bw, bh, {
+        restitution: 0.18,
+        friction: 0.72,
+        frictionAir: 0.018,
+        density: 0.003,
+        label: char,
+      });
+      body._ldColor    = color;
+      body._ldFontSize = fontSize;
+
+      Matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.18);
+      Matter.Composite.add(ld.engine.world, body);
+    }
+
+    function ldRenderLoop() {
+      if (!ld.engine) return;
+      const ctx = ld.ctx;
+      ctx.clearRect(0, 0, ld.W, ld.H);
+
+      const bodies = Matter.Composite.allBodies(ld.engine.world);
+      bodies.forEach(body => {
+        if (body.isStatic) return;
+        ctx.save();
+        ctx.translate(body.position.x, body.position.y);
+        ctx.rotate(body.angle);
+        ctx.font = `bold ${body._ldFontSize}px 'DM Serif Display', serif`;
+        ctx.fillStyle = body._ldColor;
+        ctx.textAlign  = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(body.label, 0, 0);
+        ctx.restore();
+      });
+
+      ld.raf = requestAnimationFrame(ldRenderLoop);
+    }
+
+    document.getElementById('ld-text-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); ldDumpWord(); }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && document.getElementById('letter-dump-modal').style.display !== 'none') {
+        closeLetterDump();
+      }
     });
   </script>
 </body>

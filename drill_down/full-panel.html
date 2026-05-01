@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STLabs · Full Inspect Panel</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #0E0C08; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2A2010; border-radius: 2px; }
+
+    @keyframes dotBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+    .live-dot { animation: dotBlink 1.8s ease-in-out infinite; }
+    @keyframes tailPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+    .live-tail { animation: tailPulse 1.8s ease-in-out infinite; }
+
+    .card-body { overflow: hidden; transition: max-height 0.28s ease, opacity 0.22s ease; }
+    .card-body.open { max-height: 300px; opacity: 1; }
+    .card-body.shut { max-height: 0; opacity: 0; }
+    .attr-strip { display: flex; align-items: center; gap: 4px; overflow: hidden; min-width: 0; }
+    .attr-dot   { width: 2px; height: 2px; border-radius: 50%; background: #3A2A1A; flex-shrink: 0; }
+    .attr-name  { font-size: 10px; color: #7A6A5A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .differ-row { display: flex; align-items: baseline; gap: 6px; font-size: 11px; line-height: 1.75; }
+    .differ-attr    { color: #5A4A3A; flex-shrink: 0; min-width: 110px; }
+    .differ-ticket  { color: #C8B89A; }
+    .differ-sep     { color: #3A2A1A; }
+    .differ-cluster { color: #6A5A4A; }
+    .btn-gotit {
+      background: #E8833A; border: none; color: #1A0E06;
+      border-radius: 6px; padding: 5px 14px; font-size: 11px; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: background 0.15s;
+    }
+    .btn-gotit:hover { background: #D07530; }
+    .btn-remove {
+      background: transparent; border: 1px solid rgba(232,131,58,0.22); color: #B8A898;
+      font-size: 11px; cursor: pointer; padding: 5px 14px; font-family: inherit;
+      border-radius: 6px; transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-remove:hover { border-color: rgba(232,131,58,0.45); color: #E8E0D0; }
+    .undo-link {
+      background: transparent; border: none; color: #8A7A6A; font-size: 11px;
+      cursor: pointer; padding: 0; font-family: inherit;
+      text-decoration: underline; text-underline-offset: 2px; transition: color 0.15s;
+    }
+    .undo-link:hover { color: #C8B89A; }
+    .all-reviewed { display: flex; align-items: center; gap: 6px; padding-top: 10px; font-size: 11px; color: #4A3A2A; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+/* ─── Palette ─── */
+const C = {
+  orange:     '#E8833A',
+  label:      '#8A7A6A',
+  body:       '#E8E0D0',
+  muted:      '#6A5A4A',
+  faint:      '#4A3A2A',
+  link:       '#6B9FD4',
+  amber:      '#D48A2A',
+  panelBg:    '#1C1410',
+  card:       '#252018',
+  divider:    '#2A2010',
+  chatBg:     '#141008',
+  chatBubble: '#1E1A14',
+  chatInput:  '#1E1810',
+};
+
+const TICKETS = [
+  'VPN Keeps Disconnecting — Authenticated Tableau',
+  'VPN Crashes Immediately After Opening Files Morning',
+  'Stuck On Connecting... For 20 Minutes',
+  'VPN Errors After Last Night\'s Update',
+  'Cannot Reach Internal Tools After Sleep',
+  'Connection Drops Every 5 Minutes on Corp WiFi',
+  'VPN Auth Loop — Okta Not Responding',
+  'Slow Tunnel Speed Since Monday Patch',
+  'VPN Client Freezes on Launch',
+  'Split Tunneling Stopped Working',
+  'Remote Desktop Timing Out via VPN',
+  'VPN Disconnects During Video Calls',
+  'Certificate Error on Reconnect',
+  'Gateway Unreachable from Home Office',
+  'VPN Works on WiFi, Fails on Ethernet',
+  'Multi-Domain Auth Failing',
+  'DNS Not Resolving Internal Hostnames',
+  'Intermittent Drops — Boston HQ Floor 3',
+  'Cisco AnyConnect Error 2000034',
+  'VPN Reconnect Loop After Hibernate',
+  'No Internet Access When VPN Active',
+  'Two-Factor Prompt Not Appearing',
+  'VPN Latency Spike — All APAC Users',
+  'VPN Not Connecting for 20 min',
+];
+
+/* ─── STLabs logo ─── */
+const STLABS_PATH = "M392.247,248.322c0-12.207,7.452-22.472,17.566-25.475v-61.415c0-14.023-11.368-25.391-25.391-25.391H115.577c-14.023,0-25.391,11.368-25.391,25.391v61.349c10.319,2.934,17.949,13.352,17.949,25.755s-7.63,22.821-17.949,25.755v61.321c0,14.023,11.368,25.391,25.391,25.391h268.846c14.023,0,25.391-11.368,25.391-25.391v-61.814c-10.114-3.003-17.566-13.268-17.566-25.475ZM364.642,315.823h-200.038l-29.245,13.893v-148.582h229.283v134.689Z";
+
+function StLabsLogo({ color = '#dc5a1c', size = 20 }) {
+  return (
+    <svg viewBox="88 134 324 228" width={size} height={size * (228/324)} style={{ display: 'block', flexShrink: 0 }}>
+      <path d={STLABS_PATH} fill={color} />
+      <rect x="197.379" y="224.626" width="26.624" height="47.392" rx="12.207" ry="12.207"
+        transform="translate(421.381 496.644) rotate(-180)" fill={color} />
+      <rect x="276.38" y="224.626" width="26.624" height="47.392" rx="12.207" ry="12.207"
+        transform="translate(579.384 496.644) rotate(-180)" fill={color} />
+    </svg>
+  );
+}
+
+/* ─── Shared ─── */
+function SectionLabel({ children, icon }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+      <span style={{ fontSize: 11, color: C.label, fontWeight: 500, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{children}</span>
+      {icon && <span style={{ fontSize: 11, color: C.muted }}>{icon}</span>}
+    </div>
+  );
+}
+function BodyText({ children }) {
+  return <p style={{ fontSize: 13, color: C.body, lineHeight: 1.6, margin: 0 }}>{children}</p>;
+}
+function Divider() {
+  return <div style={{ height: 1, background: C.divider, margin: '18px 0' }} />;
+}
+
+/* ─── Environment Signal ─── */
+const BAR_DATA = [
+  { name: 'VPN Gateway',       value: 'gw-us-east-02', cluster: 96, org: 20, above: true  },
+  { name: 'VPN Client',        value: 'v6.3.1',         cluster: 88, org: 20, above: true  },
+  { name: 'OS Version',        value: 'macOS 14.3',     cluster: 79, org: 55, above: true  },
+  { name: 'Device Enrollment', value: 'Unmanaged',      cluster: 62, org: 95, above: false },
+];
+
+function EnvironmentSignal() {
+  return (
+    <div>
+      <div style={{ marginBottom: 14 }}>
+        <span style={{ fontSize: 11, color: C.label, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Environment Signal</span>
+        <p style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>
+          Compared to{' '}
+          <span style={{ color: C.link, textDecoration: 'underline', textUnderlineOffset: 2, cursor: 'pointer' }}>org-wide baseline</span>
+        </p>
+      </div>
+      {BAR_DATA.map(b => (
+        <div key={b.name} style={{ marginBottom: 15, paddingLeft: 10, borderLeft: '2px solid transparent' }}>
+          <span style={{ fontSize: 12, color: C.body, fontWeight: 500 }}>{b.name}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 10, color: C.muted, opacity: 0.6, width: 66, textAlign: 'right', flexShrink: 0 }}>org-wide</span>
+              <div style={{ flex: 1, height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${b.org}%`, borderRadius: 99, background: 'rgba(138,122,106,0.4)' }} />
+              </div>
+              <span style={{ fontSize: 11, color: C.muted, width: 28, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{b.org}%</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 10, color: C.muted, opacity: 0.6, width: 66, textAlign: 'right', flexShrink: 0 }}>this cluster</span>
+              <div style={{ flex: 1, height: 4, borderRadius: 99, background: b.above ? 'rgba(232,131,58,0.08)' : 'rgba(107,159,212,0.08)', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${b.cluster}%`, borderRadius: 99, background: b.above ? 'rgba(232,131,58,0.85)' : 'rgba(107,159,212,0.5)' }} />
+              </div>
+              <span style={{ fontSize: 11, color: C.body, fontWeight: 600, width: 28, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{b.cluster}%</span>
+            </div>
+          </div>
+          <div style={{ marginTop: 4, paddingLeft: 74 }}>
+            <span style={{ fontSize: 10, color: C.muted, fontFamily: 'monospace' }}>{b.value}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Ticket Rate (Volume Timeline) ─── */
+function makeBuckets(counts, startHour, startMin) {
+  return counts.map((count, i) => {
+    const totalMin = startHour * 60 + startMin + i;
+    const h   = Math.floor(totalMin / 60);
+    const m   = totalMin % 60;
+    const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return { count, label: `${h12}:${String(m).padStart(2,'0')}` };
+  });
+}
+const LIVE_SEED_FP     = makeBuckets([0,0,1,1,2,3,4,6,9,11], 9, 42);
+const LIVE_INCOMING_FP = [14, 16, 13, 10, 7, 4, 2, 1, 1, 0, 0, 0];
+const GHOST_FP         = makeBuckets([0,0,1,2,4,7,9,8,5,3,1,0,0], 9, 42);
+
+function LineChart({ buckets, ghost, ghostLabel, live, height }) {
+  const [hoverIdx, setHoverIdx]     = React.useState(null);
+  const [tooltipPos, setTooltipPos] = React.useState(null);
+  const containerRef = React.useRef(null);
+  const [W, setW]    = React.useState(300);
+  React.useEffect(() => {
+    if (!containerRef.current) return;
+    const ro = new ResizeObserver(e => setW(e[0].contentRect.width));
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+  const H = height, PAD_T = 8, n = buckets.length;
+  const allCounts = [...buckets.map(b => b.count), ...(ghost ? ghost.map(b => b.count) : [])];
+  const maxVal    = Math.max(...allCounts, 1);
+  function xPos(i) { return n < 2 ? 0 : (i / (n - 1)) * W; }
+  function yPos(v) { return PAD_T + (1 - v / maxVal) * (H - PAD_T); }
+  function stepPath(pts) {
+    if (pts.length < 2) return '';
+    let d = `M ${pts[0][0]} ${pts[0][1]}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const midX = (pts[i][0] + pts[i+1][0]) / 2;
+      d += ` H ${midX} V ${pts[i+1][1]} H ${pts[i+1][0]}`;
+    }
+    return d;
+  }
+  const pts      = buckets.map((b, i) => [xPos(i), yPos(b.count)]);
+  const linePath = stepPath(pts);
+  const areaPath = linePath + ` V ${yPos(0)} H ${pts[0][0]} Z`;
+  const gPts     = ghost ? ghost.map((b, i) => [xPos(i), yPos(b.count)]) : null;
+  const gPath    = gPts ? stepPath(gPts) : null;
+  const lastPt   = pts[pts.length - 1];
+  const slotW    = n > 1 ? W / (n - 1) : W;
+  return (
+    <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height, display: 'block', overflow: 'visible' }}
+        onMouseLeave={() => { setHoverIdx(null); setTooltipPos(null); }}>
+        <defs>
+          <linearGradient id="ag-fp" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stopColor="#6B9FD4" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#6B9FD4" stopOpacity="0.01" />
+          </linearGradient>
+        </defs>
+        {gPath && <path d={gPath} fill="none" stroke="#A89B8A" strokeWidth="1" strokeDasharray="3 3" strokeOpacity="0.3" />}
+        <path d={areaPath} fill="url(#ag-fp)" />
+        <path d={linePath} fill="none" stroke="#6B9FD4" strokeWidth="1.5" strokeLinecap="round" />
+        {hoverIdx !== null && (
+          <>
+            <line x1={xPos(hoverIdx)} y1={PAD_T} x2={xPos(hoverIdx)} y2={H} stroke={C.muted} strokeWidth="1" strokeDasharray="3 3" />
+            <circle cx={xPos(hoverIdx)} cy={yPos(buckets[hoverIdx].count)} r="3" fill="#6B9FD4" stroke={C.panelBg} strokeWidth="1.5" />
+          </>
+        )}
+        {live && <circle className="live-tail" cx={lastPt[0]} cy={lastPt[1]} r="3" fill="#6B9FD4" stroke={C.panelBg} strokeWidth="1.5" />}
+        {buckets.map((b, i) => (
+          <rect key={i} x={xPos(i) - slotW/2} y={0} width={slotW} height={H} fill="transparent" style={{ cursor: 'default' }}
+            onMouseEnter={e => { setHoverIdx(i); setTooltipPos({ x: e.clientX, y: e.clientY }); }} />
+        ))}
+      </svg>
+      {hoverIdx !== null && tooltipPos && (
+        <div style={{ position: 'fixed', left: tooltipPos.x + 12, top: tooltipPos.y - 8, background: '#191208', border: `1px solid ${C.divider}`, borderRadius: 6, padding: '6px 10px', pointerEvents: 'none', zIndex: 999 }}>
+          <div style={{ fontSize: 11, color: C.body, fontWeight: 500, marginBottom: 3 }}>{buckets[hoverIdx].label}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: C.label }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6B9FD4', display: 'inline-block', flexShrink: 0 }} />
+            <span>live</span>
+            <span style={{ marginLeft: 'auto', paddingLeft: 12, color: C.body }}>{buckets[hoverIdx].count}{hoverIdx === buckets.length - 1 && live ? ' so far' : ''}</span>
+          </div>
+          {ghost && ghost[hoverIdx] != null && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: C.muted, marginTop: 2 }}>
+              <svg width="6" height="4" style={{ flexShrink: 0 }}><line x1="0" y1="2" x2="6" y2="2" stroke="#A89B8A" strokeWidth="1" strokeDasharray="2 2"/></svg>
+              <span>Nov 12</span>
+              <span style={{ marginLeft: 'auto', paddingLeft: 12 }}>{ghost[hoverIdx].count}</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function XAxisFP({ buckets, live }) {
+  const n = buckets.length;
+  if (n < 2) return null;
+  const peakIdx  = buckets.reduce((best, b, i) => b.count > buckets[best].count ? i : best, 0);
+  const peakIsNow = peakIdx === n - 1;
+  const pastPeak  = !peakIsNow && peakIdx > 0;
+  let endIdx = n - 1;
+  if (!live) { while (endIdx > 0 && buckets[endIdx].count === 0) endIdx--; }
+  const labels = [{ index: 0, label: buckets[0].label, align: 'left' }];
+  if (pastPeak && peakIdx < n - 1) labels.push({ index: peakIdx, label: buckets[peakIdx].label + ' ↓', align: 'center', isPeak: true });
+  if (live) labels.push({ index: n - 1, label: 'now', align: 'right', isNow: true });
+  else labels.push({ index: endIdx, label: buckets[endIdx].label, align: 'right' });
+  return (
+    <div style={{ position: 'relative', height: 18, marginTop: 5 }}>
+      {labels.map(({ index, label, align, isNow, isPeak }) => (
+        <div key={label} style={{
+          position: 'absolute', left: `${(index / (n-1)) * 100}%`,
+          transform: align === 'left' ? 'none' : align === 'right' ? 'translateX(-100%)' : 'translateX(-50%)',
+          fontSize: 10, color: isNow ? C.orange : isPeak ? C.label : C.muted,
+          fontWeight: isNow ? 500 : 400, whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4,
+        }}>
+          {isNow && <span className="live-dot" style={{ width: 5, height: 5, borderRadius: '50%', background: C.orange, display: 'inline-block', flexShrink: 0 }} />}
+          {label}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TicketRate() {
+  const [buckets, setBuckets] = React.useState(LIVE_SEED_FP);
+  const [idx, setIdx]         = React.useState(0);
+  const [done, setDone]       = React.useState(false);
+  React.useEffect(() => {
+    if (done) return;
+    const id = setInterval(() => {
+      setIdx(prev => {
+        const next = prev + 1;
+        if (next >= LIVE_INCOMING_FP.length) { setDone(true); return prev; }
+        const totalMin = 9 * 60 + 42 + LIVE_SEED_FP.length + next;
+        const h = Math.floor(totalMin / 60), m = totalMin % 60;
+        const h12 = h > 12 ? h - 12 : h;
+        setBuckets(b => [...b, { count: LIVE_INCOMING_FP[next], label: `${h12}:${String(m).padStart(2,'0')}` }]);
+        return next;
+      });
+    }, 1500);
+    return () => clearInterval(id);
+  }, [done]);
+  const live = !done;
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 11, color: C.label, fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Ticket Rate</span>
+          {live && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span className="live-dot" style={{ width: 5, height: 5, borderRadius: '50%', background: C.orange, display: 'inline-block' }} />
+              <span style={{ fontSize: 10, color: C.muted }}>live</span>
+            </span>
+          )}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <svg width="16" height="8"><line x1="0" y1="4" x2="16" y2="4" stroke={C.muted} strokeWidth="1" strokeDasharray="3 3" strokeOpacity="0.5" /></svg>
+          <span style={{ fontSize: 10, color: C.muted }}>Nov 12 VPN cluster</span>
+        </div>
+      </div>
+      <LineChart buckets={buckets} ghost={GHOST_FP.slice(0, buckets.length)} ghostLabel="Nov 12 VPN cluster" live={live} height={80} />
+      <XAxisFP buckets={buckets} live={live} />
+    </div>
+  );
+}
+
+/* ─── Outlier Surfacing ─── */
+const OUTLIERS = [
+  { id: 'S1', title: 'VPN Not Connecting for 20 min', reason: "Identity record spans multiple tenant domains. Standard remediation assumes a single Okta tenant.", confidence: 'high',
+    differs: [{ attr: 'Identity Provider', ticketVal: 'Okta (EU)', clusterVal: 'Okta (US)' }, { attr: 'Region', ticketVal: 'EU-West', clusterVal: 'US-East' }] },
+  { id: 'S2', title: 'Stuck On Connecting For 20 Minutes', reason: "Device is not enrolled in MDM. Standard remediation steps may not apply.", confidence: 'medium',
+    differs: [{ attr: 'Device Enrollment', ticketVal: 'Unmanaged', clusterVal: 'Corporate MDM' }] },
+];
+
+function OutlierCard({ outlier }) {
+  const [open, setOpen]   = React.useState(false);
+  const [state, setState] = React.useState('idle');
+  const isIdle = state === 'idle', isAck = state === 'acknowledged', isRemoved = state === 'removed';
+  return (
+    <div style={{ background: C.card, borderRadius: 6, overflow: 'hidden', opacity: isRemoved ? 0.5 : 1, transition: 'opacity 0.25s' }}>
+      <div onClick={() => isIdle && setOpen(o => !o)}
+        style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', cursor: isIdle ? 'pointer' : 'default', userSelect: 'none', minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <span style={{ fontSize: 12, color: isRemoved ? C.muted : C.body, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.4, textDecoration: isRemoved ? 'line-through' : 'none', textDecorationColor: '#3A2A1A' }}>
+            {outlier.title}
+          </span>
+          {!open && isIdle && (
+            <div className="attr-strip" style={{ marginTop: 2 }}>
+              {outlier.differs.map((d, i) => (
+                <React.Fragment key={d.attr}>
+                  {i > 0 && <span className="attr-dot" />}
+                  <span className="attr-name">{d.attr}</span>
+                </React.Fragment>
+              ))}
+            </div>
+          )}
+          {isRemoved && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+              <span style={{ fontSize: 11, color: C.faint }}>Removed from group.</span>
+              <button className="undo-link" onClick={() => setState('idle')}>Undo</button>
+            </div>
+          )}
+        </div>
+        {isAck   && <span style={{ fontSize: 11, color: C.faint, flexShrink: 0 }}>✓</span>}
+        {isIdle  && <span style={{ fontSize: 11, color: C.faint, flexShrink: 0, display: 'inline-block', transform: open ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s', lineHeight: 1 }}>›</span>}
+      </div>
+      <div className={`card-body ${open && isIdle ? 'open' : 'shut'}`}>
+        <div style={{ padding: '0 12px 12px' }}>
+          <div style={{ height: 1, background: C.divider, marginBottom: 10 }} />
+          <p style={{ fontSize: 12, color: C.muted, marginBottom: outlier.confidence === 'medium' ? 5 : 10, lineHeight: 1.55 }}>{outlier.reason}</p>
+          {outlier.confidence === 'medium' && <p style={{ fontSize: 10, color: C.faint, marginBottom: 10, letterSpacing: '0.02em' }}>Moderate confidence · flag may not apply</p>}
+          <div style={{ marginBottom: 12 }}>
+            {outlier.differs.map(d => (
+              <div key={d.attr} className="differ-row">
+                <span className="differ-attr">{d.attr}</span>
+                <span className="differ-ticket">{d.ticketVal}</span>
+                <span className="differ-sep">vs</span>
+                <span className="differ-cluster">{d.clusterVal}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <button className="btn-gotit" onClick={() => { setState('acknowledged'); setOpen(false); }}>Got it</button>
+            <button className="btn-remove" onClick={() => { setState('removed'); setOpen(false); }}>Remove from group</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OutlierSurfacingPanel() {
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+        <span style={{ fontSize: 11, color: C.label, fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Outliers</span>
+        <span style={{ fontSize: 11, color: C.faint }}>2 of 24 tickets</span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {OUTLIERS.map(o => <OutlierCard key={o.id} outlier={o} />)}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Ticket Preview ─── */
+function TicketPreview() {
+  const visible = TICKETS.slice(0, 8);
+  const hidden  = TICKETS.slice(8);
+  const [showAll, setShowAll] = React.useState(false);
+  return (
+    <div>
+      <SectionLabel>Ticket Preview</SectionLabel>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+        {(showAll ? TICKETS : visible).map(t => (
+          <a key={t} href="#" style={{ fontSize: 13, color: C.link, textDecoration: 'none', lineHeight: 1.4, display: 'block' }}
+            onClick={e => e.preventDefault()}>{t}</a>
+        ))}
+      </div>
+      {!showAll && hidden.length > 0 && (
+        <button onClick={() => setShowAll(true)} style={{ marginTop: 10, background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: C.muted, padding: 0 }}>
+          +{hidden.length} more tickets ↓
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ─── Inspect Panel ─── */
+function InspectPanel() {
+  return (
+    <div style={{ flex: 1, height: '100vh', background: C.panelBg, display: 'flex', flexDirection: 'column', borderLeft: '1px solid #2A2010' }}>
+      <div style={{ padding: '16px 20px 14px', borderBottom: '1px solid #2A2010', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <div>
+          <span style={{ fontSize: 14, color: C.body, fontWeight: 600 }}>VPN Investigation Cluster</span>
+          <span style={{ fontSize: 12, color: C.muted, marginLeft: 10 }}>24 Tickets</span>
+        </div>
+        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.muted, fontSize: 16, lineHeight: 1 }}>✕</button>
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '18px 20px 24px' }}>
+        <SectionLabel>Ticket Summary</SectionLabel>
+        <BodyText>24 tickets reporting VPN failures — consistent auth errors, stalled connections, and immediate disconnects across multiple users and locations.</BodyText>
+        <div style={{ marginTop: 20 }} />
+        <SectionLabel icon="ⓘ">Additional Context</SectionLabel>
+        <BodyText>Same VPN client build, same set of gateways. Likely a shared dependency rather than isolated device failures.</BodyText>
+        <Divider />
+        <EnvironmentSignal />
+        <Divider />
+        <TicketRate />
+        <Divider />
+        <OutlierSurfacingPanel />
+        <Divider />
+        <TicketPreview />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Chat Panel ─── */
+function ChatPanel() {
+  return (
+    <div style={{ flex: 1, height: '100vh', background: C.chatBg, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: '14px 20px', borderBottom: '1px solid #1E1810', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        <div style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <StLabsLogo color="white" size={22} />
+        </div>
+        <span style={{ fontSize: 13, color: C.body, fontWeight: 500 }}>Ticket Agent</span>
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '28px 20px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <div style={{ width: 28, height: 28, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2 }}>
+            <StLabsLogo color="white" size={22} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
+              <span style={{ fontSize: 12, color: C.label, fontWeight: 500 }}>Ticket Agent</span>
+              <span style={{ fontSize: 11, color: C.muted }}>9:44 AM</span>
+            </div>
+            <div style={{ background: C.chatBubble, borderRadius: '3px 12px 12px 12px', padding: '12px 14px' }}>
+              <p style={{ fontSize: 13, color: C.body, margin: 0, lineHeight: 1.65 }}>
+                These 24 tickets share consistent VPN failure patterns across users and locations. I've pulled data on gateway routing, client version, and device state — let me know when you're ready to go over resolution options.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style={{ padding: '14px 16px', borderTop: '1px solid #1E1810', flexShrink: 0 }}>
+        <div style={{ background: C.chatInput, borderRadius: 24, border: '1px solid #2A2010', display: 'flex', alignItems: 'center', padding: '10px 16px', gap: 10 }}>
+          <input type="text" placeholder="Ask Anything" style={{ flex: 1, background: 'none', border: 'none', outline: 'none', fontSize: 13, color: C.body }} />
+          <button style={{ width: 28, height: 28, borderRadius: '50%', background: C.orange, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <span style={{ color: '#fff', fontSize: 13 }}>↑</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Sidebar ─── */
+function Sidebar() {
+  return (
+    <div style={{ width: 48, height: '100vh', background: '#0E0C08', borderRight: '1px solid #1E1810', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 0', gap: 4, flexShrink: 0 }}>
+      <div style={{ marginBottom: 16, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28 }}>
+        <StLabsLogo color={C.orange} size={24} />
+      </div>
+      <div style={{ flex: 1 }} />
+      <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#2A2010', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ fontSize: 10, color: C.label }}>IL</span>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Root ─── */
+function App() {
+  return (
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      <ChatPanel />
+      <InspectPanel />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

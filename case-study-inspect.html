@@ -6,10 +6,13 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/png" sizes="180x180" href="favicon.png">
   <link rel="apple-touch-icon" href="favicon.png">
-  <title>Ticket Inbox — Abigail Leyva</title>
+  <title>Inspect Panel — Abigail Leyva</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -66,13 +69,11 @@
       -webkit-font-smoothing: antialiased;
       font-size: 16px;
       line-height: 1.6;
-      cursor: none;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
-    a, button { cursor: none; }
 
     /* ========== CUSTOM CURSOR ========== */
-    .cursor {
+    /* .cursor {
       position: fixed;
       top: 0; left: 0;
       width: 16px; height: 16px;
@@ -89,7 +90,7 @@
       width: 40px; height: 40px;
       background: var(--accent-soft);
       border: 2px solid var(--accent);
-    }
+    } */
 
     /* ========== HEADER ========== */
     .site-header {
@@ -348,13 +349,6 @@
       100% { opacity: 0; transform: translate(var(--dx2), var(--dy2)) rotate(var(--rot)) scale(0.6); }
     }
 
-    /* ========== CASE STUDY STYLES ========== */
-
-    /* NAV (old — kept for footer only, replaced by site-header above) */
-    .case-nav {
-      display: none; /* replaced by site-header */
-    }
-
     /* ========== CONTENT ========== */
     .content {
       max-width: 680px;
@@ -422,14 +416,14 @@
     }
 
     /* ========== ARTICLE ========== */
-    .case-article { padding: 3.5rem 0; }
+    .case-article { padding: 4.5rem 0; }
 
     .case-article h2 {
       font-family: var(--font-display);
       font-size: 1.8rem;
       font-weight: 400;
       color: var(--text);
-      margin-top: 3.5rem;
+      margin-top: 4rem;
       margin-bottom: 1rem;
     }
     .case-article h2:first-child { margin-top: 0; }
@@ -439,9 +433,10 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--accent);
-      margin-top: 3rem;
+      margin-top: 5rem;
       margin-bottom: 0.75rem;
     }
+    .case-article h3:first-child { margin-top: 0; }
 
     .case-article p {
       font-size: 1rem;
@@ -494,28 +489,22 @@
     }
 
     .case-asset {
-      margin: 2.5rem 0;
+      margin: 3rem 0;
       border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
       background: var(--bg-alt);
     }
     .case-asset-inner {
-      padding: 3rem 2rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 300px;
+      min-height: 200px;
     }
     .case-asset-inner img {
       max-width: 100%;
       height: auto;
-      border-radius: 8px;
-    }
-    .case-asset-placeholder {
-      font-size: 0.8rem;
-      color: var(--text-tertiary);
-      text-align: center;
+      display: block;
     }
     .case-asset-caption {
       padding: 0.75rem 1.5rem;
@@ -524,226 +513,63 @@
       border-top: 1px solid var(--border);
     }
 
-    .case-asset-wide {
-      margin-left: -4rem;
-      margin-right: -4rem;
+    /* ========== COMPONENT FRAME (final iframes) ========== */
+    .component-frame {
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0E0C08;
+    }
+    .component-frame iframe {
+      display: block;
+      width: 100%;
+      border: none;
+      background: #0E0C08;
     }
 
-    /* ========== ITERATION 2 — TABBED ACTIONS ========== */
-    .iter2-header {
-      padding: 0.6rem 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-alt);
+    /* ========== COMPONENT FRAME WRAPPER ========== */
+    .component-frame-outer {
+      padding: 1.5rem 2rem;
+      max-width: 980px;
+      margin: 0 auto;
     }
-    .iter2-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-    .iter2-buttons { display: flex; gap: 1.5rem; }
-    .iter2-btn {
-      padding: 0;
+
+    /* ========== OUTLIER SCENARIO TOGGLE ========== */
+    .outlier-scenario-btn {
       font-family: var(--font-body);
       font-size: 0.75rem;
       font-weight: 500;
       color: var(--text-tertiary);
       background: none;
-      border: none;
-      cursor: none;
-      transition: color 0.3s ease;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.35rem 0.85rem;
+      transition: color 0.2s, border-color 0.2s;
     }
-    .iter2-btn:hover { color: var(--text-secondary); }
-    .iter2-btn.active { color: var(--accent); }
-    .iter2-stage {
-      padding: 1.25rem;
-      background: #010308;
-      position: relative;
-      aspect-ratio: 1249 / 545;
-    }
-    .iter2-frame {
-      width: calc(100% - 2.5rem);
-      height: auto;
-      display: none;
-      position: absolute;
-      top: 1.25rem; left: 1.25rem;
-    }
-    .iter2-frame.active { display: block; }
+    .outlier-scenario-btn:hover { color: var(--text-secondary); border-color: var(--text-tertiary); }
+    .outlier-scenario-btn.outlier-active { color: var(--accent); border-color: var(--accent); }
 
-    /* ========== MANUAL SCROLL WINDOW ========== */
-    .manual-scroll-window {
-      height: 333px;
-      overflow-y: auto;
-      background: #010308;
-      padding: 1.25rem;
+    /* ========== INLINE PANEL SECTION (components rendered directly) ========== */
+    .panel-section-embed {
+      background: #1C1410;
+      border-radius: 10px;
+      padding: 18px 20px;
     }
-    .manual-scroll-window img { width: 100%; height: auto; display: block; }
-    .manual-scroll-window::-webkit-scrollbar { width: 4px; }
-    .manual-scroll-window::-webkit-scrollbar-track { background: transparent; }
-    .manual-scroll-window::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-    .manual-scroll-window::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+    .panel-section-embed * {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
 
-    /* ========== VERTICAL SCROLL SNAP ========== */
-    .vsnap-wrapper {
-      margin: 0 0 3rem;
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .vsnap-header {
-      display: flex;
-      gap: 1.5rem;
-      padding: 0;
-      margin-bottom: 12px;
-    }
-    .vsnap-label {
+    /* ========== COMPONENT CAPTION ========== */
+    .component-caption {
       font-size: 0.75rem;
-      font-weight: 500;
       color: var(--text-tertiary);
-      cursor: none;
-      transition: color 0.3s ease;
+      margin-top: 0.6rem;
+      margin-bottom: 0;
     }
-    .vsnap-label.active { color: var(--accent); }
-    .vsnap-container {
-      aspect-ratio: 1201 / 471;
-      background: var(--bg);
-      overflow-y: scroll;
-      scroll-snap-type: y mandatory;
-      scroll-behavior: smooth;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-    .vsnap-container::-webkit-scrollbar { display: none; }
-    .vsnap-slide {
-      aspect-ratio: 1201 / 471;
-      flex-shrink: 0;
-      scroll-snap-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .vsnap-slide img { width: 100%; height: auto; display: block; }
-    .vsnap-shadow {
-      position: absolute;
-      bottom: -30px; left: 0; right: 0;
-      height: 30px;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.03), transparent);
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    .vsnap-wrapper.at-bottom .vsnap-shadow { opacity: 0; }
-
-    /* ========== THREE ACTIONS ========== */
-    .three-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-      margin-top: 1rem;
-    }
-    .action-item {
-      display: grid;
-      grid-template-columns: 70px 1fr;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-    .action-icon-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-    }
-    .action-icon { height: 28px; width: auto; }
-    .action-item p { font-size: 0.95rem; margin-bottom: 0; }
-
-    /* ========== GAMIFIED RESOLUTION ========== */
-    @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
-
-    .gamified-resolution {
-      height: 74px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 2.5rem;
-      margin: 1rem 0;
-      background: var(--bg);
-      border-radius: 0;
-    }
-    .res-stat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transform-origin: center center;
-      transition: transform 0.6s ease;
-    }
-    .gamified-resolution.popped .res-stat:first-child { transform: translateX(-40px); }
-    .res-stat-resolved {
-      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.4);
-      transform-origin: right center;
-    }
-    .res-stat-resolved.pop { transform: scale(1.3); }
-    .res-number-row { display: flex; align-items: center; gap: 6px; }
-    .res-number {
-      font-family: 'Lato', sans-serif;
-      font-size: 1.65rem;
-      font-weight: 900;
-      color: var(--text-tertiary);
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-      transition: color 0.6s ease;
-    }
-    .res-label {
-      font-family: 'Lato', sans-serif;
-      font-size: 1.65rem;
-      font-weight: 900;
-      color: var(--text-tertiary);
-      text-transform: none;
-      letter-spacing: 0;
-      margin-top: 0;
-      transition: color 0.6s ease;
-    }
-    .res-arrow { transition: transform 0.4s ease; }
-    .res-arrow polyline, .res-arrow path { transition: stroke 0.6s ease; }
-    .res-stat-resolved.pop .res-number,
-    .res-stat-resolved.pop .res-label {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .res-stat-resolved.pop .res-arrow polyline,
-    .res-stat-resolved.pop .res-arrow path { stroke: #22c55e; }
-
-    /* ========== ITERATION 3 — VERTICAL SNAP ========== */
-    .iter3-snap {
-      aspect-ratio: 1467 / 164;
-      overflow-y: scroll;
-      scroll-snap-type: y mandatory;
-      scroll-behavior: smooth;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-      margin: 2.5rem 0;
-      border-radius: 8px;
-    }
-    .iter3-snap::-webkit-scrollbar { display: none; }
-    .iter3-slide {
-      aspect-ratio: 1467 / 164;
-      flex-shrink: 0;
-      scroll-snap-align: start;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0; margin: 0;
-    }
-    .iter3-slide img { width: 100%; height: auto; display: block; }
 
     .case-divider {
       border: none;
       border-top: 1px solid var(--border);
-      margin: 3rem 0;
+      margin: 5rem 0;
     }
 
     /* ========== FOOTER ========== */
@@ -767,111 +593,13 @@
       color: var(--text-tertiary);
     }
 
-    /* ========== ITERATION 1 — FREE FLOATING ========== */
-    .iter1-free {
-      position: relative;
-      margin: 2.5rem 0;
-      cursor: none;
-    }
-    .iter1-overlay {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 24px;
-    }
-    .iter1-overlay-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-    .iter1-overlay-hint {
-      font-size: 0.7rem;
-      font-weight: 400;
-      color: var(--text-tertiary);
-    }
-    .iter1-overlay .demo-dots { margin-left: auto; }
-
-    /* ========== RAW ASSETS ========== */
-    .raw-asset { margin: 2.5rem 0; }
-    .raw-asset img { display: block; width: 100%; height: auto; }
-    .raw-wide { margin-left: -6rem; margin-right: -6rem; }
-    .raw-placeholder {
-      padding: 4rem 2rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-tertiary);
-    }
-
-    /* ========== INTERACTIVE DEMO ========== */
-    .demo-box {
-      margin: 2.5rem 0;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--bg-alt);
-    }
-    .demo-header {
-      padding: 0.6rem 1.25rem;
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .demo-header .demo-hint {
-      font-weight: 400;
-      letter-spacing: 0;
-      text-transform: none;
-      color: var(--text-tertiary);
-      font-size: 0.7rem;
-    }
-    .demo-dots { display: flex; gap: 6px; align-items: center; }
-    .demo-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #d4d4d8;
-      transition: background 0.3s ease;
-    }
-    .demo-dot.filled { background: var(--accent); }
-    .demo-inner {
-      padding: 1.25rem;
-      background: var(--bg-elevated);
-    }
-    .demo-stage {
-      cursor: none;
-      position: relative;
-      overflow: hidden;
-    }
-    .demo-stage img {
-      width: 100%; height: auto;
-      display: block;
-      position: absolute;
-      top: 0; left: 0;
-      opacity: 0;
-      transition: opacity 0.8s ease;
-      pointer-events: none;
-      z-index: 1;
-    }
-    .demo-stage img.active {
-      opacity: 1;
-      position: relative;
-      pointer-events: auto;
-      z-index: 2;
-    }
-    .demo-stage img.prev { opacity: 1; z-index: 1; }
-
     /* ========== RESPONSIVE ========== */
     @media (max-width: 768px) {
       .case-hero { padding: 3rem 0 3rem; }
       .case-details { gap: 2rem; flex-wrap: wrap; }
-      .case-asset-wide, .raw-wide { margin-left: -1rem; margin-right: -1rem; }
       .case-article h2 { font-size: 1.5rem; }
+      .component-frame { border-radius: 8px; }
+      .component-frame-outer { padding: 2rem 1rem; }
     }
     @media (max-width: 640px) {
       .site-header { padding: 1.25rem 1rem 0; gap: 1rem; }
@@ -886,11 +614,9 @@
 <body>
 
   <!-- CUSTOM CURSOR -->
-  <div class="cursor" id="cursor"></div>
 
   <!-- HEADER -->
   <div class="site-header">
-    <!-- Avatar with eye tracking -->
     <div class="avatar-wrapper" id="avatar-wrapper">
       <span class="avatar-tooltip">Hi there!</span>
       <svg id="avatar" viewBox="0 0 100 105" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
@@ -930,7 +656,6 @@
       </svg>
     </div>
 
-    <!-- Nav bar -->
     <div class="nav-bar" id="nav-bar">
       <div class="scroll-progress" id="scroll-progress"></div>
       <div class="nav-bar-left">
@@ -953,8 +678,8 @@
         <img src="stlabs-orange-icon.svg" alt="STLabs">
         <span>Standard Template Labs</span>
       </div>
-      <h1>Rethinking mass ticket resolution for IT ops.</h1>
-      <p class="case-subtitle">A 0→1 design for grouping, prioritizing, and resolving tickets in seconds — through three major iterations shaped by stakeholder tension and user empathy.</p>
+      <h1>Making cluster intelligence visible.</h1>
+      <p class="case-subtitle">Three components. One question: why are these tickets together?</p>
       <div class="case-details">
         <div class="case-detail">
           <span class="case-detail-label">Role</span>
@@ -966,185 +691,202 @@
         </div>
         <div class="case-detail">
           <span class="case-detail-label">Type</span>
-          <span class="case-detail-value">0→1 Product</span>
+          <span class="case-detail-value">0→1 Component Design</span>
         </div>
         <div class="case-detail">
           <span class="case-detail-label">Focus</span>
-          <span class="case-detail-value">Enterprise UX, AI Workflows</span>
+          <span class="case-detail-value">Data Visualization · AI Transparency</span>
         </div>
       </div>
     </section>
 
+  </div>
+
+  <!-- Full inspect panel — intro -->
+  <div class="component-frame-outer" style="padding-top: 2rem; padding-bottom: 0;">
+    <div class="content" style="margin-bottom: 1.5rem;">
+      <h3 style="font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin: 0 0 0.75rem;">The inspect panel</h3>
+      <h2 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--text); margin-bottom: 0.75rem;">Three questions before the operator acts.</h2>
+      <p style="font-size: 1rem; line-height: 1.8; color: var(--text-secondary); max-width: 560px; margin: 0;">The Ticket Inbox groups related IT tickets and lets operators resolve them in bulk. Before they act, they open the inspect panel — three components, each answering a different question about why the tickets are together.</p>
+    </div>
+  </div>
+  <div class="component-frame-outer" style="padding-top: 0; padding-bottom: 0;">
+    <div class="component-frame">
+      <iframe
+        src="drill_down/full-panel.html"
+        width="100%"
+        height="600"
+        frameborder="0"
+        scrolling="no"
+        title="Full Inspect Panel — Intro"
+      ></iframe>
+    </div>
+  </div>
+
+  <div class="content">
+
     <!-- ARTICLE -->
-    <article class="case-article">
+    <article class="case-article" style="padding-bottom: 1.25rem; padding-top: 0.5rem;">
 
-      <!-- THE PROBLEM -->
-      <h2>The problem</h2>
-      <p>A core selling point of our product: intake and group tickets by workflow, then resolve them in bulk. But this was a 0→1 product — no existing patterns to reference, no shared understanding of what "grouping" meant across the team. The founder, engineers, and I each had a different mental model.</p>
+      <!-- CONTEXT -->
+      <h2>Operators were running the panel on faith.</h2>
 
-      <!-- ITERATION 1 -->
-      <h3>Iteration 1 — The safe bet</h3>
-      <h2>Starting with the known.</h2>
-      <p>I started with what existed in the market: a table view. Rows of tickets, expandable grouping applied on top. Each group showed the title, description, labels, a thumbnail of tickets inside, and a Resolve button with status controls. Groups could expand or collapse. The intention: mass resolve tickets in seconds.</p>
+      <p>Most clusters came with an AI-generated summary. In early research, operators either trusted it without verifying, or dismissed the whole cluster because they had no way to check it. The gap wasn't the summary — it was the absence of verifiable evidence behind it.</p>
 
-      <div class="iter1-free">
-        <div class="iter1-overlay">
-          <span class="iter1-overlay-label">Interactive</span>
-          <span class="iter1-overlay-hint" id="demo-hint-text">Click to explore</span>
-          <div class="demo-dots" id="demo-dots">
-            <span class="demo-dot"></span>
-            <span class="demo-dot"></span>
-            <span class="demo-dot"></span>
-          </div>
-        </div>
-        <div class="demo-stage" id="demo-iter1">
-          <img class="active" src="STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-collapsed-component.svg" alt="">
-          <img src="STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-table-component.svg" alt="">
-          <img src="STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-full-table.svg" alt="">
-        </div>
-      </div>
-
-      <div class="callout">
-        <p>"This is exactly what I was thinking — I just couldn't explain it."</p>
-        <span class="callout-attr">— Grant Fuhr, Software Engineer</span>
-      </div>
-
-      <p>The engineer in charge of the grouping mechanism validated it immediately. But the founder's reaction was different:</p>
-
-      <div class="callout">
-        <p>"It feels too old world. Yes, we're capturing grouping and resolution — but we're not going to sell the product like this."</p>
-        <span class="callout-attr">— Amit Agarwal, Founder</span>
-      </div>
-
-      <!-- THE PIVOT -->
-      <h3>The pivot</h3>
-      <h2>Dark mode and the IT admin's identity.</h2>
-      <p>This led to a full redesign — not just the inbox, but the design system. Every competitor prioritized dark mode. Our user, the IT admin, is used to being the "boring sibling" of the engineer. Dark mode wasn't aesthetic — it was empowerment.</p>
-
-      <div class="insight">
-        <p class="insight-label">Design decision</p>
-        <p>The shift to dark mode wasn't aesthetic — it was strategic. It signaled to IT admins: this tool was built for you, not adapted from someone else's workflow.</p>
-      </div>
-
-      <!-- ITERATION 2 -->
-      <h3>Iteration 2 — Editorial layout</h3>
-      <h2>From table rows to a continuum.</h2>
-
-      <p>Instead of a table, the redesign presented groups editorially — a flowing continuum of grouped tickets, each with its title, description, ticket count, labels, thumbnails, and resolution action.</p>
-
-      <div class="raw-asset">
-        <img src="STLABS/TICKET_GROUPING/Iteration_2_components/tickets_full.svg" alt="">
-      </div>
-
-      <p>A common question from engineers and the founder: <em>how do we show ungrouped tickets?</em> My answer: the component doesn't change. A single ungrouped ticket looks the same — just with one ticket inside. Making it visually different would create unintended signals: "Was something wrong?" "Should I focus on this first?" That's not what we want.</p>
-
-      <div class="insight">
-        <p class="insight-label">Key insight</p>
-        <p>Visual consistency is trust. If the component looks different based on ticket count, users start reading meaning into the difference — meaning that doesn't exist.</p>
-      </div>
-
-      <p style="margin-bottom: 3rem;">But two new problems emerged.</p>
-
-      <!-- VERTICAL SCROLL SNAP — images live raw on the page -->
-      <div class="vsnap-header">
-        <span class="vsnap-label active" data-index="0">Run Agent</span>
-        <span class="vsnap-label" data-index="1">Run Workflow</span>
-        <span class="vsnap-label" data-index="2">Investigate</span>
-      </div>
-      <div class="vsnap-wrapper" id="iter2-vsnap-wrapper">
-        <div class="vsnap-container" id="iter2-vsnap">
-          <div class="vsnap-slide">
-            <img src="STLABS/TICKET_GROUPING/Iteration_2_components/tickets_1_ticketpage.svg" alt="">
-          </div>
-          <div class="vsnap-slide">
-            <img src="STLABS/TICKET_GROUPING/Iteration_2_components/tickets_2_ticketpage.svg" alt="">
-          </div>
-          <div class="vsnap-slide">
-            <img src="STLABS/TICKET_GROUPING/Iteration_2_components/tickets_3_ticketpage.svg" alt="">
-          </div>
-        </div>
-      </div>
-
-      <p><strong>Problem 1: Engineering jargon in the UI.</strong> Working closely with engineers, I'd absorbed their language. The buttons read "<span style="color:var(--accent)">Run Agent</span>," "<span style="color:var(--accent)">Run Workflow</span>," "<span style="color:var(--accent)">Investigate</span>" — terms that meant nothing to an IT admin. Run Agent runs multiple workflows. Run Workflow runs one. Investigate opens a conversation with an AI agent. These distinctions mattered to engineers, not users.</p>
-      <p><strong>Problem 2: Confidence.</strong> The design was essentially asking: <em>"Here's our grouping — want to confirm?"</em> That undermines trust. It also created an overwhelming landing screen: too many rows, too many actions, when the main thing is resolution. Period.</p>
-      <p>My PM wanted to ship. I pushed back.</p>
-
-      <!-- ITERATION 3 -->
-      <h3>Iteration 3 — Confident & simple</h3>
-      <h2>Present the answer, not the question.</h2>
-      <p>The final redesign flipped the posture. Groups are presented confidently — not as a suggestion, but as a decision. Click to preview tickets, but the focus is on description, resolution description, and the action itself.</p>
-
-      <div class="iter3-snap raw-wide" id="iter3-snap">
-        <div class="iter3-slide"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/Group-1.svg" alt=""></div>
-        <div class="iter3-slide"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/Group-2.svg" alt=""></div>
-        <div class="iter3-slide"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/Group-3.svg" alt=""></div>
-        <div class="iter3-slide"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/Group-4.svg" alt=""></div>
-      </div>
-
-      <p>Resolution collapsed to three clear actions:</p>
-
-      <div class="insight">
-        <p class="insight-label">The three actions</p>
-        <div class="three-actions">
-          <div class="action-item">
-            <div class="action-icon-wrap"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/run.svg" alt="Run" class="action-icon"></div>
-            <p><strong>Run</strong> — resolve autonomously. Whether it's one workflow or multiple agents, the user doesn't need to know the plumbing.</p>
-          </div>
-          <div class="action-item">
-            <div class="action-icon-wrap"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/inspect.svg" alt="Inspect" class="action-icon"></div>
-            <p><strong>Inspect</strong> — conversation with an AI agent to arrive at a decision together. If inspect appears alone, it means there's no automated resolution — the path to resolution <em>is</em> the conversation.</p>
-          </div>
-          <div class="action-item">
-            <div class="action-icon-wrap"><img src="STLABS/TICKET_GROUPING/Iteration_3_components/dismiss.svg" alt="Dismiss" class="action-icon" style="height:22px;"></div>
-            <p><strong>Dismiss</strong> — remove from the queue.</p>
-          </div>
-        </div>
-      </div>
-
-      <p>I realized I'd been stuck in engineering language. "Run Agent" and "Run Workflow" both lead to the same outcome: resolved tickets. Is there really a need to distinguish them for the user? I brought this to engineering — and they agreed.</p>
+      <p>Research surfaced three questions operators asked before acting on any cluster: <em>Is anything in the environment behaving unusually?</em> <em>Is this the same problem across all these tickets?</em> <em>Is this still happening?</em> None of those questions were answered anywhere in the product. The inspect panel was designed to answer them — one component per question.</p>
 
       <hr class="case-divider">
 
-      <!-- THE DETAILS -->
-      <h2>The details that matter.</h2>
-      <p><strong>Gamified resolution.</strong> When someone resolves a large batch of tickets at once, the UI celebrates it. Speed should feel rewarding.</p>
+      <!-- COMPONENT 1 — ENVIRONMENT SIGNAL -->
+      <h3>Component 1 — Environment Signal</h3>
+      <h2>The wrong question was "what do these tickets have in common?"</h2>
 
-      <div class="gamified-resolution" id="gamified-res">
-        <div class="res-stat">
-          <div class="res-number-row">
-            <span class="res-number" id="res-total">187</span>
-            <span class="res-label">Total</span>
-            <svg class="res-arrow res-arrow-down" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a1a1a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>
-            </svg>
-          </div>
+      <p>Tickets are already grouped by similarity — confirming that similarity is tautological. The right question: is anything in the environment behaving unusually? The system has a model of the full org, pulled from CrowdStrike, Jamf, and Okta. That makes it possible to compare the cluster against org-wide baseline distributions, not just against itself.</p>
+
+      <!-- Iteration 1 -->
+      <div class="case-asset">
+        <div class="case-asset-inner" style="background: #1C1410; padding: 0; min-height: 0;">
+          <iframe src="drill_down/commonality/iteration-1.html" width="100%" height="320" frameborder="0" scrolling="no" title="Common Attributes — iteration 1"></iframe>
         </div>
-        <div class="res-stat res-stat-resolved" id="res-resolved-group">
-          <div class="res-number-row">
-            <span class="res-number" id="res-resolved">12</span>
-            <span class="res-label" id="res-resolved-label">Resolved Today</span>
-            <svg class="res-arrow" id="res-resolved-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a1a1a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
-            </svg>
-          </div>
-        </div>
+        <div class="case-asset-caption">Iteration 1 — Single bar, match percentage. "21 of 24 tickets share these patterns." No baseline context.</div>
       </div>
 
-      <p><strong>Color as priority.</strong> Component ordering and color coding draw the eye to what matters most — no need to read labels to know urgency.</p>
-      <p><strong>Conversational foundation.</strong> The page is inherently interactive. An expandable chat bar sits at the bottom — the inbox is a conversation, not just a list.</p>
+      <p>In testing, 5 of 8 operators asked the same thing: <em>"Is 96% high? Is that normal for that gateway?"</em> The original design couldn't answer them. A 96% match on VPN gateway sounds alarming until you learn that gateway handles 95% of all company VPN traffic. Without a baseline, every percentage is noise.</p>
 
-      <div class="raw-asset">
-        <img src="STLABS/TICKET_GROUPING/fullview.svg" alt="">
+      <!-- Intermediate iteration -->
+      <div class="case-asset">
+        <div class="case-asset-inner" style="background: #1C1410; padding: 0; min-height: 0;">
+          <iframe src="drill_down/commonality/iteration-intermediate.html" width="100%" height="330" frameborder="0" scrolling="no" title="Environment Signal — intermediate iteration"></iframe>
+        </div>
+        <div class="case-asset-caption">Intermediate — Renamed to "Environment Signal." Delta shown as text (↑ +76 above). Historical match row added. Still a single bar — the two-population comparison comes next.</div>
       </div>
+
+      <div class="callout">
+        <p>"A bar showing 96% concentration is only meaningful if the operator knows whether 96% is normal. Without a baseline, every bar is noise."</p>
+        <span class="callout-attr">— Design Process, Environment Signal</span>
+      </div>
+
+      <p>The rename from "Common Attributes" to "Environment Signal" was a framing shift, not a label change. Common Attributes asked what the tickets shared internally. Environment Signal asked what the environment was doing that it shouldn't. Three rounds of copy testing ran alongside the visual iteration: Round 1 flagged terms like "baseline distribution" as jargon operators didn't use. Round 2 introduced relative language — "higher than usual" — which was ambiguous without knowing the reference population. Round 3 shipped with explicit scope and raw percentages. Slower to read, but verifiable.</p>
+
+      <p>Each attribute now shows two populations: org-wide (muted) and this cluster (orange). The gap is the anomaly, visible before reading a number. Below-baseline attributes render in blue-gray — a different color for a different operational reality. Absence of a pattern is not the same problem as concentration of one.</p>
+
+      <!-- Environment Signal — final component -->
+      <div style="margin: 2rem 0 0; background: #1C1410; border-radius: 10px; padding: 18px 20px;">
+        <div id="env-signal-root"></div>
+      </div>
+      <p class="component-caption">Final — two-population bars comparing this cluster to org-wide baselines across VPN gateway, client version, OS, and device enrollment.</p>
 
       <hr class="case-divider">
 
-      <!-- REFLECTION -->
+      <!-- COMPONENT 2 — VOLUME TIMELINE -->
+      <h3>Component 2 — Ticket Rate</h3>
+      <h2>Without time, every cluster feels equally urgent.</h2>
+
+      <p>The inspect panel could tell operators what the cluster was and what was anomalous in the environment. What it couldn't tell them: <em>is this still happening?</em> A cluster that peaked 40 minutes ago needs a different response than one still climbing. Without temporal context, operators can't calibrate their response to something they can't place in time.</p>
+
+      <!-- Iteration 1 -->
+      <div class="case-asset">
+        <div class="case-asset-inner" style="background: #1C1410; padding: 0; min-height: 0;">
+          <iframe src="drill_down/volume_timeline/iteration-1.html" width="100%" height="210" frameborder="0" scrolling="no" title="Volume — iteration 1, bar chart"></iframe>
+        </div>
+        <div class="case-asset-caption">Iteration 1 — Bar chart with "Gateway failover detected" annotation and collapse chevron. 5 of 8 participants described it as "something in the background." Both elements were cut.</div>
+      </div>
+
+      <p>The bar chart was invisible at panel width. Smooth curves were worse: they imply continuous data between discrete arrival buckets — a smooth line between minute 3 and minute 4 invents data that doesn't exist. Step interpolation is honest about bucket boundaries. Each horizontal segment is a minute; nothing is smoothed between them.</p>
+
+      <div class="callout">
+        <p>"The step line was the only variant where participants spontaneously asked 'what's this one?' pointing at the ghost — indicating the shape was clear enough that the second line registered as meaningful rather than noise."</p>
+        <span class="callout-attr">— Design Process, Ticket Rate · Round 1 testing (n=8)</span>
+      </div>
+
+      <p>The final component overlays a ghost cluster from the most comparable prior incident — not a number, not a label, but a shape. Operators could see whether the current cluster was tracking above or below a pattern they'd already resolved. Across five rounds and 42 participants, operators without the chart made wrong decisions on escalating clusters at three times the rate of operators who had it. Median time to decision dropped from 54 seconds to 38.</p>
+
+      <!-- Ticket Rate — final component -->
+      <div class="case-asset" style="margin: 2rem 0 0;">
+        <div class="case-asset-inner" style="background: #1C1410; padding: 12px; min-height: 0;">
+          <iframe src="drill_down/volume_timeline/vpn-cluster.html" width="100%" height="175" frameborder="0" scrolling="no" title="Ticket Rate — final component" style="display: block;"></iframe>
+        </div>
+      </div>
+      <p class="component-caption">Final — step-interpolated line with ghost overlay from the most comparable prior cluster. Tapering state shown.</p>
+
+      <hr class="case-divider">
+
+      <!-- COMPONENT 3 — OUTLIER SURFACING -->
+      <h3>Component 3 — Outlier Surfacing</h3>
+      <h2>Three actions was too many.</h2>
+
+      <p>Before any workflow runs, some tickets in the cluster diverge from the dominant attribute pattern — not because they don't belong (they passed clustering), but because one detail is different: a different Okta tenant, a different region. The component's job is to surface that before the operator acts, without alarming anyone. The core tension: how quiet is too quiet?</p>
+
+      <!-- Iteration 1 -->
+      <div class="case-asset">
+        <div class="case-asset-inner" style="background: #1C1410; padding: 0; min-height: 0;">
+          <iframe src="drill_down/outlier_surfacing/iteration-1.html" width="100%" height="138" frameborder="0" scrolling="no" title="Outliers — iteration 1, three actions"></iframe>
+        </div>
+        <div class="case-asset-caption">Iteration 1 — Three actions per card: Investigate, Exclude from workflow, Keep &amp; proceed. Orange label. Diff data hidden behind tooltip tags.</div>
+      </div>
+
+      <p>In testing, "Route separately" had zero interaction rate: <em>"Route separately — where? I don't have another workflow in front of me right now."</em> The action model was designed for a threat level the component didn't carry.</p>
+
+      <p>The signal problem ran deeper than the actions. Early iterations used a numeric badge — "3 outliers" — to indicate divergence in the collapsed row. In testing, 50% of operators expanded the section when they saw only the badge. When attribute names appeared in the collapsed row instead — "Identity Provider, Region" — that rate jumped to 75%. The number didn't mean anything. The attribute name told operators whether the divergence was relevant to their cluster.</p>
+
+      <div class="callout">
+        <p>"The action model should match the signal weight. A low-urgency pre-run signal doesn't need three decisions — it needs one easy out and one meaningful escalation path."</p>
+        <span class="callout-attr">— Design Process, Outlier Surfacing</span>
+      </div>
+
+      <p>Four iterations later: two actions — <em>Got it</em> and <em>Remove from group</em> — diff data moved from tooltips into inline rows, attribute names visible in the collapsed state. "Got it" reached 8/8 comprehension; "Noted" had been 2/6. Time to first action dropped from 18 seconds to 11.</p>
+
+      <!-- Outlier Surfacing — final component -->
+      <div style="margin: 2rem 0 0;">
+        <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+          <button id="outlier-btn-small" onclick="switchOutlier('small')" class="outlier-scenario-btn outlier-active">2 outliers of 24</button>
+          <button id="outlier-btn-large" onclick="switchOutlier('large')" class="outlier-scenario-btn">6 outliers of 24</button>
+        </div>
+        <div id="outlier-root"></div>
+      </div>
+      <p class="component-caption">Final — two actions, attribute names visible in collapsed state. Toggle to see a smaller or larger outlier set.</p>
+
+      <hr class="case-divider">
+
+      <!-- THE THROUGH-LINE -->
+      <h2>Evidence layer, not decision layer.</h2>
+
+      <p>Environment Signal shows what's anomalous in the infrastructure. Ticket Rate shows whether it's still happening. Outlier Surfacing flags what sits outside the dominant pattern before the run. None of these components tell the operator what to do — that's intentional. Their job is to make the available evidence visible and legible, not to make the decision for the person holding it.</p>
+
+      <hr class="case-divider">
+
+      <!-- WHAT I LEARNED -->
       <h2>What I learned.</h2>
-      <p>Working this closely with engineers is a gift and a trap. You gain deep technical fluency — you can talk in their terms, understand constraints, move fast. But you also start <em>designing</em> in their terms. The biggest shift in this project was remembering that the user doesn't care about the difference between an agent and a workflow. They care that the problem goes away.</p>
-      <p>The other lesson: conviction matters. My PM was ready to ship iteration 2. I wasn't. The final design was better because I trusted the discomfort and pushed for one more round.</p>
+
+      <p>The question drives the design. "What do these tickets have in common?" was our original framing for the commonality component. The right question — "what is the environment doing that it shouldn't?" — produces a completely different component. Getting there required exploration, not refinement. Those aren't the same thing.</p>
+
+      <p>Testing exposed gaps that couldn't be designed around. The single bar with a tick mark failed for 7 of 10 participants on an encoding I thought was obvious. A smooth curve read as "a trend" instead of discrete ticket arrivals. "Noted" had 2/6 comprehension; "Got it" had 8/8. You can't see those gaps from the inside.</p>
+
+      <p>Engineering and ML reviews were design inputs, not implementation checkpoints. The ML lead's note — <em>"surfacing our uncertainty builds trust in the cases where we are confident"</em> — restored a confidence indicator that had been cut. The engineering walkthrough of Outlier Surfacing produced four open questions that sharpened the spec. The best design feedback came from people who weren't UX designers.</p>
 
     </article>
+  </div>
+
+  <!-- FULL COMBINED PANEL -->
+  <div class="component-frame-outer" style="padding-top: 0;">
+    <div class="content" style="margin-bottom: 2rem;">
+      <h3 style="font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin: 0 0 0.75rem;">All together</h3>
+      <h2 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--text); margin-bottom: 1rem;">The full inspect panel.</h2>
+      <p style="font-size: 1rem; line-height: 1.8; color: var(--text-secondary);">Environment Signal, Ticket Rate, and Outlier Surfacing live together in the panel — each a different layer of the same cluster, read in sequence before the operator decides what to do.</p>
+    </div>
+    <div class="component-frame">
+      <iframe
+        src="drill_down/full-panel.html"
+        width="100%"
+        height="600"
+        frameborder="0"
+        scrolling="no"
+        title="Full Inspect Panel — All Components"
+      ></iframe>
+    </div>
+  </div>
+
+  <div class="content">
 
     <!-- FOOTER -->
     <div class="case-footer">
@@ -1171,7 +913,7 @@
   </div>
 
   <script>
-    // ========== THEME (persists via same localStorage key as index) ==========
+    // ========== THEME ==========
     (function initTheme() {
       var saved = localStorage.getItem('theme');
       var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -1190,23 +932,23 @@
       });
     });
 
-    // ========== CUSTOM CURSOR ==========
-    const cursor = document.getElementById('cursor');
+    // // ========== CUSTOM CURSOR ==========
+    // const cursor = document.getElementById('cursor');
     let mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
 
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      cursor.style.left = mouseX + 'px';
-      cursor.style.top = mouseY + 'px';
-      if (!cursor.classList.contains('visible')) cursor.classList.add('visible');
-    });
-    document.addEventListener('mouseleave', () => cursor.classList.remove('visible'));
-    document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-    });
-
+    // document.addEventListener('mousemove', (e) => {
+    //   mouseX = e.clientX;
+    //   mouseY = e.clientY;
+    //   cursor.style.left = mouseX + 'px';
+    //   cursor.style.top = mouseY + 'px';
+    //   if (!cursor.classList.contains('visible')) cursor.classList.add('visible');
+    // });
+    // document.addEventListener('mouseleave', () => cursor.classList.remove('visible'));
+    // document.querySelectorAll('a, button, .outlier-scenario-btn').forEach(el => {
+    //   el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    //   el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    // });
 
     // ========== EMAIL COPY ==========
     document.getElementById('copy-email').addEventListener('click', () => {
@@ -1221,7 +963,6 @@
     const eyesOpen = document.getElementById('eyes-open');
     const eyesClosed = document.getElementById('eyes-closed');
     let isCalming = false;
-
 
     avatarWrapper.addEventListener('click', () => {
       if (isCalming) return;
@@ -1391,136 +1132,148 @@
       if (acc[name]) g.innerHTML = acc[name];
     })();
 
-    // ========== CASE STUDY SCRIPTS ==========
-
-    // Demo: click → expanded + dots, auto-advance, click to reset
-    const stage = document.getElementById('demo-iter1');
-    const frames = stage.querySelectorAll('img');
-    const dots = document.querySelectorAll('#demo-dots .demo-dot');
-    const hintText = document.getElementById('demo-hint-text');
-    let step = 0;
-    let autoTimer1 = null;
-    let autoTimer2 = null;
-
-    function goTo(s) {
-      const prev = step;
-      frames.forEach(f => f.classList.remove('prev'));
-      frames[prev].classList.remove('active');
-      frames[prev].classList.add('prev');
-      step = s;
-      frames[step].classList.add('active');
-      setTimeout(() => frames[prev].classList.remove('prev'), 900);
-      dots.forEach((d, i) => { d.classList.toggle('filled', i <= step); });
+    // ========== OUTLIER SCENARIO TOGGLE ==========
+    function switchOutlier(scenario) {
+      if (window.__setOutlierScenario) window.__setOutlierScenario(scenario);
+      document.getElementById('outlier-btn-small').classList.toggle('outlier-active', scenario === 'small');
+      document.getElementById('outlier-btn-large').classList.toggle('outlier-active', scenario === 'large');
     }
 
-    function clearTimers() {
-      clearTimeout(autoTimer1);
-      clearTimeout(autoTimer2);
+    // ========== SCROLL PROGRESS ==========
+  </script>
+
+  <!-- ========== INLINE REACT COMPONENTS (drawn directly from full-panel) ========== -->
+  <script type="text/babel">
+  (function() {
+    const C = {
+      orange:'#E8833A', label:'#8A7A6A', body:'#E8E0D0', muted:'#6A5A4A',
+      faint:'#4A3A2A', link:'#6B9FD4', amber:'#D48A2A', panelBg:'#1C1410',
+      card:'#252018', divider:'#2A2010',
+    };
+
+    /* ── Environment Signal ── */
+    const BAR_DATA = [
+      { name:'VPN Gateway',       value:'gw-us-east-02', cluster:96, org:20, above:true  },
+      { name:'VPN Client',        value:'v6.3.1',         cluster:88, org:20, above:true  },
+      { name:'OS Version',        value:'macOS 14.3',     cluster:79, org:55, above:true  },
+      { name:'Device Enrollment', value:'Unmanaged',      cluster:62, org:95, above:false },
+    ];
+
+    function EnvironmentSignal() {
+      return (
+        <div>
+          <div style={{marginBottom:14}}>
+            <span style={{fontSize:11,color:C.label,fontWeight:500,textTransform:'uppercase',letterSpacing:'0.04em'}}>Environment Signal</span>
+            <p style={{fontSize:11,color:C.muted,marginTop:3}}>
+              Compared to{' '}
+              <span style={{color:C.link,textDecoration:'underline',textUnderlineOffset:2,cursor:'pointer'}}>org-wide baseline</span>
+            </p>
+          </div>
+          {BAR_DATA.map(b => (
+            <div key={b.name} style={{marginBottom:15,paddingLeft:10,borderLeft:'2px solid transparent'}}>
+              <span style={{fontSize:12,color:C.body,fontWeight:500}}>{b.name}</span>
+              <div style={{display:'flex',flexDirection:'column',gap:4,marginTop:6}}>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <span style={{fontSize:10,color:C.muted,opacity:0.6,width:66,textAlign:'right',flexShrink:0}}>org-wide</span>
+                  <div style={{flex:1,height:4,borderRadius:99,background:'rgba(255,255,255,0.05)',overflow:'hidden'}}>
+                    <div style={{height:'100%',width:`${b.org}%`,borderRadius:99,background:'rgba(138,122,106,0.4)'}}/>
+                  </div>
+                  <span style={{fontSize:11,color:C.muted,width:28,textAlign:'right',fontVariantNumeric:'tabular-nums'}}>{b.org}%</span>
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <span style={{fontSize:10,color:C.muted,opacity:0.6,width:66,textAlign:'right',flexShrink:0}}>this cluster</span>
+                  <div style={{flex:1,height:4,borderRadius:99,background:b.above?'rgba(232,131,58,0.08)':'rgba(107,159,212,0.08)',overflow:'hidden'}}>
+                    <div style={{height:'100%',width:`${b.cluster}%`,borderRadius:99,background:b.above?'rgba(232,131,58,0.85)':'rgba(107,159,212,0.5)'}}/>
+                  </div>
+                  <span style={{fontSize:11,color:C.body,fontWeight:600,width:28,textAlign:'right',fontVariantNumeric:'tabular-nums'}}>{b.cluster}%</span>
+                </div>
+              </div>
+              <div style={{marginTop:4,paddingLeft:74}}>
+                <span style={{fontSize:10,color:C.muted,fontFamily:'monospace'}}>{b.value}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
     }
 
-    stage.addEventListener('click', () => {
-      clearTimers();
-      const next = (step + 1) % frames.length;
-      goTo(next);
-      if (next === 0) {
-        dots.forEach(d => d.classList.remove('filled'));
-        hintText.style.display = '';
-      } else {
-        hintText.style.display = 'none';
-      }
-    });
+    /* ── Outlier Surfacing ── */
+    const OUTLIERS_SMALL=[
+      {id:'S1',title:'VPN Not Connecting for 20 min',reason:"Identity record spans multiple tenant domains. Standard remediation assumes a single Okta tenant.",confidence:'high',differs:[{attr:'Identity Provider',ticketVal:'Okta (EU)',clusterVal:'Okta (US)'},{attr:'Region',ticketVal:'EU-West',clusterVal:'US-East'}]},
+      {id:'S2',title:'Stuck On Connecting For 20 Minutes',reason:"Device is not enrolled in MDM. Standard remediation steps may not apply.",confidence:'medium',differs:[{attr:'Device Enrollment',ticketVal:'Unmanaged',clusterVal:'Corporate MDM'}]},
+    ];
+    const OUTLIERS_LARGE=[
+      {id:'L1',title:'VPN Not Connecting for 20 min',reason:"Identity record spans multiple tenant domains. Auth and region routing both differ from cluster norm.",differs:[{attr:'Identity Provider',ticketVal:'Okta (EU)',clusterVal:'Okta (US)'},{attr:'Region',ticketVal:'EU-West',clusterVal:'US-East'},{attr:'Auth Method',ticketVal:'SAML',clusterVal:'OIDC'}]},
+      {id:'L2',title:'VPN Auth Loop — Okta Not Responding',reason:"OS version predates the MDM policy rollout. Certificate chain differs from the cluster majority.",differs:[{attr:'OS Version',ticketVal:'macOS 12.6',clusterVal:'macOS 14.x'},{attr:'Cert Chain',ticketVal:'Legacy CA',clusterVal:'Corp PKI'}]},
+      {id:'L3',title:'Stuck On Connecting For 20 Minutes',reason:"Device is not enrolled in MDM. Standard remediation steps may not apply.",differs:[{attr:'Device Enrollment',ticketVal:'Unmanaged',clusterVal:'Corporate MDM'},{attr:'VPN Client',ticketVal:'GP 5.2',clusterVal:'GP 6.1'}]},
+      {id:'L4',title:'VPN Crashes Immediately After Opening Files',reason:"Split-tunnel config is non-standard. Traffic routing will differ from the remediation assumption.",differs:[{attr:'Tunnel Mode',ticketVal:'Split',clusterVal:'Full'}]},
+      {id:'L5',title:'Connection Drops Every 5 Minutes on Corp WiFi',reason:"Known issue with Intel Wi-Fi 6E on this VPN client version.",differs:[{attr:'Network Adapter',ticketVal:'Intel Wi-Fi 6E',clusterVal:'Broadcom BCM94360'}]},
+      {id:'L6',title:'Cannot Reach Internal Tools After Sleep',reason:"Contractor device. Network policy differs from employee policy.",differs:[{attr:'User Type',ticketVal:'Contractor',clusterVal:'FTE'}]},
+    ];
 
-    // Iteration 2 — vertical scroll cycle
-    const vsnapEl = document.getElementById('iter2-vsnap');
-    const vsnapSlides = vsnapEl.querySelectorAll('.vsnap-slide');
-    const vsnapLabels = document.querySelectorAll('.vsnap-label');
-    let vsnapIndex = 0;
-
-    function vsnapGoTo(i) {
-      vsnapIndex = i;
-      vsnapEl.scrollTo({ top: i * vsnapEl.offsetHeight, behavior: 'smooth' });
-      vsnapLabels.forEach((l, j) => l.classList.toggle('active', j === i));
-    }
-    vsnapEl.addEventListener('scroll', () => {
-      const i = Math.round(vsnapEl.scrollTop / vsnapEl.offsetHeight);
-      vsnapLabels.forEach((l, j) => l.classList.toggle('active', j === i));
-      vsnapIndex = i;
-    }, { passive: true });
-
-    let vsnapInterval = setInterval(() => {
-      vsnapGoTo((vsnapIndex + 1) % vsnapSlides.length);
-    }, 3000);
-
-    vsnapLabels.forEach(label => {
-      label.addEventListener('click', () => {
-        clearInterval(vsnapInterval);
-        vsnapGoTo(parseInt(label.dataset.index));
-        setTimeout(() => {
-          vsnapInterval = setInterval(() => {
-            vsnapGoTo((vsnapIndex + 1) % vsnapSlides.length);
-          }, 3000);
-        }, 10000);
-      });
-    });
-
-    // Gamified resolution
-    const resTotal = document.getElementById('res-total');
-    const resResolved = document.getElementById('res-resolved');
-    const resGroup = document.getElementById('res-resolved-group');
-    let resRunning = false;
-
-    function animateCount(el, from, to, duration) {
-      const start = performance.now();
-      const step = (now) => {
-        const progress = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.round(from + (to - from) * eased);
-        if (progress < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
+    function OutlierCard({outlier,startOpen}){
+      const[open,setOpen]=React.useState(!!startOpen);
+      const[state,setState]=React.useState('idle');
+      const isIdle=state==='idle',isAck=state==='acknowledged',isRem=state==='removed';
+      return(
+        <div style={{background:C.card,borderRadius:6,overflow:'hidden',opacity:isRem?0.5:1,transition:'opacity 0.25s'}}>
+          <div onClick={()=>isIdle&&setOpen(o=>!o)} style={{display:'flex',alignItems:'center',gap:8,padding:'9px 12px',cursor:isIdle?'pointer':'default',userSelect:'none',minWidth:0}}>
+            <div style={{flex:1,minWidth:0}}>
+              <span style={{fontSize:12,color:isRem?C.muted:C.body,display:'block',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',lineHeight:1.4,textDecoration:isRem?'line-through':'none',textDecorationColor:'#3A2A1A'}}>{outlier.title}</span>
+              {!open&&isIdle&&<div style={{display:'flex',alignItems:'center',gap:4,overflow:'hidden',minWidth:0,marginTop:2}}>{outlier.differs.map((d,i)=>(<React.Fragment key={d.attr}>{i>0&&<span style={{width:2,height:2,borderRadius:'50%',background:'#3A2A1A',flexShrink:0,display:'inline-block'}}/>}<span style={{fontSize:10,color:'#7A6A5A',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{d.attr}</span></React.Fragment>))}</div>}
+              {isRem&&<div style={{display:'flex',alignItems:'center',gap:6,marginTop:2}}><span style={{fontSize:11,color:C.faint}}>Removed from group.</span><button onClick={()=>setState('idle')} style={{background:'none',border:'none',color:C.label,fontSize:11,cursor:'pointer',padding:0,fontFamily:'inherit',textDecoration:'underline',textUnderlineOffset:2}}>Undo</button></div>}
+            </div>
+            {isAck&&<span style={{fontSize:11,color:C.faint,flexShrink:0}}>✓</span>}
+            {isIdle&&<span style={{fontSize:11,color:C.faint,flexShrink:0,display:'inline-block',transform:open?'rotate(90deg)':'rotate(0deg)',transition:'transform 0.2s',lineHeight:1}}>›</span>}
+          </div>
+          <div style={{overflow:'hidden',transition:'max-height 0.28s ease,opacity 0.22s ease',maxHeight:open&&isIdle?300:0,opacity:open&&isIdle?1:0}}>
+            <div style={{padding:'0 12px 12px'}}>
+              <div style={{height:1,background:C.divider,marginBottom:10}}/>
+              <p style={{fontSize:12,color:C.muted,marginBottom:outlier.confidence==='medium'?5:10,lineHeight:1.55}}>{outlier.reason}</p>
+              {outlier.confidence==='medium'&&<p style={{fontSize:10,color:C.faint,marginBottom:10,letterSpacing:'0.02em'}}>Moderate confidence · flag may not apply</p>}
+              <div style={{marginBottom:12}}>{outlier.differs.map(d=>(<div key={d.attr} style={{display:'flex',gap:6,fontSize:11,lineHeight:1.75}}><span style={{color:'#8A7A6A',minWidth:110,flexShrink:0}}>{d.attr}</span><span style={{color:'#D4C8B0'}}>{d.ticketVal}</span><span style={{color:'#6A5A4A'}}>vs</span><span style={{color:'#A89B8A'}}>{d.clusterVal}</span></div>))}</div>
+              <div style={{display:'flex',alignItems:'center',gap:14}}>
+                <button onClick={()=>{setState('acknowledged');setOpen(false);}} style={{background:'#E8833A',border:'none',color:'#1A0E06',borderRadius:6,padding:'5px 14px',fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:'inherit',transition:'background 0.15s'}}>Got it</button>
+                <button onClick={()=>{setState('removed');setOpen(false);}} style={{background:'transparent',border:'1px solid rgba(232,131,58,0.22)',color:'#B8A898',fontSize:11,cursor:'pointer',padding:'5px 14px',fontFamily:'inherit',borderRadius:6,transition:'border-color 0.15s, color 0.15s'}}>Remove from group</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
     }
 
-    function runResAnimation() {
-      if (resRunning) return;
-      resRunning = true;
-      setTimeout(() => {
-        animateCount(resTotal, 187, 167, 1200);
-        animateCount(resResolved, 12, 32, 1200);
-        setTimeout(() => {
-          resGroup.classList.add('pop');
-          document.getElementById('gamified-res').classList.add('popped');
-        }, 800);
-        setTimeout(() => {
-          resGroup.classList.remove('pop');
-          document.getElementById('gamified-res').classList.remove('popped');
-          setTimeout(() => {
-            resTotal.textContent = '187';
-            resResolved.textContent = '12';
-            resRunning = false;
-          }, 600);
-        }, 3200);
-      }, 500);
+    function OutlierShowcase(){
+      const[scenario,setScenario]=React.useState('small');
+      window.__setOutlierScenario=setScenario;
+      const isSmall=scenario==='small';
+      const outliers=isSmall?OUTLIERS_SMALL:OUTLIERS_LARGE;
+      const[showAll,setShowAll]=React.useState(false);
+      React.useEffect(()=>setShowAll(false),[scenario]);
+      const FOLD=3;
+      const visible=!isSmall&&!showAll?outliers.slice(0,FOLD):outliers;
+      const hiddenCt=!isSmall?outliers.length-FOLD:0;
+      return(
+        <div>
+          <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',marginBottom:10}}>
+            <span style={{fontSize:11,color:C.label,fontWeight:500,letterSpacing:'0.04em',textTransform:'uppercase'}}>Outliers</span>
+            <span style={{fontSize:11,color:C.faint}}>{outliers.length} of 24 tickets</span>
+          </div>
+          <div style={{display:'flex',flexDirection:'column',gap:4}}>
+            {visible.map((o,i)=><OutlierCard key={o.id+scenario} outlier={o} startOpen={i===0}/>)}
+          </div>
+          {!isSmall&&!showAll&&hiddenCt>0&&<button onClick={()=>setShowAll(true)} style={{background:'none',border:'none',color:'#4A3A2A',fontSize:11,cursor:'pointer',padding:'8px 0 0',fontFamily:'inherit',display:'flex',alignItems:'center',gap:5}}>+{hiddenCt} more · Show all</button>}
+          {!isSmall&&showAll&&<button onClick={()=>setShowAll(false)} style={{background:'none',border:'none',color:'#4A3A2A',fontSize:11,cursor:'pointer',padding:'8px 0 0',fontFamily:'inherit'}}>Show less</button>}
+        </div>
+      );
     }
 
-    const resObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => { if (entry.isIntersecting) runResAnimation(); });
-    }, { threshold: 0.5 });
-    resObserver.observe(document.getElementById('gamified-res'));
+    /* ── Mount ── */
+    const esEl = document.getElementById('env-signal-root');
+    const osEl = document.getElementById('outlier-root');
+    if (esEl) ReactDOM.createRoot(esEl).render(<EnvironmentSignal />);
+    if (osEl) ReactDOM.createRoot(osEl).render(<OutlierShowcase />);
 
-    setInterval(() => {
-      const rect = document.getElementById('gamified-res').getBoundingClientRect();
-      if (rect.top < window.innerHeight && rect.bottom > 0) runResAnimation();
-    }, 6000);
-
-    // Iteration 3 — auto-cycle
-    const iter3 = document.getElementById('iter3-snap');
-    const iter3Slides = iter3.querySelectorAll('.iter3-slide');
-    let iter3Index = 0;
-    setInterval(() => {
-      iter3Index = (iter3Index + 1) % iter3Slides.length;
-      iter3.scrollTo({ top: iter3Index * iter3.offsetHeight, behavior: 'smooth' });
-    }, 3000);
-
+  })();
   </script>
 
 </body>

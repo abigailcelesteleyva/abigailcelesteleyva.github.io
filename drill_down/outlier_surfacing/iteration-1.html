@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outliers — Iteration 1</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1C1410;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 0;
+    }
+    .btn-gotit { background: #E8833A; border: none; color: #1A0E06; border-radius: 6px; padding: 5px 14px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+    .btn-gotit:hover { background: #D07530; }
+    .btn-rmv { background: transparent; border: 1px solid rgba(232,131,58,0.22); color: #B8A898; font-size: 11px; cursor: pointer; padding: 5px 14px; font-family: inherit; border-radius: 6px; transition: border-color 0.15s, color 0.15s; }
+    .btn-rmv:hover { border-color: rgba(232,131,58,0.45); color: #E8E0D0; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const C = {
+  orange: '#E8833A', amber: '#D48A2A', label: '#8A7A6A', body: '#E8E0D0',
+  muted: '#6A5A4A', faint: '#4A3A2A', panelBg: '#1C1410', card: '#252018', divider: '#2A2010',
+};
+
+function OutlierIt1() {
+  return (
+    <div>
+      <div style={{ background: C.card, borderRadius: 8, padding: '14px 16px' }}>
+        <div style={{ fontSize: 13, color: C.body, fontWeight: 600, marginBottom: 4, lineHeight: 1.35 }}>VPN Not Connecting for 20 min</div>
+        <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.55, marginBottom: 10 }}>Identity record spans multiple tenant domains. Standard remediation assumes a single Okta tenant.</div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: 'rgba(212,138,42,0.12)', color: C.amber, border: '1px solid rgba(212,138,42,0.2)' }}>Identity Provider</span>
+          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: 'rgba(212,138,42,0.12)', color: C.amber, border: '1px solid rgba(212,138,42,0.2)' }}>Region</span>
+        </div>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+          <button className="btn-gotit">Keep</button>
+          <button className="btn-rmv">Investigate</button>
+          <button className="btn-rmv">Exclude</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<OutlierIt1 />);
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Environment Signal — Intermediate</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1C1410;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 24px;
+      color: #E8E0D0;
+    }
+    .label    { font-size: 11px; color: #8A7A6A; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+    .scope    { font-size: 11px; color: #6A5A4A; margin-top: 3px; margin-bottom: 16px; }
+    .scope a  { color: #E8833A; text-decoration: underline; text-decoration-style: dotted; cursor: pointer; }
+    .attr-row { margin-bottom: 16px; }
+    .attr-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 6px;
+    }
+    .attr-name-wrap { display: flex; align-items: center; gap: 6px; }
+    .attr-name  { font-size: 12px; color: #E8E0D0; font-weight: 500; }
+    .badge-new  {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+      color: #E8833A; border: 1px solid rgba(232,131,58,0.4);
+      border-radius: 3px; padding: 1px 4px; text-transform: uppercase;
+    }
+    .attr-right { display: flex; align-items: center; gap: 8px; }
+    .attr-pct   { font-size: 12px; color: #E8E0D0; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .delta-up   { font-size: 11px; color: #E8833A; }
+    .delta-down { font-size: 11px; color: #7AAACA; }
+    .bar-track  { height: 5px; background: rgba(255,255,255,0.04); border-radius: 99px; overflow: hidden; margin-bottom: 5px; }
+    .bar-fill-up   { height: 100%; border-radius: 99px; background: #E8833A; }
+    .bar-fill-down { height: 100%; border-radius: 99px; background: #7AAACA; opacity: 0.5; }
+    .attr-meta  { display: flex; justify-content: space-between; }
+    .attr-val   { font-size: 11px; color: #6A5A4A; font-family: monospace; }
+    .attr-src   { font-size: 10px; color: #4A3A2A; }
+    .divider    { height: 1px; background: #2A2010; margin: 16px 0; }
+    .history    { font-size: 11px; color: #4A3A2A; line-height: 1.6; }
+    .history-row { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 3px; }
+    .history-dash { color: #2A2010; flex-shrink: 0; margin-top: 1px; }
+    .info-btn { background: none; border: none; cursor: pointer; color: #4A3A2A; font-size: 13px; padding: 0; line-height: 1; }
+  </style>
+</head>
+<body>
+
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:3px;">
+    <span class="label">Environment Signal</span>
+    <button class="info-btn">ⓘ</button>
+  </div>
+  <p class="scope">Compared to Boston HQ typical · <a>change scope</a></p>
+
+  <!-- VPN Gateway -->
+  <div class="attr-row">
+    <div class="attr-header">
+      <div class="attr-name-wrap"><span class="attr-name">VPN Gateway</span></div>
+      <div class="attr-right">
+        <span class="attr-pct">96%</span>
+        <span class="delta-up">↑ +76 above</span>
+      </div>
+    </div>
+    <div class="bar-track"><div class="bar-fill-up" style="width:96%;"></div></div>
+    <div class="attr-meta">
+      <span class="attr-val">gw-us-east-02</span>
+      <span class="attr-src" style="color:#D48A2A;">Elevated error rate since 09:32 ⚠&nbsp;&nbsp;CrowdStrike</span>
+    </div>
+  </div>
+
+  <!-- VPN Client Version -->
+  <div class="attr-row">
+    <div class="attr-header">
+      <div class="attr-name-wrap">
+        <span class="attr-name">VPN Client Version</span>
+        <span class="badge-new">NEW</span>
+      </div>
+      <div class="attr-right">
+        <span class="attr-pct">88%</span>
+        <span class="delta-up">↑ +68 above</span>
+      </div>
+    </div>
+    <div class="bar-track"><div class="bar-fill-up" style="width:88%; opacity:0.85;"></div></div>
+    <div class="attr-meta">
+      <span class="attr-val">v6.3.1</span>
+      <span class="attr-src">deployed 14h ago&nbsp;&nbsp;Jamf</span>
+    </div>
+  </div>
+
+  <!-- OS Version -->
+  <div class="attr-row">
+    <div class="attr-header">
+      <div class="attr-name-wrap"><span class="attr-name">OS Version</span></div>
+      <div class="attr-right">
+        <span class="attr-pct">79%</span>
+        <span class="delta-up">↑ +24 above</span>
+      </div>
+    </div>
+    <div class="bar-track"><div class="bar-fill-up" style="width:79%; opacity:0.55;"></div></div>
+    <div class="attr-meta">
+      <span class="attr-val">macOS 14.3</span>
+      <span class="attr-src">Jamf</span>
+    </div>
+  </div>
+
+  <!-- Device Enrollment -->
+  <div class="attr-row">
+    <div class="attr-header">
+      <div class="attr-name-wrap"><span class="attr-name">Device Enrollment</span></div>
+      <div class="attr-right">
+        <span class="attr-pct" style="color:#7AAACA;">62%</span>
+        <span class="delta-down">↓ −57 below</span>
+      </div>
+    </div>
+    <div class="bar-track"><div class="bar-fill-down" style="width:62%;"></div></div>
+    <div class="attr-meta">
+      <span class="attr-val">Unmanaged</span>
+      <span class="attr-src">Jamf</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="history">
+    <div class="history-row">
+      <span class="history-dash">┄</span>
+      <span>Seen this pattern 3 times · Last: Nov 12 · gateway restart resolved in 23 min</span>
+    </div>
+  </div>
+
+</body>
+</html>

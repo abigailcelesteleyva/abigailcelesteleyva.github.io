@@ -586,7 +586,8 @@
       </div>
       <div class="nav-links">
         <a href="index.html#work" class="active">Work</a>
-        <a href="index.html#journey">Journey</a>
+        <a href="journey.html">About</a>
+        <a href="play.html">Play</a>
         <a href="AbigailCLeyva.pdf" target="_blank" rel="noopener">Resume</a>
       </div>
     </div>
@@ -992,23 +993,26 @@
 
     // Eye tracking
     const avatar = document.getElementById('avatar');
-    const pupilLeft = document.getElementById('pupil-left');
+    const pupilLeft  = document.getElementById('pupil-left');
     const pupilRight = document.getElementById('pupil-right');
-    const MAX_MOVE = 3;
+    const EYE_CX_MAIN = [39, 61], EYE_CY_MAIN = 54;
+    const MAX_X_MAIN = 2.8, MAX_Y_MAIN = 3.2;
     function updateEyes() {
-      const rect = avatar.getBoundingClientRect();
-      const ax = rect.left + rect.width / 2;
-      const ay = rect.top + rect.height / 2;
-      const dx = mouseX - ax;
-      const dy = mouseY - ay;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const ratio = Math.min(dist, 300) / 300;
-      const moveX = (dx / (dist || 1)) * MAX_MOVE * ratio;
-      const moveY = (dy / (dist || 1)) * MAX_MOVE * ratio;
-      pupilLeft.setAttribute('cx', 39 + moveX);
-      pupilLeft.setAttribute('cy', 54 + moveY);
-      pupilRight.setAttribute('cx', 61 + moveX);
-      pupilRight.setAttribute('cy', 54 + moveY);
+      const rect   = avatar.getBoundingClientRect();
+      const scaleX = 100 / rect.width;
+      const scaleY = 105 / rect.height;
+      const localX = (mouseX - rect.left) * scaleX;
+      const localY = (mouseY - rect.top)  * scaleY;
+      EYE_CX_MAIN.forEach((ecx, i) => {
+        const dx = localX - ecx;
+        const dy = localY - EYE_CY_MAIN;
+        const ex = dx / MAX_X_MAIN, ey = dy / MAX_Y_MAIN;
+        const len = Math.sqrt(ex * ex + ey * ey);
+        const s = len > 1 ? 1 / len : 1;
+        const pupil = i === 0 ? pupilLeft : pupilRight;
+        pupil.setAttribute('cx', ecx + ex * s * MAX_X_MAIN);
+        pupil.setAttribute('cy', EYE_CY_MAIN + ey * s * MAX_Y_MAIN);
+      });
       requestAnimationFrame(updateEyes);
     }
     requestAnimationFrame(updateEyes);
