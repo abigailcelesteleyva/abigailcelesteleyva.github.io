@@ -130,46 +130,155 @@ function Divider() {
   return <div style={{ height: 1, background: C.divider, margin: '18px 0' }} />;
 }
 
-/* ─── Environment Signal ─── */
-const BAR_DATA = [
-  { name: 'VPN Gateway',       value: 'gw-us-east-02', cluster: 96, org: 20, above: true  },
-  { name: 'VPN Client',        value: 'v6.3.1',         cluster: 88, org: 20, above: true  },
-  { name: 'OS Version',        value: 'macOS 14.3',     cluster: 79, org: 55, above: true  },
-  { name: 'Device Enrollment', value: 'Unmanaged',      cluster: 62, org: 95, above: false },
+/* ─── Environment Signal (Final — Unified Multi-line Chart) ─── */
+const ES_SVG_W = 200, ES_CH = 52, ES_CBL = 46, ES_CTOP = 4;
+const ES_ET = 319/360;
+
+const ES_GW_PTS = [
+  {t:0,dev:1},{t:0.1,dev:0},{t:0.2,dev:1},{t:0.3,dev:0},{t:0.5,dev:1},{t:0.7,dev:0},{t:0.8,dev:1},{t:0.86,dev:2},{t:ES_ET,dev:3},
+  {t:0.893,dev:10},{t:0.902,dev:18},{t:0.911,dev:23},{t:0.92,dev:26},{t:0.93,dev:27},{t:1,dev:26},
+];
+const ES_CV_PTS = [
+  {t:0,dev:8},{t:0.1,dev:9},{t:0.2,dev:10},{t:0.3,dev:11},{t:0.4,dev:12},{t:0.5,dev:13},
+  {t:0.6,dev:14},{t:0.7,dev:15},{t:0.8,dev:16},{t:0.85,dev:17},{t:ES_ET,dev:17},{t:0.92,dev:18},{t:1,dev:20},
+];
+const ES_OS_PTS = [{t:0,dev:4},{t:0.2,dev:4.2},{t:0.4,dev:4.4},{t:0.6,dev:4.6},{t:0.8,dev:4.8},{t:1,dev:5}];
+const ES_ALL_PTS = [ES_GW_PTS, ES_CV_PTS, ES_OS_PTS];
+const ES_LINE_STYLES = [
+  { stroke: '#E8833A', op: 0.85, w: 1.5 },
+  { stroke: '#E8833A', op: 0.42, w: 1.0 },
+  { stroke: '#8A7A6A', op: 0.48, w: 0.75 },
 ];
 
+function esInterpolate(pts, t) {
+  if (t <= pts[0].t) return pts[0].dev;
+  if (t >= pts[pts.length-1].t) return pts[pts.length-1].dev;
+  for (let i = 0; i < pts.length-1; i++) {
+    if (t >= pts[i].t && t <= pts[i+1].t) {
+      const f = (t - pts[i].t) / (pts[i+1].t - pts[i].t);
+      return pts[i].dev + f * (pts[i+1].dev - pts[i].dev);
+    }
+  }
+  return 0;
+}
+
 function EnvironmentSignal() {
+  const [hoverT, setHoverT] = React.useState(null);
+  const allDevs = ES_ALL_PTS.flatMap(pts => pts.map(p => p.dev));
+  const maxDev  = Math.max(...allDevs, 1);
+  const scale   = (ES_CBL - ES_CTOP) / maxDev;
+  function cy(d) { return ES_CBL - d * scale; }
+
+  function sPath(pts) {
+    return pts.map((p,i) => `${i===0?'M':'L'} ${(p.t*ES_SVG_W).toFixed(1)},${cy(p.dev).toFixed(1)}`).join(' ');
+  }
+  function aPath(pts) {
+    const last = pts[pts.length-1];
+    return [`M ${(pts[0].t*ES_SVG_W).toFixed(1)},${ES_CBL}`, ...pts.map(p=>`L ${(p.t*ES_SVG_W).toFixed(1)},${cy(p.dev).toFixed(1)}`), `L ${(last.t*ES_SVG_W).toFixed(1)},${ES_CBL} Z`].join(' ');
+  }
+
+  const ES_NAMES = ['VPN Gateway', 'VPN Client Version', 'OS Version'];
+  const ES_ATTRS = [
+    { name: 'VPN Gateway',        value: 'gw-us-east-02', cluster: 96, org: 20, source: 'CrowdStrike' },
+    { name: 'VPN Client Version', value: 'v6.3.1',        cluster: 88, org: 20, source: 'Jamf' },
+    { name: 'OS Version',         value: 'macOS 14.3',    cluster: 79, org: 55, source: 'Jamf' },
+  ];
+
+  const hoverVals = hoverT !== null ? ES_ALL_PTS.map((pts, i) => ({
+    orgPct: Math.round([20,0,50][i] + esInterpolate(pts, hoverT)),
+  })) : null;
+
+  function tToTime(t) {
+    const m = Math.round((3*60+44) + t*360);
+    const h = Math.floor(m/60)%24, mn = m%60;
+    return `${h%12||12}:${String(mn).padStart(2,'0')} ${h>=12?'PM':'AM'}`;
+  }
+
   return (
     <div>
-      <div style={{ marginBottom: 14 }}>
+      <div style={{ marginBottom: 6 }}>
         <span style={{ fontSize: 11, color: C.label, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Environment Signal</span>
         <p style={{ fontSize: 11, color: C.muted, marginTop: 3 }}>
           Compared to{' '}
-          <span style={{ color: C.link, textDecoration: 'underline', textUnderlineOffset: 2, cursor: 'pointer' }}>org-wide baseline</span>
+          <span style={{ color: C.link, textDecoration: 'underline', textUnderlineOffset: 2, cursor: 'pointer' }}>Boston HQ</span>
         </p>
       </div>
-      {BAR_DATA.map(b => (
-        <div key={b.name} style={{ marginBottom: 15, paddingLeft: 10, borderLeft: '2px solid transparent' }}>
-          <span style={{ fontSize: 12, color: C.body, fontWeight: 500 }}>{b.name}</span>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 6 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 10, color: C.muted, opacity: 0.6, width: 66, textAlign: 'right', flexShrink: 0 }}>org-wide</span>
-              <div style={{ flex: 1, height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${b.org}%`, borderRadius: 99, background: 'rgba(138,122,106,0.4)' }} />
+
+      <div style={{ position: 'relative', height: ES_CH, cursor: 'crosshair', marginTop: 20 }}
+        onMouseMove={e => {
+          const r = e.currentTarget.getBoundingClientRect();
+          setHoverT(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)));
+        }}
+        onMouseLeave={() => setHoverT(null)}>
+
+        <div style={{ position: 'absolute', top: -12, left: `${ES_ET*100}%`, transform: 'translateX(-50%)', fontSize: 8, color: 'rgba(232,131,58,0.65)', whiteSpace: 'nowrap', pointerEvents: 'none' }}>
+          09:03 ↑
+        </div>
+
+        {hoverT !== null && hoverVals && (
+          <div style={{
+            position: 'absolute', top: -62,
+            left: `${hoverT*100}%`,
+            transform: hoverT > 0.72 ? 'translateX(-100%)' : hoverT < 0.15 ? 'translateX(0)' : 'translateX(-50%)',
+            background: '#0D0A08', border: '1px solid #2A2010',
+            borderRadius: 4, padding: '5px 8px',
+            pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 10,
+          }}>
+            <div style={{ fontSize: 8, color: C.muted, marginBottom: 4 }}>{tToTime(hoverT)}</div>
+            {ES_NAMES.map((n, i) => (
+              <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
+                <span style={{ width: 4, height: 4, borderRadius: '50%', background: ES_LINE_STYLES[i].stroke, opacity: ES_LINE_STYLES[i].op, display: 'inline-block', flexShrink: 0 }} />
+                <span style={{ fontSize: 9, color: C.muted, width: 95 }}>{n}</span>
+                <span style={{ fontSize: 9, color: i < 2 ? C.orange : C.muted, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{hoverVals[i].orgPct}%</span>
               </div>
-              <span style={{ fontSize: 11, color: C.muted, width: 28, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{b.org}%</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 10, color: C.muted, opacity: 0.6, width: 66, textAlign: 'right', flexShrink: 0 }}>this cluster</span>
-              <div style={{ flex: 1, height: 4, borderRadius: 99, background: b.above ? 'rgba(232,131,58,0.08)' : 'rgba(107,159,212,0.08)', overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${b.cluster}%`, borderRadius: 99, background: b.above ? 'rgba(232,131,58,0.85)' : 'rgba(107,159,212,0.5)' }} />
-              </div>
-              <span style={{ fontSize: 11, color: C.body, fontWeight: 600, width: 28, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{b.cluster}%</span>
-            </div>
+            ))}
           </div>
-          <div style={{ marginTop: 4, paddingLeft: 74 }}>
-            <span style={{ fontSize: 10, color: C.muted, fontFamily: 'monospace' }}>{b.value}</span>
-          </div>
+        )}
+
+        <svg viewBox={`0 0 ${ES_SVG_W} ${ES_CH}`} preserveAspectRatio="none" style={{ width: '100%', height: ES_CH, display: 'block', overflow: 'visible' }}>
+          <defs>
+            {ES_ALL_PTS.map((_, i) => (
+              <linearGradient key={i} id={`es-fg-${i}`} x1="0" y1={ES_CTOP} x2="0" y2={ES_CBL} gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor={ES_LINE_STYLES[i].stroke} stopOpacity={ES_LINE_STYLES[i].op * 0.3} />
+                <stop offset="100%" stopColor={ES_LINE_STYLES[i].stroke} stopOpacity="0" />
+              </linearGradient>
+            ))}
+          </defs>
+          <line x1="0" y1={ES_CBL} x2={ES_SVG_W} y2={ES_CBL} stroke="rgba(138,122,106,0.15)" strokeWidth="0.5" />
+          <line x1={ES_ET*ES_SVG_W} y1="0" x2={ES_ET*ES_SVG_W} y2={ES_CH} stroke="rgba(232,131,58,0.18)" strokeWidth="0.75" strokeDasharray="2,2" />
+          {ES_ALL_PTS.map((pts, i) => <path key={`a${i}`} d={aPath(pts)} fill={`url(#es-fg-${i})`} />)}
+          {ES_ALL_PTS.map((pts, i) => (
+            <path key={`s${i}`} d={sPath(pts)} fill="none"
+              stroke={ES_LINE_STYLES[i].stroke} strokeWidth={ES_LINE_STYLES[i].w}
+              strokeOpacity={ES_LINE_STYLES[i].op} strokeLinejoin="round" strokeLinecap="round" />
+          ))}
+          {hoverT !== null && (
+            <>
+              <line x1={hoverT*ES_SVG_W} y1="0" x2={hoverT*ES_SVG_W} y2={ES_CH} stroke="rgba(138,122,106,0.25)" strokeWidth="0.75" />
+              {ES_ALL_PTS.map((pts, i) => (
+                <circle key={`hc${i}`} cx={hoverT*ES_SVG_W} cy={cy(esInterpolate(pts,hoverT))} r="1.75"
+                  fill={ES_LINE_STYLES[i].stroke} fillOpacity={ES_LINE_STYLES[i].op} />
+              ))}
+            </>
+          )}
+        </svg>
+
+        <div style={{ position: 'absolute', top: 0, bottom: 0, left: `${ES_ET*100}%`, width: 1, background: 'rgba(232,131,58,0.14)', pointerEvents: 'none' }} />
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 3, marginBottom: 12 }}>
+        <span style={{ fontSize: 8, color: C.muted, opacity: 0.3 }}>org-wide · 6h ago</span>
+        <span style={{ fontSize: 8, color: C.muted, opacity: 0.3 }}>now</span>
+      </div>
+
+      {ES_ATTRS.map((b, i) => (
+        <div key={b.name} style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 7, paddingLeft: 6, borderLeft: '2px solid transparent' }}>
+          <span style={{ width: 4, height: 4, borderRadius: '50%', background: ES_LINE_STYLES[i].stroke, opacity: ES_LINE_STYLES[i].op, display: 'inline-block', flexShrink: 0, position: 'relative', top: -1 }} />
+          <span style={{ fontSize: 10, color: C.muted, width: 110, flexShrink: 0 }}>{b.name}</span>
+          <span style={{ fontSize: 10, color: C.muted, opacity: 0.55, fontFamily: 'monospace', flexShrink: 0 }}>{b.value}</span>
+          <span style={{ fontSize: 10, color: C.orange, marginLeft: 'auto', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{b.cluster}%</span>
+          <span style={{ fontSize: 9, color: C.muted, opacity: 0.4, fontVariantNumeric: 'tabular-nums' }}>vs {b.org}%</span>
+          <span style={{ fontSize: 9, color: C.muted, opacity: 0.35 }}>{b.source}</span>
         </div>
       ))}
     </div>
