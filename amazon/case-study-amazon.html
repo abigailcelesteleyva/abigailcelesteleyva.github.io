@@ -22,13 +22,13 @@
       --shadow: rgba(0,0,0,0.04); --shadow-strong: rgba(0,0,0,0.06); --shadow-hover: rgba(192,57,43,0.12);
       --font-display: 'DM Serif Display', Georgia, serif;
       --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      /* Amazon dashboard palette */
-      --amz-bg: #0f1319; --amz-surface: #181d27; --amz-surface2: #1e2436;
-      --amz-border: rgba(255,255,255,0.08); --amz-text: #e8eaf0;
-      --amz-text2: #8b92a8; --amz-orange: #ff9900; --amz-orange-soft: rgba(255,153,0,0.15);
-      --amz-green: #2ea86a; --amz-green-soft: rgba(46,168,106,0.15);
-      --amz-red: #e05252; --amz-red-soft: rgba(224,82,82,0.15);
-      --amz-yellow: #d4a017; --amz-yellow-soft: rgba(212,160,23,0.15);
+      /* Amazon dashboard palette — light mode */
+      --amz-bg: #f7f5f0; --amz-surface: #eeece6; --amz-surface2: #e5e2d8;
+      --amz-border: rgba(0,0,0,0.12); --amz-text: #2a2828;
+      --amz-text2: #757070; --amz-orange: #b86800; --amz-orange-soft: rgba(184,104,0,0.12);
+      --amz-green: #1a7840; --amz-green-soft: rgba(26,120,64,0.10);
+      --amz-red: #be2c2c; --amz-red-soft: rgba(190,44,44,0.10);
+      --amz-yellow: #7a6000; --amz-yellow-soft: rgba(122,96,0,0.10);
     }
     :root[data-theme="dark"] {
       --text: #f5f5f7; --text-secondary: #a1a1a6; --text-tertiary: #6e6e73;
@@ -179,24 +179,167 @@
     .amz-old-table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .amz-old-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--amz-text2); border-bottom: 1px solid var(--amz-border); }
     .amz-old-table td { padding: 9px 12px; border-bottom: 1px solid var(--amz-border); color: var(--amz-text); font-size: 12px; }
-    .amz-old-table tr:hover td { background: rgba(255,255,255,0.03); }
+    .amz-old-table tr td { }
     .amz-old-table td:first-child { font-family: monospace; color: var(--amz-text2); font-size: 11px; }
-    .amz-old-overload { text-align: center; padding: 12px; color: var(--amz-text2); font-size: 11px; border-top: 1px dashed rgba(255,255,255,0.06); }
+    .amz-old-overload { text-align: center; padding: 12px; color: var(--amz-text2); font-size: 11px; border-top: 1px dashed rgba(0,0,0,0.12); }
 
-    /* ── shadcn/ui-inspired dashboard tokens ── */
+    /* ── dashboard tokens — light ── */
     :root {
-      --shad-bg: #09090b;
-      --shad-card: #18181b;
-      --shad-surface: #27272a;
-      --shad-border: #3f3f46;
-      --shad-text: #fafafa;
-      --shad-muted: #a1a1aa;
-      --shad-muted2: #71717a;
-      --shad-red: #f87171; --shad-red-bg: rgba(248,113,113,0.1);
-      --shad-amber: #fb923c; --shad-amber-bg: rgba(251,146,60,0.1);
-      --shad-yellow: #fbbf24; --shad-yellow-bg: rgba(251,191,36,0.08);
-      --shad-green: #86efac; --shad-green-bg: rgba(134,239,172,0.08);
+      --shad-bg: #f2f4f8;
+      --shad-card: #ffffff;
+      --shad-surface: #e8eaf0;
+      --shad-border: #ced2de;
+      --shad-text: #1c2030;
+      --shad-muted: #525a72;
+      --shad-muted2: #8890a8;
+      --shad-red: #be2c2c; --shad-red-bg: rgba(190,44,44,0.08);
+      --shad-amber: #9e5500; --shad-amber-bg: rgba(158,85,0,0.09);
+      --shad-yellow: #7a6000; --shad-yellow-bg: rgba(122,96,0,0.09);
+      --shad-green: #1a7840; --shad-green-bg: rgba(26,120,64,0.08);
     }
+
+    /* ── Investigations — light dashboard ── */
+    :root {
+      --ent-bg: #ffffff;
+      --ent-bg-subtle: #f2f4f8;
+      --ent-bg-hover: #e8eaf0;
+      --ent-border: #ced2de;
+      --ent-border-strong: #8e96ae;
+      --ent-text: #1c2030;
+      --ent-text-2: #525a72;
+      --ent-text-3: #8890a8;
+      --ent-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --ent-shadow: none;
+      --ent-shadow-lg: 0 4px 16px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+      /* status */
+      --ent-red: #be2c2c; --ent-red-bg: rgba(190,44,44,0.08); --ent-red-border: rgba(190,44,44,0.28);
+      --ent-amber: #9e5500; --ent-amber-bg: rgba(158,85,0,0.09); --ent-amber-border: rgba(158,85,0,0.30);
+      --ent-blue: #1a52c0; --ent-blue-bg: rgba(26,82,192,0.08); --ent-blue-border: rgba(26,82,192,0.28);
+      --ent-green: #1a7840; --ent-green-bg: rgba(26,120,64,0.08); --ent-green-border: rgba(26,120,64,0.28);
+      --ent-purple: #6030b8; --ent-purple-bg: rgba(96,48,184,0.08); --ent-purple-border: rgba(96,48,184,0.28);
+    }
+
+    /* Container */
+    .ent-dashboard { background: var(--ent-bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+    /* Toolbar */
+    .ent-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--ent-border); background: var(--ent-bg-subtle); }
+    .ent-toolbar-left { display: flex; align-items: center; gap: 10px; }
+    .ent-toolbar-title { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ent-text-2); }
+    .ent-toolbar-count { font-size: 10px; color: var(--ent-text-3); }
+    .ent-toolbar-meta { font-size: 10px; color: var(--ent-text-3); font-family: var(--ent-mono); }
+
+    /* Section label */
+    .ent-section-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ent-text-3); padding: 8px 12px 4px; display: flex; align-items: center; gap: 6px; }
+    .ent-section-label .ent-count-pill { font-size: 9.5px; font-weight: 600; color: var(--ent-text-3); background: var(--ent-bg-subtle); border: 1px solid var(--ent-border); padding: 0 5px; letter-spacing: 0; text-transform: none; }
+
+    /* Badges — compact, square-ish */
+    .ent-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 2px; border: 1px solid; white-space: nowrap; letter-spacing: 0.03em; text-transform: uppercase; }
+    .ent-badge-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .ent-badge-p1 { background: var(--ent-red-bg); border-color: var(--ent-red-border); color: var(--ent-red); }
+    .ent-badge-p2 { background: var(--ent-amber-bg); border-color: var(--ent-amber-border); color: var(--ent-amber); }
+    .ent-badge-p3 { background: var(--ent-bg-subtle); border-color: var(--ent-border); color: var(--ent-text-3); }
+    .ent-badge-investigating { background: var(--ent-blue-bg); border-color: var(--ent-blue-border); color: var(--ent-blue); }
+    .ent-badge-active { background: var(--ent-green-bg); border-color: var(--ent-green-border); color: var(--ent-green); }
+    .ent-badge-bottlenecked { background: var(--ent-red-bg); border-color: var(--ent-red-border); color: var(--ent-red); }
+    .ent-badge-blocked { background: var(--ent-purple-bg); border-color: var(--ent-purple-border); color: var(--ent-purple); }
+
+    /* Watch list */
+    .ent-pinned-list { padding: 4px 12px 10px; display: flex; flex-direction: column; gap: 6px; }
+
+    /* Expanded case panels — no rounded corners, flat */
+    .ent-card { background: var(--ent-bg-subtle); border: 1px solid var(--ent-border); border-radius: 0; overflow: hidden; border-left: 3px solid var(--ent-border); }
+    .ent-card-p1 { border-left-color: var(--ent-red); }
+    .ent-card-p2 { border-left-color: var(--ent-amber); }
+    .ent-card-head { padding: 7px 10px 6px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--ent-border); background: var(--ent-bg); }
+    .ent-card-id { font-family: var(--ent-mono); font-size: 9px; color: var(--ent-text-3); letter-spacing: 0.05em; margin-bottom: 2px; text-transform: uppercase; }
+    .ent-card-title { font-size: 11.5px; font-weight: 600; color: var(--ent-text); line-height: 1.3; }
+    .ent-close-btn { background: none; border: none; cursor: default; color: var(--ent-text-3); padding: 2px; line-height: 1; flex-shrink: 0; }
+    .ent-card-body { padding: 8px 10px; }
+    .ent-card-meta-row { display: flex; align-items: center; gap: 4px; margin-bottom: 7px; flex-wrap: wrap; }
+
+    /* Stage track — segmented bar, not dot-on-line */
+    .ent-stage-track { display: flex; border: 1px solid var(--ent-border); overflow: hidden; margin: 5px 0 8px; }
+    .ent-stage { flex: 1; padding: 3px 2px 2px; border-right: 1px solid var(--ent-border); background: var(--ent-bg); }
+    .ent-stage:last-child { border-right: none; }
+    .ent-stage.s-done { background: var(--ent-green-bg); }
+    .ent-stage.s-bottleneck { background: var(--ent-red-bg); }
+    .ent-stage.s-blocked { background: var(--ent-purple-bg); }
+    .ent-stage-dot { display: none; }
+    .ent-stage-lbl { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ent-text-3); text-align: center; line-height: 1.4; display: block; }
+    .ent-stage.s-done .ent-stage-lbl { color: var(--ent-green); }
+    .ent-stage.s-bottleneck .ent-stage-lbl { color: var(--ent-red); }
+    .ent-stage.s-blocked .ent-stage-lbl { color: var(--ent-purple); }
+
+    /* KV grid */
+    .ent-kv-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; padding: 6px 0; border-top: 1px solid var(--ent-border); border-bottom: 1px solid var(--ent-border); margin-bottom: 7px; }
+    .ent-kv { display: flex; flex-direction: column; gap: 1px; }
+    .ent-kv-key { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ent-text-3); }
+    .ent-kv-val { font-size: 11px; color: var(--ent-text); font-weight: 500; }
+    .ent-kv-val.urgent, .ent-urgent { color: var(--ent-red); }
+    .ent-kv-val.warn, .ent-warn { color: var(--ent-amber); }
+
+    /* Update block */
+    .ent-update { background: var(--ent-bg); border: 1px solid var(--ent-border); padding: 5px 8px; }
+    .ent-update-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ent-text-3); margin-bottom: 2px; }
+    .ent-update-text { font-size: 10.5px; color: var(--ent-text-2); line-height: 1.5; }
+
+    /* Card footer */
+    .ent-card-foot { padding: 6px 10px; border-top: 1px solid var(--ent-border); background: var(--ent-bg); display: flex; align-items: center; }
+    .ent-btn-row { display: flex; gap: 4px; }
+    .ent-btn { font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 2px; border: 1px solid; cursor: default; font-family: inherit; line-height: 1.5; text-transform: uppercase; letter-spacing: 0.03em; }
+    .ent-btn-primary { background: #1a52c0; color: #ffffff; border-color: #1a52c0; }
+    .ent-btn-ghost { background: var(--ent-bg-subtle); color: var(--ent-text-2); border-color: var(--ent-border); }
+    .ent-btn-danger { background: var(--ent-bg-subtle); color: var(--ent-red); border-color: var(--ent-red-border); }
+
+    /* Table */
+    .ent-table-wrap { border-top: 1px solid var(--ent-border); }
+    .ent-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .ent-table thead th { padding: 5px 10px; text-align: left; font-size: 8.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ent-text-3); border-bottom: 1px solid var(--ent-border); background: var(--ent-bg-subtle); white-space: nowrap; }
+    .ent-table thead th:first-child { width: 28px; padding-left: 12px; }
+    .ent-table tbody td { padding: 6px 10px; border-bottom: 1px solid var(--ent-border); color: var(--ent-text); background: var(--ent-bg); transition: background 0.08s; vertical-align: middle; }
+    .ent-table tbody td:first-child { padding-left: 12px; }
+    .ent-table tbody tr:last-child td { border-bottom: none; }
+    .ent-table tbody tr.ent-row-pinned td { background: rgba(158,85,0,0.06); }
+    .ent-pin-btn { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: default; color: var(--ent-border-strong); border-radius: 2px; }
+    .ent-pin-btn.pinned { color: var(--ent-amber); }
+    .ent-mono-id { font-family: var(--ent-mono); font-size: 10.5px; color: var(--ent-text-2); letter-spacing: 0.03em; }
+
+    /* Case log table */
+    .ent-case-log-wrap { background: var(--ent-bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .ent-case-log { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .ent-case-log thead th { padding: 5px 12px; text-align: left; font-size: 8.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ent-text-3); border-bottom: 1px solid var(--ent-border); background: var(--ent-bg-subtle); }
+    .ent-case-log tbody td { padding: 7px 12px; border-bottom: 1px solid var(--ent-border); color: var(--ent-text); background: var(--ent-bg); transition: background 0.08s; vertical-align: middle; }
+    .ent-case-log tbody tr:last-child td { border-bottom: none; }
+    .ent-case-id-link { font-family: var(--ent-mono); font-size: 11px; color: var(--ent-blue); cursor: default; border-bottom: 1px solid var(--ent-blue-border); padding-bottom: 1px; }
+
+    /* Popover */
+    .ent-popover-wrapper { position: relative; display: inline-block; }
+    .ent-popover { position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-40%); background: var(--ent-bg-subtle); border: 1px solid var(--ent-border-strong); border-radius: 2px; width: 264px; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.12s; box-shadow: var(--ent-shadow-lg); overflow: hidden; font-size: 11.5px; }
+    .ent-popover.visible { opacity: 1; }
+    .ent-pop-head { padding: 7px 10px 6px; background: var(--ent-bg); border-bottom: 1px solid var(--ent-border); display: flex; align-items: flex-start; gap: 8px; }
+    .ent-pop-title-block { flex: 1; }
+    .ent-pop-case-id { font-family: var(--ent-mono); font-size: 9px; color: var(--ent-text-3); letter-spacing: 0.05em; margin-bottom: 2px; text-transform: uppercase; }
+    .ent-pop-case-title { font-size: 11px; font-weight: 600; color: var(--ent-text); line-height: 1.3; }
+    .ent-pop-body { padding: 8px 10px 0; }
+    .ent-pop-summary { font-size: 10.5px; color: var(--ent-text-2); line-height: 1.5; margin-bottom: 7px; }
+    .ent-pop-log { border-top: 1px solid var(--ent-border); padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; }
+    .ent-pop-log-entry { display: flex; gap: 7px; align-items: flex-start; }
+    .ent-pop-log-time { font-family: var(--ent-mono); font-size: 8.5px; color: var(--ent-text-3); white-space: nowrap; padding-top: 1px; flex-shrink: 0; min-width: 52px; }
+    .ent-pop-log-text { font-size: 10px; color: var(--ent-text-2); line-height: 1.4; }
+    .ent-pop-next { background: var(--ent-blue-bg); border-top: 1px solid var(--ent-blue-border); padding: 6px 10px; display: flex; gap: 6px; align-items: flex-start; margin-top: 4px; }
+    .ent-pop-next-lbl { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ent-blue); white-space: nowrap; padding-top: 1px; flex-shrink: 0; }
+    .ent-pop-next-text { font-size: 10px; color: var(--ent-blue); font-weight: 500; line-height: 1.4; }
+
+    /* Hover density comparison grid */
+    .ent-tc-row { font-size: 9px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ent-text-3); padding: 10px 12px 6px; border-top: 1px solid var(--ent-border); }
+    .ent-tc-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 12px 12px; }
+    .ent-tc-card { background: var(--ent-bg-subtle); border: 1px solid var(--ent-border); border-radius: 0; overflow: hidden; }
+    .ent-tc-card.ent-tc-selected { border-color: var(--ent-blue); }
+    .ent-tc-head { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ent-text-3); padding: 4px 8px 3px; border-bottom: 1px solid var(--ent-border); background: var(--ent-bg); display: flex; align-items: center; justify-content: space-between; }
+    .ent-tc-selected .ent-tc-head { color: var(--ent-blue); border-bottom-color: var(--ent-blue-border); background: var(--ent-blue-bg); }
+    .ent-tc-chosen { font-size: 7.5px; font-weight: 700; color: var(--ent-blue); }
+    .ent-tc-body { padding: 7px 8px; }
 
     /* ── Priority cases — shadcn card list ── */
     .shad-dashboard { background: var(--shad-bg); padding: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; }
@@ -246,11 +389,9 @@
     .shad-table thead th:first-child { width: 32px; }
     .shad-table tbody td { padding: 9px 12px; border-bottom: 1px solid rgba(63,63,70,0.5); color: var(--shad-text); vertical-align: middle; background: var(--shad-bg); transition: background 0.1s; }
     .shad-table tbody tr:last-child td { border-bottom: none; }
-    .shad-table tbody tr:hover td { background: var(--shad-card); }
     .shad-table tbody tr.row-pinned td { background: rgba(251,146,60,0.03); }
     .shad-mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 10.5px; color: var(--shad-muted); letter-spacing: 0.02em; }
-    .shad-pin-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; color: var(--shad-muted2); border-radius: 4px; transition: color 0.15s, background 0.15s; }
-    .shad-pin-btn:hover { background: var(--shad-surface); color: var(--shad-text); }
+    .shad-pin-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: default; color: var(--shad-muted2); border-radius: 4px; }
     .shad-pin-btn.pinned { color: var(--shad-amber); }
     .shad-section-sep { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--shad-muted2); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     .shad-section-sep::after { content: ''; flex: 1; height: 1px; background: var(--shad-border); }
@@ -260,9 +401,7 @@
     .amz-case-log th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--shad-muted2); border-bottom: 1px solid var(--shad-border); background: var(--shad-card); }
     .amz-case-log td { padding: 9px 12px; border-bottom: 1px solid rgba(63,63,70,0.5); color: var(--shad-text); background: var(--shad-bg); transition: background 0.1s; }
     .amz-case-log tbody tr:last-child td { border-bottom: none; }
-    .amz-case-log tr:hover td { background: var(--shad-card); }
-    .amz-case-id-link { font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: var(--shad-text); text-decoration: underline; text-decoration-color: var(--shad-border); text-underline-offset: 3px; cursor: pointer; transition: text-decoration-color 0.15s; letter-spacing: 0.02em; }
-    .amz-case-id-link:hover { text-decoration-color: var(--shad-muted); }
+    .amz-case-id-link { font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: var(--shad-text); text-decoration: underline; text-decoration-color: var(--shad-border); text-underline-offset: 3px; cursor: default; letter-spacing: 0.02em; }
     .amz-tooltip-wrapper { position: relative; display: inline-block; }
     /* shadcn Popover */
     .amz-tooltip { position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-40%); background: var(--shad-card); border: 1px solid var(--shad-border); border-radius: 8px; padding: 12px 14px; width: 232px; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.12s; box-shadow: 0 4px 16px rgba(0,0,0,0.5); font-size: 12px; }
@@ -399,11 +538,11 @@
         <span>Amazon — Investigations Dashboard</span>
       </div>
       <h1>Giving investigators their inner Sherlock Holmes back.</h1>
-      <p class="case-subtitle">Redesigning the Investigations Dashboard inside an existing Case Management System — to help security investigators prioritize, track, and act without friction.</p>
+      <p class="case-subtitle">Redesigning a dashboard used by Amazon's security investigators — built into an existing case management system — to help them prioritize work, track progress, and act without friction.</p>
       <div class="case-details">
         <div class="case-detail"><span class="case-detail-label">Role</span><span class="case-detail-value">UX Design Intern</span></div>
         <div class="case-detail"><span class="case-detail-label">Timeline</span><span class="case-detail-value">Summer 2024</span></div>
-        <div class="case-detail"><span class="case-detail-label">Type</span><span class="case-detail-value">0→1 Feature Design</span></div>
+        <div class="case-detail"><span class="case-detail-label">Type</span><span class="case-detail-value">Net-new Feature Design</span></div>
         <div class="case-detail"><span class="case-detail-label">Focus</span><span class="case-detail-value">Enterprise UX, Workflow Design</span></div>
       </div>
     </section>
@@ -413,7 +552,6 @@
       <!-- THE STORY -->
       <h3>The setup</h3>
       <h2>An unreleased product just went public.</h2>
-      <p>Imagine a brand-new Amazon Echo — one nobody is supposed to see yet — suddenly shows up on the internet. Engineers have poured months into it. Legal is panicking. Someone needs to figure out exactly how it happened and fast.</p>
 
       <div class="story-sequence">
         <div class="story-beat accent">
@@ -426,16 +564,14 @@
         </div>
         <div class="story-beat warning">
           <div class="story-beat-time">Day 1, morning</div>
-          <p>Lisa opens the Investigations Dashboard. She has <strong>17 active cases</strong>. She doesn't know where to start. The tool she relies on most is actively working against her.</p>
+          <p>Lisa opens the Investigations Dashboard. She has <strong>17 active cases</strong> and no idea where to start. The tool she relies on most is working against her.</p>
         </div>
       </div>
-
-      <p>That's the problem I was brought in to solve during my summer internship at Amazon.</p>
 
       <!-- DISCOVERY -->
       <h3>Discovery</h3>
       <h2>The system was making investigators feel like they were guessing.</h2>
-      <p>I ran surveys and conducted interviews with 18 security investigators to understand their day-to-day reality. What I found was a pattern of anxiety and workaround culture — people adapting themselves to a broken tool instead of the tool adapting to them.</p>
+      <p>I surveyed and interviewed 18 security investigators. What I found was people adapting to a broken tool rather than the tool adapting to them.</p>
 
       <div class="stats-row">
         <div class="stat-card">
@@ -457,12 +593,11 @@
         <span class="callout-attr">— Security Investigator, survey response</span>
       </div>
 
-      <p>The top challenges surfaced across nearly every interview: <strong>case prioritization</strong>, <strong>tracking progress</strong> across many cases, and <strong>contacting related teams</strong> when bottlenecks emerged.</p>
+      <p>Three challenges surfaced in nearly every interview: <strong>knowing which case to work on first</strong>, <strong>tracking progress</strong> across a large caseload, and <strong>reaching supporting teams</strong> when a case got stuck waiting on someone else.</p>
 
       <!-- DEFINING -->
       <h3>Defining</h3>
       <h2>Two investigators, the same broken tool.</h2>
-      <p>From my research, two distinct profiles emerged with overlapping pain points but different root frustrations.</p>
 
       <div class="persona-grid">
         <div class="persona-card">
@@ -474,12 +609,10 @@
         <div class="persona-card">
           <div class="persona-name">Raj</div>
           <div class="persona-role">Mid-level Investigator</div>
-          <div class="persona-need">Has been flagged for missing SLA deadlines — not because he's slow, but because he never knew his cases were bottlenecked. By the time he realized, it was too late.</div>
+          <div class="persona-need">Has been flagged for missing response deadlines — not because he's slow, but because he never knew his cases were stalled waiting on another team. By the time he realized, it was too late.</div>
           <div class="persona-quote">"I got in trouble for something I didn't even know was happening."</div>
         </div>
       </div>
-
-      <p>Mapping their user journeys revealed three shared moments of failure:</p>
 
       <div class="pain-journey">
         <div class="pain-step">
@@ -500,7 +633,7 @@
           <div class="pain-num">3</div>
           <div class="pain-content">
             <h4>Tracking progress — invisible bottlenecks</h4>
-            <p>Cases blocked on other teams showed no visual signal. Raj's SLA breaches happened because nothing in the UI communicated that a case had stalled.</p>
+            <p>Cases stuck waiting on another team showed no signal. Raj's missed deadlines happened because nothing in the interface communicated that a case had stalled — or who was responsible for unblocking it.</p>
           </div>
         </div>
       </div>
@@ -513,9 +646,9 @@
       <div class="demo-wrap">
         <div class="demo-header">
           <span class="demo-label">Before — existing system</span>
-          <span class="demo-hint">Scroll to feel the cognitive load</span>
+          <span class="demo-hint">17 cases, no priority signals, no next steps</span>
         </div>
-        <div class="amz-dashboard amz-before" style="max-height:260px;overflow-y:auto;">
+        <div class="amz-dashboard amz-before">
           <div class="amz-section-title">All Cases (17)</div>
           <table class="amz-old-table">
             <thead><tr><th>Case ID</th><th>Subject</th><th>Opened</th><th>Status</th></tr></thead>
@@ -546,41 +679,49 @@
       <!-- FEATURE 1 -->
       <h3>Feature 1 — Case prioritization</h3>
       <h2>Give investigators control over their signal-to-noise ratio.</h2>
-      <p>The goal: let investigators pin or star specific cases to get focused updates — reducing the cognitive burden of managing 17 cases while surfacing what actually matters for the day.</p>
-      <p>I explored three design directions, each with different information density and interaction models.</p>
+      <p>The goal: let investigators pin specific cases to surface focused status at the top of their queue — cutting through 17 cases to show what actually needs attention that day.</p>
+      <p>I explored three directions, each with a different approach to how much information a pinned case should show.</p>
 
       <div class="iteration-grid">
         <div class="iter-card">
           <div class="iter-label">Design A</div>
           <div class="iter-title">Minimal flag + modal</div>
-          <div class="iter-desc">A star icon on each row. Clicking it flags the case; details open in a modal overlay.</div>
-          <div class="iter-verdict fail">✕ Too many clicks to get useful info</div>
+          <div class="iter-desc">A pin icon on each row. Clicking it flags the case; details open in a modal overlay.</div>
+          <div class="iter-verdict fail">Rejected — too many clicks to get useful info</div>
         </div>
         <div class="iter-card selected">
           <div class="iter-label selected-label">Design B — Selected</div>
           <div class="iter-title">Inline priority cards</div>
           <div class="iter-desc">Starred cases surface as rich cards at the top — status, summary, latest update, next step, and lead in one view.</div>
-          <div class="iter-verdict pass">✓ A/B preference + data sufficiency tests</div>
+          <div class="iter-verdict pass">Validated — A/B preference + data sufficiency tests</div>
         </div>
         <div class="iter-card">
           <div class="iter-label">Design C</div>
           <div class="iter-title">Full sidebar panel</div>
           <div class="iter-desc">A persistent right-hand panel showing starred cases. Rich but took up too much real estate.</div>
-          <div class="iter-verdict fail">✕ Reduced space for active case work</div>
+          <div class="iter-verdict fail">Rejected — reduced space for active case work</div>
         </div>
       </div>
 
-      <p>Design B was validated through A/B preference tests with 12 investigators and critical data sufficiency tests — confirming that the information displayed was the minimum needed to act without opening the case. Engineers then implemented it; I ran usability tests (time-to-action, information clarity, error rate).</p>
+      <p>Design B was validated through preference tests with 12 investigators and data sufficiency tests — confirming that the card showed exactly what was needed to take action without opening the full case. Engineers implemented it; I then ran usability tests measuring time-to-first-action, information clarity, and error rate.</p>
 
       <div class="demo-wrap">
         <div class="demo-header">
-          <span class="demo-label">Priority cases</span>
-          <span class="demo-hint">Pin a case to surface it</span>
+          <span class="demo-label">Priority cases — watch list</span>
+          <span class="demo-hint">SEC-2847 is pinned to the watch list</span>
         </div>
-        <div class="shad-dashboard" id="priority-demo">
-          <div id="starred-area" style="display:none;margin-bottom:16px;">
-            <div class="shad-section-sep" id="priority-section-title">Pinned (0)</div>
-            <div class="shad-pinned-list" id="starred-cards"></div>
+        <div class="ent-dashboard" id="priority-demo">
+          <div class="ent-toolbar">
+            <div class="ent-toolbar-left">
+              <span class="ent-toolbar-title">My Queue</span>
+              <span class="ent-toolbar-count">3 active</span>
+              <span class="ent-toolbar-meta">sort: SLA ↑</span>
+            </div>
+            <span class="ent-toolbar-meta">pin to watch list</span>
+          </div>
+          <div id="starred-area" style="display:none;">
+            <div class="ent-section-label" id="priority-section-title">Watch List <span class="ent-count-pill" id="pinned-count">0</span></div>
+            <div class="ent-pinned-list" id="starred-cards"></div>
           </div>
           <div id="all-cases-wrap"></div>
         </div>
@@ -597,90 +738,165 @@
           <div class="sus-score-label">SUS After</div>
         </div>
         <div class="sus-context">
-          Usability jumped from <strong>"Ok" (61)</strong> to <strong>"Excellent" (88)</strong> on the System Usability Scale — a 44% improvement. Time-to-first-action dropped significantly; information clarity errors fell to near zero across test sessions.
+          Usability score jumped from <strong>"Ok" (61)</strong> to <strong>"Excellent" (88)</strong> on the System Usability Scale (SUS) — a 44% improvement. Time-to-first-action dropped significantly. Errors from misreading case information fell to near zero across all test sessions.
         </div>
       </div>
 
       <!-- FEATURE 2 -->
       <h3>Feature 2 — Case transparency</h3>
       <h2>The answer was already in the case log — just invisible.</h2>
-      <p>Investigators needed a way to quickly learn about cases they hadn't opened recently. Three approaches were explored: hover tooltips, inline cards, and pop-up overlays. The question was density vs. disruption.</p>
+      <p>With 17 cases to manage, investigators needed a way to quickly recall what was happening in a case without clicking into it. I tested three popover designs that appeared when hovering a case ID — each showing a different amount of information. The core question: how much detail is helpful before it becomes disruptive?</p>
 
       <div class="iteration-grid">
         <div class="iter-card">
           <div class="iter-label">Option A</div>
           <div class="iter-title">Sparse tooltip</div>
           <div class="iter-desc">Status + subject only. Fast to scan, but left too many questions unanswered.</div>
-          <div class="iter-verdict fail">✕ Not enough info to triage</div>
+          <div class="iter-verdict fail">Rejected — not enough info to triage</div>
         </div>
         <div class="iter-card">
           <div class="iter-label">Option B</div>
           <div class="iter-title">Medium tooltip</div>
           <div class="iter-desc">Added case lead. Better, but investigators still had to open the case for next steps.</div>
-          <div class="iter-verdict fail">✕ Still required a follow-up click</div>
+          <div class="iter-verdict fail">Rejected — still required a follow-up click</div>
         </div>
         <div class="iter-card selected">
           <div class="iter-label selected-label">Option C — Selected</div>
           <div class="iter-title">Dense tooltip</div>
           <div class="iter-desc">Status, summary, lead, and next step. Enough to fully triage without opening the case.</div>
-          <div class="iter-verdict pass">✓ Workflow interrupt + backlog triage tests</div>
+          <div class="iter-verdict pass">Validated — workflow interrupt + backlog triage tests</div>
         </div>
       </div>
 
       <div class="insight">
         <p class="insight-label">Key finding</p>
-        <p>The dense hover provided enough information to triage and dismiss alerts with minimal clicks, confirming its role as a non-disruptive triage tool. Investigators were significantly faster at bottleneck management compared to any pop-up or card solution tested.</p>
+        <p>The dense popover gave investigators enough information to assess and act on a case without opening it — effectively a triage tool that didn't interrupt their flow. Investigators using option C were significantly faster at identifying bottlenecks than those using any pop-up or full-card alternative.</p>
       </div>
 
       <div class="demo-wrap">
         <div class="demo-header">
-          <span class="demo-label">Case log hover</span>
-          <div class="demo-tab-row">
-            <button class="demo-tab active" data-density="dense" onclick="setTooltipDensity('dense')">Dense</button>
-            <button class="demo-tab" data-density="medium" onclick="setTooltipDensity('medium')">Medium</button>
-            <button class="demo-tab" data-density="sparse" onclick="setTooltipDensity('sparse')">Sparse</button>
-          </div>
+          <span class="demo-label">Case log — popover density comparison</span>
+          <span class="demo-hint">three iterations shown below, option C selected</span>
         </div>
-        <div class="amz-dashboard">
-          <div class="amz-section-title">Case log — hover a case ID</div>
-          <table class="amz-case-log">
-            <thead><tr><th>Case ID</th><th>Subject</th><th>Opened</th><th>Lead</th></tr></thead>
+        <div class="ent-case-log-wrap">
+          <div class="ent-toolbar">
+            <div class="ent-toolbar-left">
+              <span class="ent-toolbar-title">Case Log</span>
+              <span class="ent-toolbar-count">3 of 17</span>
+              <span class="ent-toolbar-meta">filter: assigned to me</span>
+            </div>
+            <span class="ent-toolbar-meta">Apr 4, 2024 · 14:30</span>
+          </div>
+          <table class="ent-case-log">
+            <thead>
+              <tr>
+                <th>Case ID ↕</th>
+                <th>Investigation</th>
+                <th>Opened ↓</th>
+                <th>Lead</th>
+                <th>Status</th>
+              </tr>
+            </thead>
             <tbody>
               <tr>
                 <td>
-                  <div class="amz-tooltip-wrapper">
-                    <span class="amz-case-id-link" onmouseenter="showTip('tip1')" onmouseleave="hideTip('tip1')">SEC-2847</span>
-                    <div class="amz-tooltip" id="tip1"></div>
+                  <div class="ent-popover-wrapper">
+                    <span class="ent-case-id-link">SEC-2847</span>
+                    <div class="ent-popover" id="tip1"></div>
                   </div>
                 </td>
-                <td style="font-size:12px">Unreleased Product Photo Leak</td>
-                <td style="font-size:11px">Apr 2</td>
-                <td style="font-size:11px">L. Chen</td>
+                <td style="font-size:11.5px;color:var(--ent-text)">Unreleased Product Photo Leak</td>
+                <td style="font-size:11px;font-family:var(--ent-mono);color:var(--ent-text-3)">Apr 2</td>
+                <td style="font-size:11px;color:var(--ent-text-2)">L. Chen</td>
+                <td><span class="ent-badge ent-badge-investigating">Investigating</span></td>
               </tr>
               <tr>
                 <td>
-                  <div class="amz-tooltip-wrapper">
-                    <span class="amz-case-id-link" onmouseenter="showTip('tip2')" onmouseleave="hideTip('tip2')">SEC-2831</span>
-                    <div class="amz-tooltip" id="tip2"></div>
+                  <div class="ent-popover-wrapper">
+                    <span class="ent-case-id-link">SEC-2831</span>
+                    <div class="ent-popover" id="tip2"></div>
                   </div>
                 </td>
-                <td style="font-size:12px">Unauthorized Data Access — AWS</td>
-                <td style="font-size:11px">Mar 29</td>
-                <td style="font-size:11px">R. Patel</td>
+                <td style="font-size:11.5px;color:var(--ent-text)">Unauthorized Data Access — AWS</td>
+                <td style="font-size:11px;font-family:var(--ent-mono);color:var(--ent-text-3)">Mar 29</td>
+                <td style="font-size:11px;color:var(--ent-text-2)">R. Patel</td>
+                <td><span class="ent-badge ent-badge-bottlenecked">Bottlenecked</span></td>
               </tr>
               <tr>
                 <td>
-                  <div class="amz-tooltip-wrapper">
-                    <span class="amz-case-id-link" onmouseenter="showTip('tip3')" onmouseleave="hideTip('tip3')">SEC-2819</span>
-                    <div class="amz-tooltip" id="tip3"></div>
+                  <div class="ent-popover-wrapper">
+                    <span class="ent-case-id-link">SEC-2819</span>
+                    <div class="ent-popover" id="tip3"></div>
                   </div>
                 </td>
-                <td style="font-size:12px">Supplier NDA Breach Investigation</td>
-                <td style="font-size:11px">Mar 25</td>
-                <td style="font-size:11px">L. Chen</td>
+                <td style="font-size:11.5px;color:var(--ent-text)">Supplier NDA Breach Investigation</td>
+                <td style="font-size:11px;font-family:var(--ent-mono);color:var(--ent-text-3)">Mar 25</td>
+                <td style="font-size:11px;color:var(--ent-text-2)">L. Chen</td>
+                <td><span class="ent-badge ent-badge-active">Active</span></td>
               </tr>
             </tbody>
           </table>
+          <!-- Side-by-side density comparison (static) -->
+          <div class="ent-tc-row">Popover density — three iterations compared for case SEC-2847</div>
+          <div class="ent-tc-grid">
+            <!-- A: Sparse -->
+            <div class="ent-tc-card">
+              <div class="ent-tc-head"><span>A — Sparse</span></div>
+              <div class="ent-tc-body">
+                <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;">
+                  <div style="flex:1"><div style="font-family:var(--ent-mono);font-size:8.5px;color:var(--ent-text-3);margin-bottom:1px;">SEC-2847 · SEC OPS</div><div style="font-size:10px;font-weight:600;color:var(--ent-text);line-height:1.3">Unreleased Product Photo Leak</div></div>
+                  <span class="ent-badge ent-badge-investigating" style="flex-shrink:0">Invest.</span>
+                </div>
+                <div style="font-size:10px;color:var(--ent-text-2);line-height:1.45;">Echo device images published on third-party blog 48h before embargo.</div>
+                <div style="font-size:8.5px;color:var(--ent-text-3);margin-top:6px;padding-top:5px;border-top:1px solid var(--ent-border)">Lead: L. Chen</div>
+              </div>
+            </div>
+            <!-- B: Medium -->
+            <div class="ent-tc-card">
+              <div class="ent-tc-head"><span>B — Medium</span></div>
+              <div class="ent-tc-body">
+                <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;">
+                  <div style="flex:1"><div style="font-family:var(--ent-mono);font-size:8.5px;color:var(--ent-text-3);margin-bottom:1px;">SEC-2847 · SEC OPS</div><div style="font-size:10px;font-weight:600;color:var(--ent-text);line-height:1.3">Unreleased Product Photo Leak</div></div>
+                  <span class="ent-badge ent-badge-investigating" style="flex-shrink:0">Invest.</span>
+                </div>
+                <div style="font-size:10px;color:var(--ent-text-2);line-height:1.45;margin-bottom:6px;">Echo device images published on third-party blog 48h before embargo.</div>
+                <div class="ent-stage-track" style="margin:0 0 6px">
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Filed</div></div>
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Evid.</div></div>
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Coord</div></div>
+                  <div class="ent-stage"><div class="ent-stage-lbl">Legal</div></div>
+                  <div class="ent-stage"><div class="ent-stage-lbl">Close</div></div>
+                </div>
+                <div style="font-size:8.5px;color:var(--ent-text-3);padding-top:5px;border-top:1px solid var(--ent-border)">Lead: L. Chen</div>
+              </div>
+            </div>
+            <!-- C: Dense (selected) -->
+            <div class="ent-tc-card ent-tc-selected">
+              <div class="ent-tc-head"><span>C — Dense</span><span class="ent-tc-chosen">Selected</span></div>
+              <div class="ent-tc-body">
+                <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;">
+                  <div style="flex:1"><div style="font-family:var(--ent-mono);font-size:8.5px;color:var(--ent-text-3);margin-bottom:1px;">SEC-2847 · SEC OPS</div><div style="font-size:10px;font-weight:600;color:var(--ent-text);line-height:1.3">Unreleased Product Photo Leak</div></div>
+                  <span class="ent-badge ent-badge-investigating" style="flex-shrink:0">Invest.</span>
+                </div>
+                <div style="font-size:10px;color:var(--ent-text-2);line-height:1.45;margin-bottom:5px;">Echo device images published on third-party blog 48h before embargo.</div>
+                <div class="ent-stage-track" style="margin:0 0 5px">
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Filed</div></div>
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Evid.</div></div>
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Coord</div></div>
+                  <div class="ent-stage"><div class="ent-stage-lbl">Legal</div></div>
+                  <div class="ent-stage"><div class="ent-stage-lbl">Close</div></div>
+                </div>
+                <div style="border-top:1px solid var(--ent-border);padding-top:5px;display:flex;flex-direction:column;gap:3px;margin-bottom:5px;">
+                  <div class="ent-pop-log-entry"><span class="ent-pop-log-time" style="min-width:42px">Apr 4 14:22</span><span class="ent-pop-log-text">Access logs exported from Portal</span></div>
+                  <div class="ent-pop-log-entry"><span class="ent-pop-log-time" style="min-width:42px">Apr 4 09:11</span><span class="ent-pop-log-text">3 accounts flagged in eu-west-2</span></div>
+                </div>
+                <div style="background:var(--ent-blue-bg);border:1px solid var(--ent-blue-border);padding:4px 6px;margin-top:2px;">
+                  <span style="font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--ent-blue)">Next: </span>
+                  <span style="font-size:9.5px;color:var(--ent-blue);font-weight:500">Complete access log review by EOD</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -689,64 +905,71 @@
       <h2>Investigators didn't need to find the bottleneck. They needed to understand it.</h2>
       <p>Early in research I assumed the problem was investigators couldn't identify bottlenecked cases. I was wrong. They knew cases were stalled — what they didn't know was <em>where</em> in the process the stall was occurring and who owned it.</p>
 
-      <p>I designed a process flow visualization embedded within each case, showing the investigation lifecycle as discrete stages with clear ownership and status signals. Click a stage below to see what an investigator would see.</p>
+      <p>I designed a stage tracker embedded within each case, showing the investigation lifecycle as a series of steps with clear ownership and status at each one. The key insight: show investigators not just that a case is stalled, but exactly which step owns the block — and whether that block is preventing downstream steps from starting at all.</p>
 
       <div class="demo-wrap">
         <div class="demo-header">
-          <span class="demo-label">Investigation timeline</span>
-          <span class="demo-hint">Click any stage</span>
+          <span class="demo-label">Investigation timeline — SEC-2847</span>
         </div>
-        <div class="amz-dashboard">
-          <div class="amz-section-title">SEC-2847 · Investigation Timeline</div>
-          <div style="background:var(--shad-card);border:1px solid var(--shad-border);border-radius:8px;overflow:hidden;">
-          <div style="padding:12px 16px 0;">
-          <div class="amz-flow" id="flow-demo">
-            <div class="amz-flow-step ok" data-step="0" onclick="selectStep(0)">
-              <div class="amz-flow-box">
-                <div class="amz-flow-node">01</div>
-                <div class="amz-flow-label">Report Filed</div>
-                <div class="amz-flow-status ok">Complete</div>
-              </div>
-              <div class="amz-flow-connector"></div>
+        <div class="ent-dashboard">
+          <div class="ent-toolbar">
+            <div class="ent-toolbar-left">
+              <span class="ent-toolbar-title">SEC-2847</span>
+              <span class="ent-toolbar-count">Unreleased Product Photo Leak</span>
             </div>
-            <div class="amz-flow-step ok" data-step="1" onclick="selectStep(1)">
-              <div class="amz-flow-box">
-                <div class="amz-flow-node">02</div>
-                <div class="amz-flow-label">Evidence Collection</div>
-                <div class="amz-flow-status ok">Complete</div>
-              </div>
-              <div class="amz-flow-connector"></div>
+            <span class="ent-toolbar-meta">Opened Apr 2 · Lead: L. Chen</span>
+          </div>
+          <!-- Stage bar — 5 steps, static -->
+          <div style="padding:12px 14px 10px;">
+            <div class="ent-stage-track" style="margin:0">
+              <div class="ent-stage s-done"><div class="ent-stage-lbl">01 · Filed</div></div>
+              <div class="ent-stage s-done"><div class="ent-stage-lbl">02 · Evidence</div></div>
+              <div class="ent-stage s-bottleneck"><div class="ent-stage-lbl">03 · Coord</div></div>
+              <div class="ent-stage s-blocked"><div class="ent-stage-lbl">04 · Legal</div></div>
+              <div class="ent-stage"><div class="ent-stage-lbl">05 · Close</div></div>
             </div>
-            <div class="amz-flow-step bottleneck" data-step="2" onclick="selectStep(2)">
-              <div class="amz-flow-box">
-                <div class="amz-flow-node">03</div>
-                <div class="amz-flow-label">Team Coordination</div>
-                <div class="amz-flow-status bottleneck">Bottlenecked</div>
-              </div>
-              <div class="amz-flow-connector"></div>
+          </div>
+          <!-- Two detail panels side by side -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px;">
+            <!-- Bottleneck -->
+            <div style="background:var(--ent-red-bg);border:1px solid var(--ent-red-border);border-left:3px solid var(--ent-red);padding:10px 12px;">
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--ent-red);margin-bottom:4px;">Step 3 · Bottlenecked · 3 days stalled</div>
+              <div style="font-size:12px;font-weight:600;color:var(--ent-text);margin-bottom:5px;">Team Coordination</div>
+              <div style="font-size:11px;color:var(--ent-text-2);line-height:1.55;margin-bottom:8px;">Waiting on Supplier Risk team response. No reply in 3 days. SLA breach in 2h.</div>
+              <div style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--ent-text-3);margin-bottom:2px;">Escalation contact</div>
+              <div style="font-family:var(--ent-mono);font-size:10px;color:var(--ent-red);">supplier-risk-escalations@amazon.com</div>
             </div>
-            <div class="amz-flow-step bottleneck" data-step="3" onclick="selectStep(3)">
-              <div class="amz-flow-box">
-                <div class="amz-flow-node">04</div>
-                <div class="amz-flow-label">Legal Review</div>
-                <div class="amz-flow-status bottleneck">Blocked</div>
-              </div>
-              <div class="amz-flow-connector"></div>
+            <!-- Cascade -->
+            <div style="background:var(--ent-purple-bg);border:1px solid var(--ent-purple-border);border-left:3px solid var(--ent-purple);padding:10px 12px;">
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--ent-purple);margin-bottom:4px;">Step 4 · Cascading block</div>
+              <div style="font-size:12px;font-weight:600;color:var(--ent-text);margin-bottom:5px;">Legal Review</div>
+              <div style="font-size:11px;color:var(--ent-text-2);line-height:1.55;margin-bottom:8px;">Legal cannot start until step 3 resolves. This is not an independent issue — it is a downstream effect of the coordination block above.</div>
+              <div style="font-size:9px;font-weight:600;color:var(--ent-purple);background:var(--ent-purple-bg);border:1px solid var(--ent-purple-border);display:inline-block;padding:2px 6px;">Previously invisible to investigators</div>
             </div>
-            <div class="amz-flow-step" data-step="4" onclick="selectStep(4)">
-              <div class="amz-flow-box">
-                <div class="amz-flow-node">05</div>
-                <div class="amz-flow-label">Resolution</div>
-                <div class="amz-flow-status at-risk">Not Started</div>
+          </div>
+          <!-- Before/after context row -->
+          <div style="border-top:1px solid var(--ent-border);display:grid;grid-template-columns:1fr 1fr;gap:0;">
+            <div style="padding:10px 14px;border-right:1px solid var(--ent-border);">
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--ent-text-3);margin-bottom:5px;">Before — what investigators saw</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-family:var(--ent-mono);font-size:10.5px;color:var(--ent-text-2);">SEC-2847</span>
+                <span class="ent-badge ent-badge-investigating">Active</span>
+                <span style="font-size:10.5px;color:var(--ent-text-3);">No stage info</span>
+              </div>
+            </div>
+            <div style="padding:10px 14px;">
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--ent-text-3);margin-bottom:5px;">After — bottleneck located immediately</div>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span style="font-family:var(--ent-mono);font-size:10.5px;color:var(--ent-text-2);">SEC-2847</span>
+                <span class="ent-badge ent-badge-bottlenecked">Bottlenecked</span>
+                <span style="font-size:10px;color:var(--ent-text-3);">Step 3/5 · 3 days · cascade →4</span>
               </div>
             </div>
           </div>
-          </div></div>
-          <div id="flow-detail" class="amz-flow-detail"></div>
-          </div>
         </div>
+      </div>
 
-      <p>This component was validated through concept testing and usability testing. The middle-density design — showing the bottlenecked stage with team ownership and days-stalled context — was consistently preferred. Investigators described it as "finally seeing where the fire actually is."</p>
+      <p>This component was validated through concept and usability testing. The design shown above — stage bar with ownership labels, days stalled, and escalation contact — was consistently preferred. Investigators described it as "finally seeing where the fire actually is."</p>
 
       <hr class="case-divider">
 
@@ -757,7 +980,7 @@
 
       <div class="insight">
         <p class="insight-label">Measured results</p>
-        <p><strong>SUS 61 → 88</strong> — system usability across all features. <strong>Time-to-first-action</strong> dropped significantly on priority cases. <strong>Bottleneck identification</strong> dropped from "unknown" to correctly located within the first interaction for 100% of test participants.</p>
+        <p><strong>SUS 61 → 88</strong> — usability score across all three features. <strong>Time-to-first-action</strong> dropped significantly on the priority queue. <strong>Bottleneck identification</strong> went from "unknown" to correctly located on the first try for every test participant.</p>
       </div>
 
       <!-- REFLECTION -->
@@ -923,66 +1146,91 @@
 
     // ========== PRIORITY CASES COMPONENT ==========
     const cases = [
-      { id:'SEC-2847', title:'Unreleased Product Photo Leak', summary:'Echo device images appeared on a third-party tech blog 48h before embargo lift. Source unknown.', update:'Supplier access logs pulled — reviewing 3 flagged accounts.', priority:'P1', status:'Investigating', lead:'L. Chen', sla:'2h remaining', starred:false },
-      { id:'SEC-2831', title:'Unauthorized AWS Data Access', summary:'Abnormal API calls from deprovisioned IAM role. Accessed 4 S3 buckets in eu-west-1.', update:'IAM role revoked. Waiting on CloudTrail export from infra team.', priority:'P2', status:'Bottlenecked', lead:'R. Patel', sla:'6h remaining', starred:false },
-      { id:'SEC-2819', title:'Supplier NDA Breach', summary:'Confidential roadmap details shared externally by third-party vendor. Legal notified.', update:'Vendor contract pulled. Scheduling call with legal for escalation path.', priority:'P2', status:'Active', lead:'L. Chen', sla:'1d remaining', starred:false },
+      { id:'SEC-2847', title:'Unreleased Product Photo Leak', summary:'Echo device images appeared on a third-party tech blog 48h before embargo lift. Source unknown.', update:'Supplier access logs pulled — reviewing 3 flagged accounts in eu-west-2.', priority:'P1', status:'Investigating', lead:'L. Chen', team:'Sec Ops', sla:'2h remaining', stage:3, totalStages:5, stageLabel:'Coordination', starred:true },
+      { id:'SEC-2831', title:'Unauthorized AWS Data Access', summary:'Abnormal API calls from deprovisioned IAM role. Accessed 4 S3 buckets in eu-west-1.', update:'IAM role revoked. Waiting on CloudTrail export from infra team.', priority:'P2', status:'Bottlenecked', lead:'R. Patel', team:'Cloud Sec', sla:'6h remaining', stage:3, totalStages:5, stageLabel:'Legal review', starred:false },
+      { id:'SEC-2819', title:'Supplier NDA Breach', summary:'Confidential roadmap details shared externally by third-party vendor. Legal notified.', update:'Vendor contract pulled. Scheduling call with legal for escalation path.', priority:'P2', status:'Active', lead:'L. Chen', team:'Vendor Sec', sla:'1d remaining', stage:2, totalStages:5, stageLabel:'Evidence', starred:false },
     ];
 
     function priorityBadge(p) {
-      if (p === 'P1') return `<span class="shad-badge shad-badge-red"><span class="shad-badge-dot"></span>P1 · Critical</span>`;
-      if (p === 'P2') return `<span class="shad-badge shad-badge-yellow"><span class="shad-badge-dot"></span>P2 · High</span>`;
-      return `<span class="shad-badge shad-badge-muted">P3</span>`;
+      if (p === 'P1') return `<span class="ent-badge ent-badge-p1">P1 · Critical</span>`;
+      if (p === 'P2') return `<span class="ent-badge ent-badge-p2">P2 · High</span>`;
+      return `<span class="ent-badge ent-badge-p3">P3</span>`;
     }
     function statusBadge(s) {
-      if (s === 'Bottlenecked') return `<span class="shad-badge shad-badge-red">${s}</span>`;
-      if (s === 'Investigating') return `<span class="shad-badge shad-badge-amber">${s}</span>`;
-      return `<span class="shad-badge shad-badge-green">${s}</span>`;
+      const map = { 'Bottlenecked':'ent-badge-bottlenecked', 'Investigating':'ent-badge-investigating', 'Active':'ent-badge-active', 'Blocked':'ent-badge-blocked' };
+      const cls = map[s] || 'ent-badge-p3';
+      return `<span class="ent-badge ${cls}">${s}</span>`;
     }
-    function slaColor(s) { return s.startsWith('2h') || s.startsWith('1h') ? 'color:var(--shad-red)' : s.startsWith('6h') ? 'color:var(--shad-amber)' : ''; }
+    function slaClass(s) { return s.startsWith('2h')||s.startsWith('1h') ? 'urgent' : s.startsWith('6h') ? 'warn' : ''; }
+
+    function stageTrackHTML(c) {
+      const stageNames = ['Filed','Evidence','Coord','Legal','Close'];
+      return stageNames.map((lbl, i) => {
+        let cls = '';
+        if (i < c.stage - 1) cls = 's-done';
+        else if (i === c.stage - 1) {
+          if (c.status === 'Bottlenecked') cls = 's-bottleneck';
+          else if (c.status === 'Blocked') cls = 's-blocked';
+          else cls = 's-done';
+        }
+        return `<div class="ent-stage ${cls}"><div class="ent-stage-dot"></div><div class="ent-stage-lbl">${lbl}</div></div>`;
+      }).join('');
+    }
 
     function renderTableRow(c) {
-      return `<tr class="${c.starred ? 'row-pinned' : ''}" id="row-${c.id}">
+      const sc = slaClass(c.sla);
+      return `<tr class="${c.starred ? 'ent-row-pinned' : ''}" id="row-${c.id}">
         <td>
-          <button class="shad-pin-btn${c.starred ? ' pinned' : ''}" onclick="toggleStar('${c.id}')" title="${c.starred ? 'Unpin' : 'Pin'}">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="${c.starred ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1z"/></svg>
+          <button class="ent-pin-btn${c.starred ? ' pinned' : ''}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="${c.starred ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1z"/></svg>
           </button>
         </td>
         <td>${priorityBadge(c.priority)}</td>
-        <td><span class="shad-mono">${c.id}</span></td>
-        <td style="font-size:12px;color:var(--shad-text);max-width:180px">${c.title}</td>
+        <td><span class="ent-mono-id">${c.id}</span></td>
+        <td style="max-width:160px">
+          <div style="font-size:11.5px;color:var(--ent-text);font-weight:500;line-height:1.3">${c.title}</div>
+          <div style="font-size:9.5px;color:var(--ent-text-3);margin-top:2px">Step ${c.stage}/${c.totalStages} · ${c.stageLabel}</div>
+        </td>
         <td>${statusBadge(c.status)}</td>
-        <td style="font-size:11px;color:var(--shad-muted)">${c.lead}</td>
-        <td style="font-size:11px;font-weight:500;${slaColor(c.sla)}">${c.sla}</td>
+        <td style="font-size:11.5px;color:var(--ent-text-2)">${c.lead}<div style="font-size:9.5px;color:var(--ent-text-3)">${c.team}</div></td>
+        <td style="font-size:11px;font-weight:${sc ? '600' : '400'}" class="${sc ? 'ent-'+sc : ''}">${c.sla}</td>
       </tr>`;
     }
 
     function renderPinnedCard(c) {
-      return `<div class="shad-card" id="pinned-${c.id}">
-        <div class="shad-card-header">
+      const sc = slaClass(c.sla);
+      const priorityCardClass = c.priority === 'P1' ? 'ent-card-p1' : 'ent-card-p2';
+      return `<div class="ent-card ${priorityCardClass}" id="pinned-${c.id}">
+        <div class="ent-card-head">
           <div style="flex:1">
-            <div class="shad-card-id">${c.id}</div>
-            <div class="shad-card-title">${c.title}</div>
+            <div class="ent-card-id">${c.id} · ${c.team}</div>
+            <div class="ent-card-title">${c.title}</div>
           </div>
-          <button class="shad-unpin-btn" onclick="toggleStar('${c.id}')" title="Unpin">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          <button class="ent-close-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
-        <div class="shad-card-body">
-          <div class="shad-card-meta">
+        <div class="ent-card-body">
+          <div class="ent-card-meta-row">
             ${priorityBadge(c.priority)}
             ${statusBadge(c.status)}
           </div>
-          <div class="shad-kv-row">
-            <div class="shad-kv"><span class="shad-kv-key">Assigned</span><span class="shad-kv-val">${c.lead}</span></div>
-            <div class="shad-kv"><span class="shad-kv-key">SLA</span><span class="shad-kv-val" style="${slaColor(c.sla)}">${c.sla}</span></div>
+          <div class="ent-stage-track">${stageTrackHTML(c)}</div>
+          <div class="ent-kv-grid">
+            <div class="ent-kv"><span class="ent-kv-key">Lead</span><span class="ent-kv-val">${c.lead}</span></div>
+            <div class="ent-kv"><span class="ent-kv-key">SLA</span><span class="ent-kv-val${sc ? ' '+sc : ''}">${c.sla}</span></div>
+            <div class="ent-kv"><span class="ent-kv-key">Stage</span><span class="ent-kv-val">${c.stage}/${c.totalStages}</span></div>
           </div>
-          <div class="shad-card-summary">${c.summary}</div>
-          <div class="shad-card-update"><div class="shad-card-update-label">Latest update</div>${c.update}</div>
+          <div class="ent-update">
+            <div class="ent-update-label">Latest activity</div>
+            <div class="ent-update-text">${c.update}</div>
+          </div>
         </div>
-        <div class="shad-card-footer">
-          <div class="shad-btn-group">
-            <button class="shad-btn shad-btn-primary" onclick="event.stopPropagation()">Open case</button>
-            <button class="shad-btn shad-btn-ghost" onclick="event.stopPropagation()">Message lead</button>
+        <div class="ent-card-foot">
+          <div class="ent-btn-row">
+            <button class="ent-btn ent-btn-primary">Open case</button>
+            <button class="ent-btn ent-btn-ghost">Message lead</button>
+            ${c.status === 'Bottlenecked' ? `<button class="ent-btn ent-btn-danger">Escalate</button>` : ''}
           </div>
         </div>
       </div>`;
@@ -990,12 +1238,12 @@
 
     function renderPriorityDemo() {
       const starred = cases.filter(c => c.starred);
-      const titleEl = document.getElementById('priority-section-title');
       const starredArea = document.getElementById('starred-area');
+      const pinnedCount = document.getElementById('pinned-count');
       const starredCards = document.getElementById('starred-cards');
       const allWrap = document.getElementById('all-cases-wrap');
 
-      titleEl.textContent = `Pinned (${starred.length})`;
+      pinnedCount.textContent = starred.length;
       if (starred.length > 0) {
         starredArea.style.display = 'block';
         starredCards.innerHTML = starred.map(renderPinnedCard).join('');
@@ -1003,18 +1251,16 @@
         starredArea.style.display = 'none';
       }
 
-      allWrap.innerHTML = `<div class="shad-table-wrap">
-        <div class="shad-table-header">
-          <span class="shad-table-title">All investigations</span>
-          <span class="shad-table-count">${cases.length} cases</span>
-        </div>
-        <table class="shad-table">
-          <thead><tr>
-            <th></th><th>Priority</th><th>Case ID</th><th>Title</th><th>Status</th><th>Lead</th><th>SLA</th>
-          </tr></thead>
-          <tbody>${cases.map(renderTableRow).join('')}</tbody>
-        </table>
-      </div>`;
+      allWrap.innerHTML = `
+        <div class="ent-section-label">All investigations <span class="ent-count-pill">${cases.length}</span></div>
+        <div class="ent-table-wrap">
+          <table class="ent-table">
+            <thead><tr>
+              <th></th><th>Priority</th><th>Case ID</th><th>Investigation</th><th>Status</th><th>Lead</th><th>SLA</th>
+            </tr></thead>
+            <tbody>${cases.map(renderTableRow).join('')}</tbody>
+          </table>
+        </div>`;
     }
 
     function toggleStar(id) {
@@ -1027,16 +1273,86 @@
     // ========== TOOLTIP DEMO ==========
     let tooltipDensity = 'dense';
     const tooltipData = {
-      'tip1': { status:'Investigating', summary:'Echo device leak — 3 flagged supplier accounts.', lead:'L. Chen', nextStep:'Complete access log review by EOD.' },
-      'tip2': { status:'Bottlenecked', summary:'Deprovisioned IAM role accessed 4 S3 buckets.', lead:'R. Patel', nextStep:'Waiting on CloudTrail export from infra team.' },
-      'tip3': { status:'Active', summary:'Vendor shared confidential roadmap externally.', lead:'L. Chen', nextStep:'Schedule legal escalation call.' },
+      'tip1': {
+        caseId: 'SEC-2847', title: 'Unreleased Product Photo Leak',
+        statusKey: 'investigating', statusLabel: 'Investigating',
+        summary: 'Echo device images published on third-party tech blog 48h before embargo. Source under review.',
+        lead: 'L. Chen', team: 'Sec Ops',
+        stages: ['s-done','s-done','s-done','',''],
+        logs: [
+          { time: 'Apr 4 14:22', text: 'Supplier access logs exported from Portal' },
+          { time: 'Apr 4 09:11', text: '3 flagged accounts flagged in eu-west-2' },
+          { time: 'Apr 3 16:45', text: 'Evidence phase marked complete by L. Chen' },
+        ],
+        nextStep: 'Complete access log review by EOD today',
+      },
+      'tip2': {
+        caseId: 'SEC-2831', title: 'Unauthorized AWS Data Access',
+        statusKey: 'bottlenecked', statusLabel: 'Bottlenecked',
+        summary: 'Deprovisioned IAM role made abnormal API calls; accessed 4 S3 buckets in eu-west-1.',
+        lead: 'R. Patel', team: 'Cloud Sec',
+        stages: ['s-done','s-done','s-bottleneck','s-blocked',''],
+        logs: [
+          { time: 'Apr 2 11:30', text: 'IAM role revoked. Awaiting CloudTrail export' },
+          { time: 'Apr 1 17:00', text: 'Infra team notified — no response in 3 days' },
+          { time: 'Mar 31 09:44', text: 'S3 bucket access pattern documented' },
+        ],
+        nextStep: 'Escalate to infra-escalations@amazon.com — SLA breach in 6h',
+      },
+      'tip3': {
+        caseId: 'SEC-2819', title: 'Supplier NDA Breach',
+        statusKey: 'active', statusLabel: 'Active',
+        summary: 'Third-party vendor shared confidential product roadmap details in a public-facing document.',
+        lead: 'L. Chen', team: 'Vendor Sec',
+        stages: ['s-done','s-done','','',''],
+        logs: [
+          { time: 'Mar 27 10:15', text: 'Vendor contract and NDA terms pulled' },
+          { time: 'Mar 26 14:30', text: 'External document identified and archived' },
+          { time: 'Mar 25 08:50', text: 'Case opened, legal notified' },
+        ],
+        nextStep: 'Schedule legal escalation call — waiting on L. Chen availability',
+      },
     };
+
+    const stageNames2 = ['Filed','Evidence','Coord','Legal','Close'];
+
+    function buildPopoverStages(stages) {
+      return `<div class="ent-stage-track" style="margin-bottom:0">` +
+        stages.map((cls, i) =>
+          `<div class="ent-stage ${cls}"><div class="ent-stage-dot"></div><div class="ent-stage-lbl">${stageNames2[i]}</div></div>`
+        ).join('') +
+      `</div>`;
+    }
 
     function buildTooltipHTML(id) {
       const d = tooltipData[id];
-      if (tooltipDensity === 'sparse') return `<div class="amz-tooltip-row"><span class="amz-tooltip-key">Status</span><span class="amz-tooltip-val">${d.status}</span></div>`;
-      if (tooltipDensity === 'medium') return `<div class="amz-tooltip-row"><span class="amz-tooltip-key">Status</span><span class="amz-tooltip-val">${d.status}</span></div><div class="amz-tooltip-row"><span class="amz-tooltip-key">Lead</span><span class="amz-tooltip-val">${d.lead}</span></div>`;
-      return `<div class="amz-tooltip-row"><span class="amz-tooltip-key">Status</span><span class="amz-tooltip-val">${d.status}</span></div><div class="amz-tooltip-row"><span class="amz-tooltip-key">Summary</span><span class="amz-tooltip-val" style="max-width:140px">${d.summary}</span></div><div class="amz-tooltip-row"><span class="amz-tooltip-key">Lead</span><span class="amz-tooltip-val">${d.lead}</span></div><div class="amz-tooltip-row"><span class="amz-tooltip-key">Next step</span><span class="amz-tooltip-val" style="max-width:140px;color:var(--shad-green)">${d.nextStep}</span></div>`;
+      const badge = `<span class="ent-badge ent-badge-${d.statusKey}">${d.statusLabel}</span>`;
+      const head = `<div class="ent-pop-head"><div class="ent-pop-title-block"><div class="ent-pop-case-id">${d.caseId} · ${d.team}</div><div class="ent-pop-case-title">${d.title}</div></div>${badge}</div>`;
+
+      if (tooltipDensity === 'sparse') {
+        return head +
+          `<div class="ent-pop-body"><div class="ent-pop-summary">${d.summary}</div></div>`;
+      }
+      if (tooltipDensity === 'medium') {
+        return head +
+          `<div class="ent-pop-body">
+            <div class="ent-pop-summary">${d.summary}</div>
+            ${buildPopoverStages(d.stages)}
+            <div style="font-size:10px;color:var(--ent-text-3);margin-top:6px;padding-bottom:8px">Lead: <span style="color:var(--ent-text-2);font-weight:500">${d.lead}</span></div>
+          </div>`;
+      }
+      // dense
+      const logHTML = d.logs.slice(0,2).map(l =>
+        `<div class="ent-pop-log-entry"><span class="ent-pop-log-time">${l.time}</span><span class="ent-pop-log-text">${l.text}</span></div>`
+      ).join('');
+      return head +
+        `<div class="ent-pop-body">
+          <div class="ent-pop-summary">${d.summary}</div>
+          ${buildPopoverStages(d.stages)}
+          <div style="height:6px"></div>
+        </div>
+        <div class="ent-pop-log">${logHTML}</div>
+        <div class="ent-pop-next"><span class="ent-pop-next-lbl">Next</span><span class="ent-pop-next-text">${d.nextStep}</span></div>`;
     }
 
     function showTip(id) { const el=document.getElementById(id); if(el){el.innerHTML=buildTooltipHTML(id);el.classList.add('visible');} }
@@ -1047,27 +1363,7 @@
       ['tip1','tip2','tip3'].forEach(id=>{ const el=document.getElementById(id); if(el&&el.classList.contains('visible')){ el.innerHTML=buildTooltipHTML(id); } });
     }
 
-    // ========== BOTTLENECK FLOW ==========
-    const flowDetails = [
-      { title:'Report Filed', status:'ok', msg:'Case created Apr 2 at 09:14 AM. All required fields completed. No issues.' },
-      { title:'Evidence Collection', status:'ok', msg:'Access logs from Supplier Portal and internal systems pulled. 3 flagged accounts identified. Completed Apr 3.' },
-      { title:'Team Coordination — Bottleneck', status:'bottleneck', msg:'Waiting on response from Supplier Risk team (3 days, no reply). SLA breach risk in 2h. Escalation recommended via: supplier-risk-escalations@amazon.com' },
-      { title:'Legal Review — Blocked', status:'bottleneck', msg:'Legal cannot begin review until Supplier Risk completes coordination step. Cascading block — this step is delayed by the previous bottleneck, not a separate issue.' },
-      { title:'Resolution', status:'pending', msg:'Not yet reached. Expected timeline: 2–3 days from Legal Review completion, assuming no further bottlenecks.' },
-    ];
-
-    function selectStep(i) {
-      document.querySelectorAll('.amz-flow-step').forEach((s,j)=>{
-        s.classList.toggle('selected', j===i);
-      });
-      const detail = document.getElementById('flow-detail');
-      const d = flowDetails[i];
-      const color = d.status==='ok'?'var(--shad-green)':d.status==='bottleneck'?'var(--shad-red)':'var(--shad-muted)';
-      detail.innerHTML = `<div class="amz-flow-detail-title" style="color:${color}">${d.title}</div><p>${d.msg}</p>`;
-      detail.classList.add('visible');
-    }
-    // Auto-select the first bottleneck on load
-    setTimeout(()=>selectStep(2), 800);
+    // (Investigation timeline is now static — no JS interaction needed)
 
   </script>
 
