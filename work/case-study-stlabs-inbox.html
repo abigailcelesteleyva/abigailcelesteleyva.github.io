@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="icon" type="image/png" sizes="180x180" href="../favicon.png">
+  <link rel="apple-touch-icon" href="../favicon.png">
+  <title>STLabs · Ticket Inbox — Abigail Leyva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: #EDE8DC; color: #1C1510; }
+
+    /* Nav */
+    #nav { position: fixed; bottom: 1rem; left: 0; right: 0; z-index: 200; display: flex; justify-content: center; pointer-events: none; }
+    @media (min-width: 768px) { #nav { top: 1.5rem; bottom: auto; } }
+    #nav-pill { pointer-events: all; display: flex; align-items: center; gap: 0.25rem; background: rgba(7,15,25,0.38); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(209,173,102,0.10); border-radius: 999px; padding: 0.35rem; }
+    .nav-item { display: flex; align-items: center; padding: 0.45rem 0.85rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; color: rgba(245,237,214,0.38); text-decoration: none; transition: background 0.2s, color 0.2s; white-space: nowrap; }
+    .nav-item:hover { background: rgba(209,173,102,0.08); color: rgba(245,237,214,0.8); }
+    .nav-item.active { background: rgba(209,173,102,0.12); color: rgba(245,237,214,0.95); font-weight: 600; }
+
+    /* Hero — dark Monet */
+    .case-hero { background: #0D1118; padding: 8rem 3rem 4rem; }
+    @media (max-width: 768px) { .case-hero { padding: 6rem 1.5rem 3rem; } }
+    .case-back { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 500; color: rgba(245,237,214,0.45); text-decoration: none; margin-bottom: 2.5rem; transition: color 0.2s; letter-spacing: 0.01em; }
+    .case-back:hover { color: rgba(245,237,214,0.8); }
+    .case-eyebrow { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.7); margin-bottom: 0.75rem; }
+    .case-hero h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 600; color: #F5EDD6; line-height: 1.15; letter-spacing: -0.025em; margin-bottom: 1.25rem; max-width: 760px; }
+    .case-subtitle { font-size: clamp(0.92rem, 1.4vw, 1.05rem); font-weight: 400; color: rgba(245,237,214,0.6); line-height: 1.7; max-width: 620px; margin-bottom: 2.5rem; }
+    .case-details { display: flex; flex-wrap: wrap; gap: 2.5rem; }
+    .case-detail-label { display: block; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,237,214,0.35); margin-bottom: 0.3rem; }
+    .case-detail-value { font-size: 0.875rem; font-weight: 500; color: rgba(245,237,214,0.8); }
+
+    /* Article */
+    .case-content { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 8rem; }
+    .case-content h2 { font-size: clamp(1.45rem, 2.5vw, 1.9rem); font-weight: 600; color: #1C1510; letter-spacing: -0.02em; line-height: 1.2; margin-top: 4rem; margin-bottom: 1rem; }
+    .case-content h2:first-child { margin-top: 0; }
+    .case-content h3 { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin-top: 4rem; margin-bottom: 0.5rem; }
+    .case-content p { font-size: 1rem; line-height: 1.78; color: rgba(28,21,16,0.72); margin-bottom: 1.25rem; }
+    .case-content strong { color: #1C1510; font-weight: 600; }
+    .case-content ul, .case-content ol { padding-left: 1.4rem; margin-bottom: 1.25rem; }
+    .case-content li { font-size: 1rem; line-height: 1.78; color: rgba(28,21,16,0.72); margin-bottom: 0.4rem; }
+    .case-divider { border: none; border-top: 1px solid rgba(28,21,16,0.1); margin: 4rem 0; }
+
+    /* Section break between the three pieces */
+    .case-section-break { border: none; border-top: 2px solid rgba(28,21,16,0.08); margin: 6rem 0 0; }
+
+    /* Inline mockup/iframe wrapper */
+    .case-mockup { margin: 3rem -2rem; border-radius: 12px; overflow: hidden; background: #f8f6f2; }
+    .case-mockup iframe { display: block; width: 100%; border: none; }
+    @media (max-width: 760px) { .case-mockup { margin: 3rem 0; border-radius: 8px; } }
+
+    /* Callout / blockquote */
+    .callout { border-left: 2px solid rgba(209,173,102,0.5); padding: 0.4rem 0 0.4rem 1rem; margin: 1.25rem 0; }
+    .callout p { font-size: 0.9rem; font-style: italic; color: #1C1510; line-height: 1.5; margin-bottom: 0; display: inline; }
+    .callout-attr { font-size: 0.75rem; font-style: normal; color: rgba(28,21,16,0.4); display: inline; margin-left: 0.3rem; }
+
+    /* Insight box */
+    .insight { background: rgba(28,21,16,0.04); border-radius: 10px; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .insight-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin-bottom: 0.5rem; }
+    .insight p { font-size: 0.95rem; color: #1C1510; margin-bottom: 0; }
+
+    /* Raw asset */
+    .raw-asset { margin: 2.5rem 0; }
+    .raw-asset img { display: block; width: 100%; height: auto; }
+
+    /* Case asset box */
+    .case-asset { margin: 2.5rem 0; border: 1px solid rgba(28,21,16,0.08); border-radius: 12px; overflow: hidden; background: rgba(28,21,16,0.03); }
+    .case-asset-caption { padding: 0.75rem 1.5rem; font-size: 0.75rem; color: rgba(28,21,16,0.4); border-top: 1px solid rgba(28,21,16,0.06); }
+
+    /* Component caption */
+    .component-caption { font-size: 0.75rem; color: rgba(28,21,16,0.4); margin-top: 0.6rem; margin-bottom: 0; }
+
+    /* ── Ticket Inbox interactive demos ── */
+
+    /* Iteration 1 — free-floating click demo */
+    .iter1-free { position: relative; margin: 2.5rem 0; }
+    .iter1-overlay { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 24px; }
+    .iter1-overlay-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(209,173,102,0.8); }
+    .iter1-overlay-hint { font-size: 0.7rem; font-weight: 400; color: rgba(28,21,16,0.4); }
+    .iter1-overlay .demo-dots { margin-left: auto; }
+    .demo-dots { display: flex; gap: 6px; align-items: center; }
+    .demo-dot { width: 7px; height: 7px; border-radius: 50%; background: #d4d4d8; transition: background 0.3s ease; }
+    .demo-dot.filled { background: rgba(209,173,102,0.8); }
+    .demo-stage { cursor: pointer; position: relative; overflow: hidden; border-radius: 8px; }
+    .demo-stage img { width: 100%; height: auto; display: block; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.8s ease; pointer-events: none; z-index: 1; }
+    .demo-stage img.active { opacity: 1; position: relative; pointer-events: auto; z-index: 2; }
+    .demo-stage img.prev { opacity: 1; z-index: 1; }
+
+    /* Vertical scroll snap — iter2 */
+    .vsnap-header { display: flex; gap: 1.5rem; padding: 0; margin-bottom: 12px; }
+    .vsnap-label { font-size: 0.75rem; font-weight: 500; color: rgba(28,21,16,0.35); cursor: pointer; transition: color 0.3s ease; }
+    .vsnap-label.active { color: rgba(209,173,102,0.8); }
+    .vsnap-wrapper { position: relative; border-radius: 12px; overflow: hidden; margin: 0 0 3rem; }
+    .vsnap-container { aspect-ratio: 1201 / 471; background: #0D1118; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+    .vsnap-container::-webkit-scrollbar { display: none; }
+    .vsnap-slide { aspect-ratio: 1201 / 471; flex-shrink: 0; scroll-snap-align: center; display: flex; align-items: center; justify-content: center; }
+    .vsnap-slide img { width: 100%; height: auto; display: block; }
+
+    /* Iteration 3 — snap strip */
+    .iter3-snap { aspect-ratio: 1467 / 164; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; margin: 2.5rem 0; border-radius: 8px; }
+    .iter3-snap::-webkit-scrollbar { display: none; }
+    .iter3-slide { aspect-ratio: 1467 / 164; flex-shrink: 0; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; }
+    .iter3-slide img { width: 100%; height: auto; display: block; }
+
+    /* Three actions */
+    .three-actions { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1rem; }
+    .action-item { display: grid; grid-template-columns: 70px 1fr; gap: 1rem; align-items: flex-start; }
+    .action-icon-wrap { display: flex; align-items: center; justify-content: center; height: 100%; }
+    .action-icon { height: 28px; width: auto; }
+    .action-item p { font-size: 0.95rem; margin-bottom: 0; }
+
+    /* Gamified resolution */
+    .gamified-resolution { height: 74px; display: flex; align-items: center; justify-content: center; gap: 2.5rem; margin: 1rem 0; background: #EDE8DC; border-radius: 0; }
+    .res-stat { display: flex; flex-direction: column; align-items: center; transform-origin: center center; transition: transform 0.6s ease; }
+    .gamified-resolution.popped .res-stat:first-child { transform: translateX(-40px); }
+    .res-stat-resolved { transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.4); transform-origin: right center; }
+    .res-stat-resolved.pop { transform: scale(1.3); }
+    .res-number-row { display: flex; align-items: center; gap: 6px; }
+    .res-number { font-family: 'Lato', sans-serif; font-size: 1.65rem; font-weight: 900; color: rgba(28,21,16,0.3); font-variant-numeric: tabular-nums; line-height: 1; transition: color 0.6s ease; }
+    .res-label { font-family: 'Lato', sans-serif; font-size: 1.65rem; font-weight: 900; color: rgba(28,21,16,0.3); transition: color 0.6s ease; }
+    .res-arrow { transition: transform 0.4s ease; }
+    .res-arrow polyline, .res-arrow path { transition: stroke 0.6s ease; }
+    .res-stat-resolved.pop .res-number, .res-stat-resolved.pop .res-label { background: linear-gradient(135deg, #22c55e, #16a34a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .res-stat-resolved.pop .res-arrow polyline, .res-stat-resolved.pop .res-arrow path { stroke: #22c55e; }
+
+    /* ── Ticket Detail interactive demos ── */
+
+    /* Proto wrap (iframes) */
+    .proto-wrap { position: relative; margin: 2.5rem 0; }
+    .proto-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 16px; }
+    .proto-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(209,173,102,0.8); }
+    .proto-hint { font-size: 0.7rem; color: rgba(28,21,16,0.4); }
+    .proto-dots { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+    .proto-dot { width: 7px; height: 7px; border-radius: 50%; background: #d4d4d8; transition: background 0.3s; }
+    .proto-dot.filled { background: rgba(209,173,102,0.8); }
+    .proto-caption { font-size: 0.75rem; color: rgba(28,21,16,0.4); margin-top: 0.5rem; }
+    .proto-stage { border-radius: 8px; overflow: hidden; border: 1px solid rgba(28,21,16,0.08); position: relative; cursor: pointer; }
+    .proto-frame-wrap { width: 860px; transform-origin: top left; position: relative; }
+    .proto-frame-wrap iframe { width: 860px; border: none; display: none; background: #FEFEFE; }
+    .proto-frame-wrap iframe.active { display: block; animation: iframeFadeIn 0.12s ease forwards; }
+    @keyframes iframeFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Workflow demos */
+    .wf-grid { display: flex; flex-direction: column; gap: 2.5rem; margin: 3.5rem 0; }
+    .wf-item { display: flex; flex-direction: column; gap: 0.6rem; }
+    .wf-header { display: flex; align-items: center; gap: 0.5rem; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(28,21,16,0.35); }
+    .wf-interactive-label { color: rgba(209,173,102,0.8); }
+    .wf-res-block { background: #f5f0e8; border-radius: 10px; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; transition: all 0.4s ease; min-height: 80px; border: 1px solid rgba(28,21,16,0.04); }
+    .wf-res-block.done { background: rgba(28,21,16,0.04); opacity: 0.7; border-color: transparent; }
+    .wf-res-block.failed { background: #fff5f5; border: 1px solid rgba(192,57,43,0.08); }
+    .wf-info { flex: 1; min-width: 0; }
+    .wf-name { font-size: 0.95rem; font-weight: 600; color: #1C1510; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(28,21,16,0.1); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+    .wf-desc { font-size: 0.8rem; color: rgba(28,21,16,0.55); line-height: 1.4; }
+    .wf-run-btn { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 600; background: #9A3700; color: #fff; border: none; border-radius: 6px; padding: 8px 18px; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+    .wf-run-btn:hover { background: #7E2D00; }
+    .wf-retry-btn { font-size: 0.7rem; font-weight: 600; background: #EDE8DC; color: #1C1510; border: 1px solid rgba(28,21,16,0.12); border-radius: 6px; padding: 5px 12px; cursor: pointer; margin-top: 4px; }
+    .wf-logo-running { width: 24px; height: 24px; animation: wf-pulse 1.2s ease-in-out infinite; }
+    @keyframes wf-pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1) translateY(-1px); opacity: 1; } }
+    .wf-tag { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: #16a34a; }
+    .wf-tag-failed { color: #c0392b; }
+    .wf-logo-green { filter: hue-rotate(90deg) saturate(1.5); }
+    .wf-logo-red { filter: brightness(0) saturate(100%) invert(25%) sepia(90%) saturate(1500%) hue-rotate(340deg); }
+    .wf-reset-btn { font-size: 0.6rem; color: rgba(28,21,16,0.35); background: none; border: none; cursor: pointer; text-decoration: underline; align-self: flex-start; }
+    .wf-status-text { font-size: 0.7rem; color: rgba(28,21,16,0.5); margin-top: 4px; font-style: italic; }
+
+    /* Activity timeline (static inline version from ticket-detail) */
+    .tl-container { margin: 2.5rem 0; border: 1px solid rgba(28,21,16,0.08); border-radius: 12px; overflow: hidden; background: #EDE8DC; }
+    .timeline-mini-av { background: rgba(28,21,16,0.08) !important; color: rgba(28,21,16,0.6) !important; }
+
+    /* ── Inspect Panel component frames ── */
+    .component-frame { border-radius: 12px; overflow: hidden; background: #0E0C08; max-width: 980px; margin: 0 auto; }
+    .component-frame iframe { display: block; width: 100%; border: none; background: #0E0C08; }
+    .component-frame-outer { padding: 1.5rem 0; }
+
+    /* Outlier scenario toggle */
+    .outlier-scenario-btn { font-family: inherit; font-size: 0.75rem; font-weight: 500; color: rgba(28,21,16,0.4); background: none; border: 1px solid rgba(28,21,16,0.12); border-radius: 6px; padding: 0.35rem 0.85rem; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+    .outlier-scenario-btn:hover { color: rgba(28,21,16,0.65); border-color: rgba(28,21,16,0.25); }
+    .outlier-scenario-btn.outlier-active { color: rgba(209,173,102,0.9); border-color: rgba(209,173,102,0.4); }
+
+    /* Pagination */
+    .case-pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3rem 2rem 0;
+      max-width: 720px;
+      margin: 0 auto;
+      border-top: 1px solid rgba(28,21,16,0.1);
+    }
+    .case-page-prev, .case-page-next {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: rgba(28,21,16,0.5);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .case-page-prev:hover, .case-page-next:hover { color: #1C1510; }
+
+    /* Footer */
+    .case-footer { background: #0D1118; padding: 3rem 2rem; display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+    .case-footer a { color: rgba(245,237,214,0.45); font-size: 0.8rem; text-decoration: none; transition: color 0.2s; }
+    .case-footer a:hover { color: rgba(245,237,214,0.85); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav" aria-label="Main navigation">
+    <div id="nav-pill">
+      <a href="../#home" class="nav-item">Home</a>
+      <a href="../#work" class="nav-item active">Work</a>
+      <a href="../#play" class="nav-item">Play</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="case-hero">
+    <a href="../#work" class="case-back">← Back to work</a>
+    <p class="case-eyebrow">STLabs · 01 of 03</p>
+    <h1>Rethinking mass ticket resolution for IT ops.</h1>
+    <p class="case-subtitle">Designing the inbox experience — how IT operators triage, group, and resolve high volumes of tickets with AI assistance.</p>
+    <div class="case-details">
+      <div>
+        <span class="case-detail-label">Role</span>
+        <span class="case-detail-value">UX Design Engineer</span>
+      </div>
+      <div>
+        <span class="case-detail-label">Timeline</span>
+        <span class="case-detail-value">2022–2024</span>
+      </div>
+      <div>
+        <span class="case-detail-label">Type</span>
+        <span class="case-detail-value">Enterprise Product</span>
+      </div>
+      <div>
+        <span class="case-detail-label">Focus</span>
+        <span class="case-detail-value">Workflow Design, AI</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ARTICLE BODY -->
+  <div class="case-content">
+
+    <h3>01 — Ticket Inbox</h3>
+    <h2>Rethinking mass ticket resolution for IT ops.</h2>
+    <p>A 0→1 design for grouping, prioritizing, and resolving tickets in seconds — through three major iterations shaped by stakeholder tension and user empathy.</p>
+
+    <!-- THE PROBLEM -->
+    <h3>The problem</h3>
+    <h2>Starting from zero.</h2>
+    <p>A core selling point of our product: intake and group tickets by workflow, then resolve them in bulk. But this was a 0→1 product — no existing patterns to reference, no shared understanding of what "grouping" meant across the team. The founder, engineers, and I each had a different mental model.</p>
+
+    <!-- ITERATION 1 -->
+    <h3>Iteration 1 — The safe bet</h3>
+    <h2>Starting with the known.</h2>
+    <p>I started with what existed in the market: a table view. Rows of tickets, expandable grouping applied on top. Each group showed the title, description, labels, a thumbnail of tickets inside, and a Resolve button with status controls. Groups could expand or collapse. The intention: mass resolve tickets in seconds.</p>
+
+    <div class="iter1-free">
+      <div class="iter1-overlay">
+        <span class="iter1-overlay-label">Interactive</span>
+        <span class="iter1-overlay-hint" id="demo-hint-text">Click to explore</span>
+        <div class="demo-dots" id="demo-dots">
+          <span class="demo-dot"></span>
+          <span class="demo-dot"></span>
+          <span class="demo-dot"></span>
+        </div>
+      </div>
+      <div class="demo-stage" id="demo-iter1">
+        <img class="active" src="../STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-collapsed-component.svg" alt="">
+        <img src="../STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-table-component.svg" alt="">
+        <img src="../STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-full-table.svg" alt="">
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>"This is exactly what I was thinking — I just couldn't explain it."</p>
+      <span class="callout-attr">— Grant Fuhr, Software Engineer</span>
+    </div>
+
+    <p>The engineer in charge of the grouping mechanism validated it immediately. But the founder's reaction was different:</p>
+
+    <div class="callout">
+      <p>"It feels too old world. Yes, we're capturing grouping and resolution — but we're not going to sell the product like this."</p>
+      <span class="callout-attr">— Amit Agarwal, Founder</span>
+    </div>
+
+    <!-- THE PIVOT -->
+    <h3>The pivot</h3>
+    <h2>Dark mode and the IT admin's identity.</h2>
+    <p>This led to a full redesign — not just the inbox, but the design system. Every competitor prioritized dark mode. Our user, the IT admin, is used to being the "boring sibling" of the engineer. Dark mode wasn't aesthetic — it was empowerment.</p>
+
+    <div class="insight">
+      <p class="insight-label">Design decision</p>
+      <p>The shift to dark mode wasn't aesthetic — it was strategic. It signaled to IT admins: this tool was built for you, not adapted from someone else's workflow.</p>
+    </div>
+
+    <!-- ITERATION 2 -->
+    <h3>Iteration 2 — Editorial layout</h3>
+    <h2>From table rows to a continuum.</h2>
+
+    <p>Instead of a table, the redesign presented groups editorially — a flowing continuum of grouped tickets, each with its title, description, ticket count, labels, thumbnails, and resolution action.</p>
+
+    <div class="raw-asset">
+      <img src="../STLABS/TICKET_GROUPING/Iteration_2_components/tickets_full.svg" alt="">
+    </div>
+
+    <p>A common question from engineers and the founder: <em>how do we show ungrouped tickets?</em> My answer: the component doesn't change. A single ungrouped ticket looks the same — just with one ticket inside. Making it visually different would create unintended signals: "Was something wrong?" "Should I focus on this first?" That's not what we want.</p>
+
+    <div class="insight">
+      <p class="insight-label">Key insight</p>
+      <p>Visual consistency is trust. If the component looks different based on ticket count, users start reading meaning into the difference — meaning that doesn't exist.</p>
+    </div>
+
+    <p style="margin-bottom: 3rem;">But two new problems emerged.</p>
+
+    <!-- VERTICAL SCROLL SNAP -->
+    <div class="vsnap-header">
+      <span class="vsnap-label active" data-index="0">Run Agent</span>
+      <span class="vsnap-label" data-index="1">Run Workflow</span>
+      <span class="vsnap-label" data-index="2">Investigate</span>
+    </div>
+    <div class="vsnap-wrapper" id="iter2-vsnap-wrapper">
+      <div class="vsnap-container" id="iter2-vsnap">
+        <div class="vsnap-slide">
+          <img src="../STLABS/TICKET_GROUPING/Iteration_2_components/tickets_1_ticketpage.svg" alt="">
+        </div>
+        <div class="vsnap-slide">
+          <img src="../STLABS/TICKET_GROUPING/Iteration_2_components/tickets_2_ticketpage.svg" alt="">
+        </div>
+        <div class="vsnap-slide">
+          <img src="../STLABS/TICKET_GROUPING/Iteration_2_components/tickets_3_ticketpage.svg" alt="">
+        </div>
+      </div>
+    </div>
+
+    <p><strong>Problem 1: Engineering jargon in the UI.</strong> Working closely with engineers, I'd absorbed their language. The buttons read "Run Agent," "Run Workflow," "Investigate" — terms that meant nothing to an IT admin. Run Agent runs multiple workflows. Run Workflow runs one. Investigate opens a conversation with an AI agent. These distinctions mattered to engineers, not users.</p>
+    <p><strong>Problem 2: Confidence.</strong> The design was essentially asking: <em>"Here's our grouping — want to confirm?"</em> That undermines trust. It also created an overwhelming landing screen: too many rows, too many actions, when the main thing is resolution. Period.</p>
+    <p>My PM wanted to ship. I pushed back.</p>
+
+    <!-- ITERATION 3 -->
+    <h3>Iteration 3 — Confident &amp; simple</h3>
+    <h2>Present the answer, not the question.</h2>
+    <p>The final redesign flipped the posture. Groups are presented confidently — not as a suggestion, but as a decision. Click to preview tickets, but the focus is on description, resolution description, and the action itself.</p>
+
+    <div class="iter3-snap" id="iter3-snap">
+      <div class="iter3-slide"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/Group-1.svg" alt=""></div>
+      <div class="iter3-slide"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/Group-2.svg" alt=""></div>
+      <div class="iter3-slide"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/Group-3.svg" alt=""></div>
+      <div class="iter3-slide"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/Group-4.svg" alt=""></div>
+    </div>
+
+    <p>Resolution collapsed to three clear actions:</p>
+
+    <div class="insight">
+      <p class="insight-label">The three actions</p>
+      <div class="three-actions">
+        <div class="action-item">
+          <div class="action-icon-wrap"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/run.svg" alt="Run" class="action-icon"></div>
+          <p><strong>Run</strong> — resolve autonomously. Whether it's one workflow or multiple agents, the user doesn't need to know the plumbing.</p>
+        </div>
+        <div class="action-item">
+          <div class="action-icon-wrap"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/inspect.svg" alt="Inspect" class="action-icon"></div>
+          <p><strong>Inspect</strong> — conversation with an AI agent to arrive at a decision together. If inspect appears alone, it means there's no automated resolution — the path to resolution <em>is</em> the conversation.</p>
+        </div>
+        <div class="action-item">
+          <div class="action-icon-wrap"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/dismiss.svg" alt="Dismiss" class="action-icon" style="height:22px;"></div>
+          <p><strong>Dismiss</strong> — remove from the queue.</p>
+        </div>
+      </div>
+    </div>
+
+    <p>I realized I'd been stuck in engineering language. "Run Agent" and "Run Workflow" both lead to the same outcome: resolved tickets. Is there really a need to distinguish them for the user? I brought this to engineering — and they agreed.</p>
+
+    <hr class="case-divider">
+
+    <!-- THE DETAILS -->
+    <h2>The details that matter.</h2>
+    <p><strong>Gamified resolution.</strong> When someone resolves a large batch of tickets at once, the UI celebrates it. Speed should feel rewarding.</p>
+
+    <div class="gamified-resolution" id="gamified-res">
+      <div class="res-stat">
+        <div class="res-number-row">
+          <span class="res-number" id="res-total">187</span>
+          <span class="res-label">Total</span>
+          <svg class="res-arrow res-arrow-down" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(28,21,16,0.25)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>
+          </svg>
+        </div>
+      </div>
+      <div class="res-stat res-stat-resolved" id="res-resolved-group">
+        <div class="res-number-row">
+          <span class="res-number" id="res-resolved">12</span>
+          <span class="res-label" id="res-resolved-label">Resolved Today</span>
+          <svg class="res-arrow" id="res-resolved-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(28,21,16,0.25)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <p><strong>Color as priority.</strong> Component ordering and color coding draw the eye to what matters most — no need to read labels to know urgency.</p>
+    <p><strong>Conversational foundation.</strong> The page is inherently interactive. An expandable chat bar sits at the bottom — the inbox is a conversation, not just a list.</p>
+
+    <div class="raw-asset">
+      <img src="../STLABS/TICKET_GROUPING/fullview.svg" alt="">
+    </div>
+
+    <hr class="case-divider">
+
+    <!-- REFLECTION -->
+    <h2>What I learned.</h2>
+    <p>Working this closely with engineers is a gift and a trap. You gain deep technical fluency — you can talk in their terms, understand constraints, move fast. But you also start <em>designing</em> in their terms. The biggest shift in this project was remembering that the user doesn't care about the difference between an agent and a workflow. They care that the problem goes away.</p>
+    <p>The other lesson: conviction matters. My PM was ready to ship iteration 2. I wasn't. The final design was better because I trusted the discomfort and pushed for one more round.</p>
+
+  </div><!-- end .case-content -->
+
+  <!-- PAGINATION -->
+  <div class="case-pagination">
+    <span></span>
+    <a href="case-study-stlabs-detail.html" class="case-page-next">Ticket Detail →</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="case-footer">
+    <a href="https://www.linkedin.com/in/abigailleyva" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:abigailcleyva@gmail.com">abigailcleyva@gmail.com</a>
+    <a href="../">← Back to portfolio</a>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Demo iter1: click → advance, auto-dots
+    const stage = document.getElementById('demo-iter1');
+    const frames = stage.querySelectorAll('img');
+    const dots = document.querySelectorAll('#demo-dots .demo-dot');
+    const hintText = document.getElementById('demo-hint-text');
+    let step = 0;
+
+    function goTo(s) {
+      const prev = step;
+      frames.forEach(f => f.classList.remove('prev'));
+      frames[prev].classList.remove('active');
+      frames[prev].classList.add('prev');
+      step = s;
+      frames[step].classList.add('active');
+      setTimeout(() => frames[prev].classList.remove('prev'), 900);
+      dots.forEach((d, i) => { d.classList.toggle('filled', i <= step); });
+    }
+
+    stage.addEventListener('click', () => {
+      const next = (step + 1) % frames.length;
+      goTo(next);
+      if (next === 0) {
+        dots.forEach(d => d.classList.remove('filled'));
+        hintText.style.display = '';
+      } else {
+        hintText.style.display = 'none';
+      }
+    });
+
+    // Iteration 2 — vertical scroll cycle
+    const vsnapEl = document.getElementById('iter2-vsnap');
+    const vsnapSlides = vsnapEl.querySelectorAll('.vsnap-slide');
+    const vsnapLabels = document.querySelectorAll('.vsnap-label');
+    let vsnapIndex = 0;
+
+    function vsnapGoTo(i) {
+      vsnapIndex = i;
+      vsnapEl.scrollTo({ top: i * vsnapEl.offsetHeight, behavior: 'smooth' });
+      vsnapLabels.forEach((l, j) => l.classList.toggle('active', j === i));
+    }
+    vsnapEl.addEventListener('scroll', () => {
+      const i = Math.round(vsnapEl.scrollTop / vsnapEl.offsetHeight);
+      vsnapLabels.forEach((l, j) => l.classList.toggle('active', j === i));
+      vsnapIndex = i;
+    }, { passive: true });
+
+    let vsnapInterval = setInterval(() => {
+      vsnapGoTo((vsnapIndex + 1) % vsnapSlides.length);
+    }, 3000);
+
+    vsnapLabels.forEach(label => {
+      label.addEventListener('click', () => {
+        clearInterval(vsnapInterval);
+        vsnapGoTo(parseInt(label.dataset.index));
+        setTimeout(() => {
+          vsnapInterval = setInterval(() => {
+            vsnapGoTo((vsnapIndex + 1) % vsnapSlides.length);
+          }, 3000);
+        }, 10000);
+      });
+    });
+
+    // Gamified resolution
+    const resTotal = document.getElementById('res-total');
+    const resResolved = document.getElementById('res-resolved');
+    const resGroup = document.getElementById('res-resolved-group');
+    let resRunning = false;
+
+    function animateCount(el, from, to, duration) {
+      const start = performance.now();
+      const step = (now) => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(from + (to - from) * eased);
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    function runResAnimation() {
+      if (resRunning) return;
+      resRunning = true;
+      setTimeout(() => {
+        animateCount(resTotal, 187, 167, 1200);
+        animateCount(resResolved, 12, 32, 1200);
+        setTimeout(() => {
+          resGroup.classList.add('pop');
+          document.getElementById('gamified-res').classList.add('popped');
+        }, 800);
+        setTimeout(() => {
+          resGroup.classList.remove('pop');
+          document.getElementById('gamified-res').classList.remove('popped');
+          setTimeout(() => {
+            resTotal.textContent = '187';
+            resResolved.textContent = '12';
+            resRunning = false;
+          }, 600);
+        }, 3200);
+      }, 500);
+    }
+
+    const resObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) runResAnimation(); });
+    }, { threshold: 0.5 });
+    resObserver.observe(document.getElementById('gamified-res'));
+
+    setInterval(() => {
+      const rect = document.getElementById('gamified-res').getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) runResAnimation();
+    }, 6000);
+
+    // Iteration 3 — auto-cycle snap strip
+    const iter3 = document.getElementById('iter3-snap');
+    const iter3Slides = iter3.querySelectorAll('.iter3-slide');
+    let iter3Index = 0;
+    setInterval(() => {
+      iter3Index = (iter3Index + 1) % iter3Slides.length;
+      iter3.scrollTo({ top: iter3Index * iter3.offsetHeight, behavior: 'smooth' });
+    }, 3000);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yami — Abigail Leyva</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: #EDE8DC; color: #1C1510; -webkit-font-smoothing: antialiased; }
+
+    /* ── Nav ── */
+    #nav { position: fixed; bottom: 1rem; left: 0; right: 0; z-index: 200; display: flex; justify-content: center; pointer-events: none; }
+    @media (min-width: 768px) { #nav { top: 1.5rem; bottom: auto; } }
+    #nav-pill { pointer-events: all; display: flex; align-items: center; gap: 0.25rem; background: rgba(7,15,25,0.38); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(209,173,102,0.10); border-radius: 999px; padding: 0.35rem; }
+    .nav-item { display: flex; align-items: center; padding: 0.45rem 0.85rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; color: rgba(245,237,214,0.38); text-decoration: none; transition: background 0.2s, color 0.2s; white-space: nowrap; }
+    .nav-item:hover { background: rgba(209,173,102,0.08); color: rgba(245,237,214,0.8); }
+    .nav-item.active { background: rgba(209,173,102,0.12); color: rgba(245,237,214,0.95); font-weight: 600; }
+
+    /* ── Hero ── */
+    .case-hero { background: #0D1118; padding: 8rem 3rem 4rem; }
+    @media (max-width: 768px) { .case-hero { padding: 6rem 1.5rem 3rem; } }
+    .case-hero-inner { max-width: 1100px; margin: 0 auto; }
+    .case-back { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 500; color: rgba(245,237,214,0.45); text-decoration: none; margin-bottom: 2.5rem; transition: color 0.2s; }
+    .case-back:hover { color: rgba(245,237,214,0.8); }
+    .case-eyebrow { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.7); margin-bottom: 0.75rem; }
+    .case-hero h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 600; color: #F5EDD6; line-height: 1.15; letter-spacing: -0.025em; margin-bottom: 1.25rem; max-width: 760px; }
+    .case-subtitle { font-size: clamp(0.92rem, 1.4vw, 1.05rem); font-weight: 400; color: rgba(245,237,214,0.6); line-height: 1.7; max-width: 620px; margin-bottom: 2.5rem; }
+    .case-details { display: flex; flex-wrap: wrap; gap: 2.5rem; }
+    .case-detail-label { display: block; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,237,214,0.35); margin-bottom: 0.3rem; }
+    .case-detail-value { font-size: 0.875rem; font-weight: 500; color: rgba(245,237,214,0.8); }
+
+    /* ── Article ── */
+    .case-content { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 8rem; }
+
+    .case-content h2 { font-size: clamp(1.45rem, 2.5vw, 1.9rem); font-weight: 600; color: #1C1510; letter-spacing: -0.02em; line-height: 1.2; margin-top: 4rem; margin-bottom: 1rem; }
+    .case-content h2:first-child { margin-top: 0; }
+    .case-content h3 { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin-top: 3rem; margin-bottom: 0.5rem; }
+    .case-content p { font-size: 1rem; line-height: 1.78; color: rgba(28,21,16,0.72); margin-bottom: 1.25rem; }
+    .case-content strong { color: #1C1510; font-weight: 600; }
+    .case-divider { border: none; border-top: 1px solid rgba(28,21,16,0.1); margin: 4rem 0; }
+
+    /* ── Journey grid ── */
+    .journey-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 2.5rem 0; }
+    @media (max-width: 640px) { .journey-grid { grid-template-columns: 1fr; } }
+    .journey-stage { background: rgba(255,255,255,0.5); border: 1px solid rgba(28,21,16,0.08); border-radius: 12px; padding: 1.4rem; display: flex; flex-direction: column; gap: 1rem; }
+    .stage-header { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(209,173,102,0.8); display: flex; align-items: center; gap: 6px; }
+    .stage-header::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: rgba(209,173,102,0.8); flex-shrink: 0; }
+    .stage-desc { font-size: 0.875rem; color: rgba(28,21,16,0.65); line-height: 1.55; flex-grow: 1; }
+    .friction-point { background: rgba(209,173,102,0.08); border-left: 2px solid rgba(209,173,102,0.5); padding: 0.7rem 0.9rem; border-radius: 0 6px 6px 0; }
+    .friction-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(209,173,102,0.8); display: block; margin-bottom: 4px; }
+    .friction-text { font-size: 0.8rem; color: rgba(28,21,16,0.6); line-height: 1.4; font-style: italic; }
+
+    /* ── Mobile screenshots ── */
+    .mobile-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 2.5rem 0; align-items: start; }
+    @media (max-width: 600px) { .mobile-grid { grid-template-columns: 1fr 1fr; gap: 1rem; } }
+    .screenshot-card { display: flex; flex-direction: column; gap: 0.65rem; }
+    .screenshot-frame { width: 100%; aspect-ratio: 9/19.5; background: rgba(255,255,255,0.4); border-radius: 12px; border: 1.5px solid rgba(28,21,16,0.12); overflow: hidden; box-shadow: 0 6px 18px rgba(28,21,16,0.07); }
+    .screenshot-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .screenshot-caption { font-size: 0.65rem; color: rgba(28,21,16,0.45); line-height: 1.4; }
+    .screenshot-caption strong { display: block; color: rgba(28,21,16,0.65); font-weight: 600; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.58rem; }
+
+    /* ── Insight callout ── */
+    .insight { background: rgba(255,255,255,0.5); border: 1px solid rgba(28,21,16,0.08); border-radius: 12px; padding: 1.4rem 1.6rem; margin: 2rem 0; }
+    .insight-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin-bottom: 0.6rem; }
+    .insight p { margin-bottom: 0; }
+
+    /* ── Footer ── */
+    .case-footer { background: #0D1118; padding: 3rem 2rem; display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+    .case-footer a { color: rgba(245,237,214,0.45); font-size: 0.8rem; text-decoration: none; transition: color 0.2s; }
+    .case-footer a:hover { color: rgba(245,237,214,0.85); }
+  </style>
+</head>
+<body>
+
+<nav id="nav" aria-label="Main navigation">
+  <div id="nav-pill">
+    <a href="../#home" class="nav-item">Home</a>
+    <a href="../#work" class="nav-item active">Work</a>
+    <a href="../#play" class="nav-item">Play</a>
+  </div>
+</nav>
+
+<section class="case-hero">
+  <div class="case-hero-inner">
+    <a href="../#work" class="case-back">← Work</a>
+    <p class="case-eyebrow">Yami · Summer 2022</p>
+    <h1>Scaling Cross-Cultural Discovery.</h1>
+    <p class="case-subtitle">Redesigning the search-to-cart flow for global users by mapping cultural mental models and reducing discovery friction.</p>
+    <div class="case-details">
+      <div>
+        <span class="case-detail-label">Role</span>
+        <span class="case-detail-value">Growth UX Intern</span>
+      </div>
+      <div>
+        <span class="case-detail-label">Timeline</span>
+        <span class="case-detail-value">Summer 2022</span>
+      </div>
+      <div>
+        <span class="case-detail-label">Type</span>
+        <span class="case-detail-value">Mobile UX Redesign</span>
+      </div>
+      <div>
+        <span class="case-detail-label">Focus</span>
+        <span class="case-detail-value">Growth Design, Cross-Cultural UX</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="case-content">
+
+  <h2>The Challenge</h2>
+  <p>Navigating an ethnic marketplace is often high-friction for users unfamiliar with specific product categories. I focused on identifying where discovery stalled and translating a complex marketplace into a streamlined mobile experience.</p>
+
+  <div class="journey-grid">
+    <div class="journey-stage">
+      <div class="stage-header">1. Discovery</div>
+      <p class="stage-desc">User enters the app seeking familiar generic items but encounters specialized brands.</p>
+      <div class="friction-point">
+        <span class="friction-label">Cognitive Overload</span>
+        <span class="friction-text">Unfamiliar brand names and scripts create hesitation at the first touchpoint.</span>
+      </div>
+    </div>
+    <div class="journey-stage">
+      <div class="stage-header">2. Search</div>
+      <p class="stage-desc">Translating a mental model of an item into specific marketplace terminology.</p>
+      <div class="friction-point">
+        <span class="friction-label">Semantic Barrier</span>
+        <span class="friction-text">Translation-heavy search results don't always align with user intent.</span>
+      </div>
+    </div>
+    <div class="journey-stage">
+      <div class="stage-header">3. Evaluation</div>
+      <p class="stage-desc">Deciding on a product without legacy brand trust or local habits.</p>
+      <div class="friction-point">
+        <span class="friction-label">Trust Deficit</span>
+        <span class="friction-text">Users struggle to assess quality or taste through text alone.</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>The Solution</h3>
+  <h2>Visualizing Information Hierarchy.</h2>
+  <p>To solve for the language barrier, I prioritized a visual-first hierarchy. Users can identify products by skin concern before engaging with deep-tier technical details regarding ingredients and allergens.</p>
+
+  <div class="mobile-grid">
+    <div class="screenshot-card">
+      <div class="screenshot-frame"><img src="../yami/image_1.PNG" alt="Product Page"></div>
+      <div class="screenshot-caption"><strong>01. Product Page</strong></div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-frame"><img src="../yami/image_2.PNG" alt="Skin Info"></div>
+      <div class="screenshot-caption"><strong>02. Skin Info</strong>Quickly addresses purpose of product without needing a secondary translation layer.</div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-frame"><img src="../yami/image_3.PNG" alt="Product Page"></div>
+      <div class="screenshot-caption"><strong>03. Product Page</strong></div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-frame"><img src="../yami/image_4.PNG" alt="Product Details"></div>
+      <div class="screenshot-caption"><strong>04. Product Details</strong>Key product details for brand trust.</div>
+    </div>
+  </div>
+
+  <h3>The Win</h3>
+  <h2>Bridging the gap.</h2>
+  <p>By conducting deep competitor analysis and journey mapping, I identified growth opportunities to broaden the app's appeal. The final high-fidelity prototypes focused on stripping away friction from the Asian consumer market.</p>
+
+  <div class="insight">
+    <p class="insight-label">Key Insight</p>
+    <p>Visual discovery is the core driver for growth in cross-cultural e-commerce. Reducing reliance on text and leaning into intuitive category hierarchy allowed non-native users to find the "Aha!" moment faster.</p>
+  </div>
+
+</div>
+
+<footer class="case-footer">
+  <a href="https://www.linkedin.com/in/abigailleyva" target="_blank" rel="noopener">LinkedIn</a>
+  <a href="mailto:abigailcleyva@gmail.com">abigailcleyva@gmail.com</a>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="icon" type="image/png" sizes="180x180" href="../favicon.png">
+  <link rel="apple-touch-icon" href="../favicon.png">
+  <title>Investigations Dashboard Redesign — Abigail Leyva</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: #EDE8DC; color: #1C1510; }
+
+    /* Nav */
+    #nav { position: fixed; bottom: 1rem; left: 0; right: 0; z-index: 200; display: flex; justify-content: center; pointer-events: none; }
+    @media (min-width: 768px) { #nav { top: 1.5rem; bottom: auto; } }
+    #nav-pill { pointer-events: all; display: flex; align-items: center; gap: 0.25rem; background: rgba(7,15,25,0.38); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(209,173,102,0.10); border-radius: 999px; padding: 0.35rem; }
+    .nav-item { display: flex; align-items: center; padding: 0.45rem 0.85rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; color: rgba(245,237,214,0.38); text-decoration: none; transition: background 0.2s, color 0.2s; white-space: nowrap; }
+    .nav-item:hover { background: rgba(209,173,102,0.08); color: rgba(245,237,214,0.8); }
+    .nav-item.active { background: rgba(209,173,102,0.12); color: rgba(245,237,214,0.95); font-weight: 600; }
+
+    /* Hero — dark Monet */
+    .case-hero { background: #0D1118; padding: 8rem 3rem 4rem; }
+    @media (max-width: 768px) { .case-hero { padding: 6rem 1.5rem 3rem; } }
+    .case-back { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 500; color: rgba(245,237,214,0.45); text-decoration: none; margin-bottom: 2.5rem; transition: color 0.2s; letter-spacing: 0.01em; }
+    .case-back:hover { color: rgba(245,237,214,0.8); }
+    .case-eyebrow { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.7); margin-bottom: 0.75rem; }
+    .case-hero h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 600; color: #F5EDD6; line-height: 1.15; letter-spacing: -0.025em; margin-bottom: 1.25rem; max-width: 760px; }
+    .case-subtitle { font-size: clamp(0.92rem, 1.4vw, 1.05rem); font-weight: 400; color: rgba(245,237,214,0.6); line-height: 1.7; max-width: 620px; margin-bottom: 2.5rem; }
+    .case-details { display: flex; flex-wrap: wrap; gap: 2.5rem; }
+    .case-detail-label { display: block; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,237,214,0.35); margin-bottom: 0.3rem; }
+    .case-detail-value { font-size: 0.875rem; font-weight: 500; color: rgba(245,237,214,0.8); }
+
+    /* Wide hero asset strip */
+    .case-asset-wide { width: 100%; background: #111820; }
+    .case-asset-wide img, .case-asset-wide video { width: 100%; height: auto; display: block; }
+
+    /* Article */
+    .case-content { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 8rem; }
+    .case-content h2 { font-size: clamp(1.45rem, 2.5vw, 1.9rem); font-weight: 600; color: #1C1510; letter-spacing: -0.02em; line-height: 1.2; margin-top: 4rem; margin-bottom: 1rem; }
+    .case-content h2:first-child { margin-top: 0; }
+    .case-content h3 { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin-top: 3rem; margin-bottom: 0.5rem; }
+    .case-content p { font-size: 1rem; line-height: 1.78; color: rgba(28,21,16,0.72); margin-bottom: 1.25rem; }
+    .case-content strong { color: #1C1510; font-weight: 600; }
+    .case-content ul, .case-content ol { padding-left: 1.4rem; margin-bottom: 1.25rem; }
+    .case-content li { font-size: 1rem; line-height: 1.78; color: rgba(28,21,16,0.72); margin-bottom: 0.4rem; }
+    .case-divider { border: none; border-top: 1px solid rgba(28,21,16,0.1); margin: 4rem 0; }
+
+    /* Inline mockup wrapper — full-bleed within article */
+    .case-mockup { margin: 3rem -2rem; border-radius: 12px; overflow: hidden; background: #f8f6f2; }
+    @media (max-width: 760px) { .case-mockup { margin: 3rem 0; border-radius: 8px; } }
+
+    /* Footer */
+    .case-footer { background: #0D1118; padding: 3rem 2rem; display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+    .case-footer a { color: rgba(245,237,214,0.45); font-size: 0.8rem; text-decoration: none; transition: color 0.2s; }
+    .case-footer a:hover { color: rgba(245,237,214,0.85); }
+
+    /* ── Preserved component styles ── */
+
+    /* Story sequence */
+    .story-sequence { display: flex; flex-direction: column; gap: 0.75rem; margin: 2rem 0; }
+    .story-beat { background: rgba(28,21,16,0.06); border-radius: 10px; padding: 1rem 1.25rem; border-left: 3px solid transparent; }
+    .story-beat.accent { border-left-color: rgba(209,173,102,0.8); }
+    .story-beat.warning { border-left-color: #e09030; }
+    .story-beat-time { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(28,21,16,0.4); margin-bottom: 0.3rem; }
+    .story-beat p { font-size: 0.9rem; color: rgba(28,21,16,0.72); margin-bottom: 0; }
+    .story-beat strong { color: #1C1510; }
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
+    .stat-card { background: rgba(28,21,16,0.06); border-radius: 12px; padding: 1.25rem; text-align: center; }
+    .stat-number { font-size: 2.2rem; font-weight: 700; color: rgba(209,173,102,0.9); line-height: 1; margin-bottom: 0.4rem; }
+    .stat-label { font-size: 0.75rem; color: rgba(28,21,16,0.6); line-height: 1.4; }
+
+    /* Callout */
+    .callout { border-left: 2px solid rgba(209,173,102,0.7); padding: 0.4rem 0 0.4rem 1rem; margin: 1.25rem 0; }
+    .callout p { font-size: 0.9rem; font-style: italic; color: #1C1510; line-height: 1.5; margin-bottom: 0; display: inline; }
+    .callout .callout-attr { font-size: 0.75rem; font-style: normal; color: rgba(28,21,16,0.45); display: inline; margin-left: 0.3rem; }
+
+    /* Insight */
+    .insight { background: rgba(28,21,16,0.06); border-radius: 10px; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .insight-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin-bottom: 0.5rem; }
+    .insight p { font-size: 0.95rem; color: #1C1510; margin-bottom: 0; }
+
+    /* Persona grid */
+    .persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; }
+    .persona-card { background: rgba(28,21,16,0.06); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(28,21,16,0.1); }
+    .persona-name { font-size: 1.2rem; font-weight: 600; color: #1C1510; margin-bottom: 0.25rem; }
+    .persona-role { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(28,21,16,0.4); margin-bottom: 1rem; }
+    .persona-need { font-size: 0.85rem; color: rgba(28,21,16,0.65); line-height: 1.6; }
+    .persona-quote { font-size: 0.82rem; font-style: italic; color: #1C1510; border-left: 2px solid rgba(209,173,102,0.7); padding-left: 0.75rem; margin-top: 0.75rem; line-height: 1.5; }
+
+    /* Pain journey */
+    .pain-journey { display: flex; flex-direction: column; gap: 0; margin: 2rem 0; }
+    .pain-step { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid rgba(28,21,16,0.1); }
+    .pain-step:last-child { border-bottom: none; }
+    .pain-num { width: 28px; height: 28px; border-radius: 50%; background: rgba(209,173,102,0.15); color: rgba(209,173,102,0.9); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+    .pain-content h4 { font-size: 0.9rem; font-weight: 600; color: #1C1510; margin-bottom: 0.3rem; }
+    .pain-content p { font-size: 0.82rem; color: rgba(28,21,16,0.65); margin-bottom: 0; line-height: 1.5; }
+
+    /* SUS metric */
+    .sus-metric { display: flex; align-items: center; gap: 2rem; margin: 2rem 0; padding: 1.5rem; background: rgba(28,21,16,0.06); border-radius: 12px; }
+    .sus-score { text-align: center; }
+    .sus-score-num { font-size: 2.8rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem; }
+    .sus-score-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(28,21,16,0.4); }
+    .sus-arrow { font-size: 1.5rem; color: rgba(28,21,16,0.3); }
+    .sus-before .sus-score-num { color: rgba(28,21,16,0.35); }
+    .sus-after .sus-score-num { color: rgba(209,173,102,0.9); }
+    .sus-context { flex: 1; font-size: 0.82rem; color: rgba(28,21,16,0.65); line-height: 1.6; }
+
+    /* Iteration cards */
+    .iteration-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1.5rem 0; }
+    .iter-card { background: rgba(28,21,16,0.06); border: 1.5px solid rgba(28,21,16,0.1); border-radius: 10px; padding: 1rem; }
+    .iter-card.selected { border-color: rgba(209,173,102,0.7); background: rgba(209,173,102,0.08); }
+    .iter-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(28,21,16,0.4); margin-bottom: 0.5rem; }
+    .iter-label.selected-label { color: rgba(209,173,102,0.9); }
+    .iter-title { font-size: 0.82rem; font-weight: 600; color: #1C1510; margin-bottom: 0.35rem; }
+    .iter-desc { font-size: 0.75rem; color: rgba(28,21,16,0.65); line-height: 1.45; }
+    .iter-verdict { font-size: 0.7rem; font-weight: 600; margin-top: 0.5rem; }
+    .iter-verdict.pass { color: #2ea86a; }
+    .iter-verdict.fail { color: #be2c2c; }
+
+    /* Demo wrapper */
+    .demo-wrap { border-radius: 8px; overflow: hidden; border: 1px solid rgba(28,21,16,0.12); background: #f2f4f8; }
+    .demo-header { padding: 0.55rem 1rem; display: flex; align-items: center; justify-content: space-between; background: #ffffff; border-bottom: 1px solid #ced2de; }
+    .demo-label { font-size: 0.68rem; font-weight: 500; color: #525a72; display: flex; align-items: center; gap: 6px; }
+    .demo-label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #8890a8; flex-shrink: 0; }
+    .demo-hint { font-size: 0.68rem; color: #8890a8; }
+
+    /* Dashboard tokens */
+    :root {
+      --shad-bg: #f2f4f8;
+      --shad-card: #ffffff;
+      --shad-surface: #e8eaf0;
+      --shad-border: #ced2de;
+      --shad-text: #1c2030;
+      --shad-muted: #525a72;
+      --shad-muted2: #8890a8;
+      --shad-red: #be2c2c; --shad-red-bg: rgba(190,44,44,0.08);
+      --shad-amber: #9e5500; --shad-amber-bg: rgba(158,85,0,0.09);
+      --shad-yellow: #7a6000; --shad-yellow-bg: rgba(122,96,0,0.09);
+      --shad-green: #1a7840; --shad-green-bg: rgba(26,120,64,0.08);
+      /* Amazon before palette */
+      --amz-bg: #f7f5f0; --amz-surface: #eeece6; --amz-surface2: #e5e2d8;
+      --amz-border: rgba(0,0,0,0.12); --amz-text: #2a2828;
+      --amz-text2: #757070; --amz-orange: #b86800; --amz-orange-soft: rgba(184,104,0,0.12);
+      --amz-green: #1a7840; --amz-green-soft: rgba(26,120,64,0.10);
+      --amz-red: #be2c2c; --amz-red-soft: rgba(190,44,44,0.10);
+      --amz-yellow: #7a6000; --amz-yellow-soft: rgba(122,96,0,0.10);
+      /* Enterprise tokens */
+      --ent-bg: #ffffff;
+      --ent-bg-subtle: #f2f4f8;
+      --ent-bg-hover: #e8eaf0;
+      --ent-border: #ced2de;
+      --ent-border-strong: #8e96ae;
+      --ent-text: #1c2030;
+      --ent-text-2: #525a72;
+      --ent-text-3: #8890a8;
+      --ent-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --ent-shadow: none;
+      --ent-shadow-lg: 0 4px 16px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+      --ent-red: #be2c2c; --ent-red-bg: rgba(190,44,44,0.08); --ent-red-border: rgba(190,44,44,0.28);
+      --ent-amber: #9e5500; --ent-amber-bg: rgba(158,85,0,0.09); --ent-amber-border: rgba(158,85,0,0.30);
+      --ent-blue: #1a52c0; --ent-blue-bg: rgba(26,82,192,0.08); --ent-blue-border: rgba(26,82,192,0.28);
+      --ent-green: #1a7840; --ent-green-bg: rgba(26,120,64,0.08); --ent-green-border: rgba(26,120,64,0.28);
+      --ent-purple: #6030b8; --ent-purple-bg: rgba(96,48,184,0.08); --ent-purple-border: rgba(96,48,184,0.28);
+    }
+
+    /* Old table (before) */
+    .amz-dashboard { background: var(--shad-bg); padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .amz-dashboard.amz-before { background: var(--amz-bg); }
+    .amz-section-title { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--shad-muted2); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .amz-section-title::after { content: ''; flex: 1; height: 1px; background: var(--shad-border); }
+    .amz-dashboard.amz-before .amz-section-title { color: var(--amz-text2); }
+    .amz-dashboard.amz-before .amz-section-title::after { background: var(--amz-border); }
+    .amz-old-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .amz-old-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--amz-text2); border-bottom: 1px solid var(--amz-border); }
+    .amz-old-table td { padding: 9px 12px; border-bottom: 1px solid var(--amz-border); color: var(--amz-text); font-size: 12px; }
+    .amz-old-table td:first-child { font-family: monospace; color: var(--amz-text2); font-size: 11px; }
+    .amz-old-overload { text-align: center; padding: 12px; color: var(--amz-text2); font-size: 11px; border-top: 1px dashed rgba(0,0,0,0.12); }
+
+    /* Enterprise dashboard */
+    .ent-dashboard { background: var(--ent-bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .ent-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--ent-border); background: var(--ent-bg-subtle); }
+    .ent-toolbar-left { display: flex; align-items: center; gap: 10px; }
+    .ent-toolbar-title { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ent-text-2); }
+    .ent-toolbar-count { font-size: 10px; color: var(--ent-text-3); }
+    .ent-toolbar-meta { font-size: 10px; color: var(--ent-text-3); font-family: var(--ent-mono); }
+    .ent-section-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ent-text-3); padding: 8px 12px 4px; display: flex; align-items: center; gap: 6px; }
+    .ent-section-label .ent-count-pill { font-size: 9.5px; font-weight: 600; color: var(--ent-text-3); background: var(--ent-bg-subtle); border: 1px solid var(--ent-border); padding: 0 5px; letter-spacing: 0; text-transform: none; }
+    .ent-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 2px; border: 1px solid; white-space: nowrap; letter-spacing: 0.03em; text-transform: uppercase; }
+    .ent-badge-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .ent-badge-p1 { background: var(--ent-red-bg); border-color: var(--ent-red-border); color: var(--ent-red); }
+    .ent-badge-p2 { background: var(--ent-amber-bg); border-color: var(--ent-amber-border); color: var(--ent-amber); }
+    .ent-badge-p3 { background: var(--ent-bg-subtle); border-color: var(--ent-border); color: var(--ent-text-3); }
+    .ent-badge-investigating { background: var(--ent-blue-bg); border-color: var(--ent-blue-border); color: var(--ent-blue); }
+    .ent-badge-active { background: var(--ent-green-bg); border-color: var(--ent-green-border); color: var(--ent-green); }
+    .ent-badge-bottlenecked { background: var(--ent-red-bg); border-color: var(--ent-red-border); color: var(--ent-red); }
+    .ent-badge-blocked { background: var(--ent-purple-bg); border-color: var(--ent-purple-border); color: var(--ent-purple); }
+    .ent-pinned-list { padding: 4px 12px 10px; display: flex; flex-direction: column; gap: 6px; }
+    .ent-card { background: var(--ent-bg-subtle); border: 1px solid var(--ent-border); border-radius: 0; overflow: hidden; border-left: 3px solid var(--ent-border); }
+    .ent-card-p1 { border-left-color: var(--ent-red); }
+    .ent-card-p2 { border-left-color: var(--ent-amber); }
+    .ent-card-head { padding: 7px 10px 6px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--ent-border); background: var(--ent-bg); }
+    .ent-card-id { font-family: var(--ent-mono); font-size: 9px; color: var(--ent-text-3); letter-spacing: 0.05em; margin-bottom: 2px; text-transform: uppercase; }
+    .ent-card-title { font-size: 11.5px; font-weight: 600; color: var(--ent-text); line-height: 1.3; }
+    .ent-close-btn { background: none; border: none; cursor: default; color: var(--ent-text-3); padding: 2px; line-height: 1; flex-shrink: 0; }
+    .ent-card-body { padding: 8px 10px; }
+    .ent-card-meta-row { display: flex; align-items: center; gap: 4px; margin-bottom: 7px; flex-wrap: wrap; }
+    .ent-stage-track { display: flex; border: 1px solid var(--ent-border); overflow: hidden; margin: 5px 0 8px; }
+    .ent-stage { flex: 1; padding: 3px 2px 2px; border-right: 1px solid var(--ent-border); background: var(--ent-bg); }
+    .ent-stage:last-child { border-right: none; }
+    .ent-stage.s-done { background: var(--ent-green-bg); }
+    .ent-stage.s-bottleneck { background: var(--ent-red-bg); }
+    .ent-stage.s-blocked { background: var(--ent-purple-bg); }
+    .ent-stage-dot { display: none; }
+    .ent-stage-lbl { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ent-text-3); text-align: center; line-height: 1.4; display: block; }
+    .ent-stage.s-done .ent-stage-lbl { color: var(--ent-green); }
+    .ent-stage.s-bottleneck .ent-stage-lbl { color: var(--ent-red); }
+    .ent-stage.s-blocked .ent-stage-lbl { color: var(--ent-purple); }
+    .ent-kv-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; padding: 6px 0; border-top: 1px solid var(--ent-border); border-bottom: 1px solid var(--ent-border); margin-bottom: 7px; }
+    .ent-kv { display: flex; flex-direction: column; gap: 1px; }
+    .ent-kv-key { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ent-text-3); }
+    .ent-kv-val { font-size: 11px; color: var(--ent-text); font-weight: 500; }
+    .ent-kv-val.urgent, .ent-urgent { color: var(--ent-red); }
+    .ent-kv-val.warn, .ent-warn { color: var(--ent-amber); }
+    .ent-update { background: var(--ent-bg); border: 1px solid var(--ent-border); padding: 5px 8px; }
+    .ent-update-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ent-text-3); margin-bottom: 2px; }
+    .ent-update-text { font-size: 10.5px; color: var(--ent-text-2); line-height: 1.5; }
+    .ent-card-foot { padding: 6px 10px; border-top: 1px solid var(--ent-border); background: var(--ent-bg); display: flex; align-items: center; }
+    .ent-btn-row { display: flex; gap: 4px; }
+    .ent-btn { font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 2px; border: 1px solid; cursor: default; font-family: inherit; line-height: 1.5; text-transform: uppercase; letter-spacing: 0.03em; }
+    .ent-btn-primary { background: #1a52c0; color: #ffffff; border-color: #1a52c0; }
+    .ent-btn-ghost { background: var(--ent-bg-subtle); color: var(--ent-text-2); border-color: var(--ent-border); }
+    .ent-btn-danger { background: var(--ent-bg-subtle); color: var(--ent-red); border-color: var(--ent-red-border); }
+    .ent-table-wrap { border-top: 1px solid var(--ent-border); }
+    .ent-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .ent-table thead th { padding: 5px 10px; text-align: left; font-size: 8.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ent-text-3); border-bottom: 1px solid var(--ent-border); background: var(--ent-bg-subtle); white-space: nowrap; }
+    .ent-table thead th:first-child { width: 28px; padding-left: 12px; }
+    .ent-table tbody td { padding: 6px 10px; border-bottom: 1px solid var(--ent-border); color: var(--ent-text); background: var(--ent-bg); transition: background 0.08s; vertical-align: middle; }
+    .ent-table tbody td:first-child { padding-left: 12px; }
+    .ent-table tbody tr:last-child td { border-bottom: none; }
+    .ent-table tbody tr.ent-row-pinned td { background: rgba(158,85,0,0.06); }
+    .ent-pin-btn { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: default; color: var(--ent-border-strong); border-radius: 2px; }
+    .ent-pin-btn.pinned { color: var(--ent-amber); }
+    .ent-mono-id { font-family: var(--ent-mono); font-size: 10.5px; color: var(--ent-text-2); letter-spacing: 0.03em; }
+    .ent-case-log-wrap { background: var(--ent-bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .ent-case-log { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .ent-case-log thead th { padding: 5px 12px; text-align: left; font-size: 8.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ent-text-3); border-bottom: 1px solid var(--ent-border); background: var(--ent-bg-subtle); }
+    .ent-case-log tbody td { padding: 7px 12px; border-bottom: 1px solid var(--ent-border); color: var(--ent-text); background: var(--ent-bg); transition: background 0.08s; vertical-align: middle; }
+    .ent-case-log tbody tr:last-child td { border-bottom: none; }
+    .ent-case-id-link { font-family: var(--ent-mono); font-size: 11px; color: var(--ent-blue); cursor: default; border-bottom: 1px solid var(--ent-blue-border); padding-bottom: 1px; }
+    .ent-popover-wrapper { position: relative; display: inline-block; }
+    .ent-popover { position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-40%); background: var(--ent-bg-subtle); border: 1px solid var(--ent-border-strong); border-radius: 2px; width: 264px; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.12s; box-shadow: var(--ent-shadow-lg); overflow: hidden; font-size: 11.5px; }
+    .ent-popover.visible { opacity: 1; }
+    .ent-pop-head { padding: 7px 10px 6px; background: var(--ent-bg); border-bottom: 1px solid var(--ent-border); display: flex; align-items: flex-start; gap: 8px; }
+    .ent-pop-title-block { flex: 1; }
+    .ent-pop-case-id { font-family: var(--ent-mono); font-size: 9px; color: var(--ent-text-3); letter-spacing: 0.05em; margin-bottom: 2px; text-transform: uppercase; }
+    .ent-pop-case-title { font-size: 11px; font-weight: 600; color: var(--ent-text); line-height: 1.3; }
+    .ent-pop-body { padding: 8px 10px 0; }
+    .ent-pop-summary { font-size: 10.5px; color: var(--ent-text-2); line-height: 1.5; margin-bottom: 7px; }
+    .ent-pop-log { border-top: 1px solid var(--ent-border); padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; }
+    .ent-pop-log-entry { display: flex; gap: 7px; align-items: flex-start; }
+    .ent-pop-log-time { font-family: var(--ent-mono); font-size: 8.5px; color: var(--ent-text-3); white-space: nowrap; padding-top: 1px; flex-shrink: 0; min-width: 52px; }
+    .ent-pop-log-text { font-size: 10px; color: var(--ent-text-2); line-height: 1.4; }
+    .ent-pop-next { background: var(--ent-blue-bg); border-top: 1px solid var(--ent-blue-border); padding: 6px 10px; display: flex; gap: 6px; align-items: flex-start; margin-top: 4px; }
+    .ent-pop-next-lbl { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ent-blue); white-space: nowrap; padding-top: 1px; flex-shrink: 0; }
+    .ent-pop-next-text { font-size: 10px; color: var(--ent-blue); font-weight: 500; line-height: 1.4; }
+    .ent-tc-row { font-size: 9px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ent-text-3); padding: 10px 12px 6px; border-top: 1px solid var(--ent-border); }
+    .ent-tc-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 12px 12px; }
+    .ent-tc-card { background: var(--ent-bg-subtle); border: 1px solid var(--ent-border); border-radius: 0; overflow: hidden; }
+    .ent-tc-card.ent-tc-selected { border-color: var(--ent-blue); }
+    .ent-tc-head { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ent-text-3); padding: 4px 8px 3px; border-bottom: 1px solid var(--ent-border); background: var(--ent-bg); display: flex; align-items: center; justify-content: space-between; }
+    .ent-tc-selected .ent-tc-head { color: var(--ent-blue); border-bottom-color: var(--ent-blue-border); background: var(--ent-blue-bg); }
+    .ent-tc-chosen { font-size: 7.5px; font-weight: 700; color: var(--ent-blue); }
+    .ent-tc-body { padding: 7px 8px; }
+
+    /* Investigation timeline flow */
+    .amz-flow { display: flex; align-items: flex-start; padding: 20px 0 8px; position: relative; }
+    .amz-flow::before { content: ''; position: absolute; top: 32px; left: 24px; right: 24px; height: 1px; background: var(--shad-border); z-index: 0; }
+    .amz-flow-step { flex: 1; position: relative; cursor: pointer; text-align: center; z-index: 1; }
+    .amz-flow-box { padding: 0 6px 8px; transition: opacity 0.18s; }
+    .amz-flow-step:not(.selected):not(:hover) .amz-flow-box { opacity: 0.5; }
+    .amz-flow-node { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--shad-border); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; background: var(--shad-bg); position: relative; z-index: 1; transition: border-color 0.2s, background 0.2s; }
+    .amz-flow-step.ok .amz-flow-node { border-color: var(--shad-green); background: var(--shad-green-bg); }
+    .amz-flow-step.bottleneck .amz-flow-node { border-color: var(--shad-red); background: var(--shad-red-bg); }
+    .amz-flow-step.selected:not(.ok):not(.bottleneck) .amz-flow-node { border-color: var(--shad-muted); background: var(--shad-surface); }
+    .amz-flow-step.ok .amz-flow-node::after { content: ''; display: block; width: 7px; height: 4.5px; border-left: 1.5px solid var(--shad-green); border-bottom: 1.5px solid var(--shad-green); transform: rotate(-45deg) translateY(-1px); }
+    .amz-flow-step.bottleneck .amz-flow-node::after { content: ''; display: block; width: 8px; height: 1.5px; background: var(--shad-red); border-radius: 1px; }
+    .amz-flow-step:not(.ok):not(.bottleneck) .amz-flow-node::after { content: ''; display: block; width: 5px; height: 5px; border-radius: 50%; background: var(--shad-border); }
+    .amz-flow-label { font-size: 10px; font-weight: 500; color: var(--shad-muted); line-height: 1.35; }
+    .amz-flow-status { font-size: 9px; margin-top: 2px; color: var(--shad-muted2); }
+    .amz-flow-status.ok { color: var(--shad-green); }
+    .amz-flow-status.bottleneck { color: var(--shad-red); }
+    .amz-flow-detail { background: var(--shad-card); border-top: 1px solid var(--shad-border); padding: 12px 16px; font-size: 12px; display: none; }
+    .amz-flow-detail.visible { display: block; }
+    .amz-flow-detail-title { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--shad-muted); margin-bottom: 5px; }
+    .amz-flow-detail p { font-size: 11.5px; color: var(--shad-muted); line-height: 1.6; margin-bottom: 0; }
+
+    @media (max-width: 640px) {
+      .stats-row { grid-template-columns: 1fr; }
+      .persona-grid { grid-template-columns: 1fr; }
+      .iteration-grid { grid-template-columns: 1fr; }
+      .sus-metric { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="nav" aria-label="Main navigation">
+    <div id="nav-pill">
+      <a href="../#home" class="nav-item">Home</a>
+      <a href="../#work" class="nav-item active">Work</a>
+      <a href="../#play" class="nav-item">Play</a>
+    </div>
+  </nav>
+
+  <section class="case-hero">
+    <div style="max-width:1100px; margin:0 auto;">
+      <a href="../#work" class="case-back">← Work</a>
+      <p class="case-eyebrow">Amazon · Summer 2024</p>
+      <h1>Giving investigators their inner Sherlock Holmes back.</h1>
+      <p class="case-subtitle">Redesigning a dashboard used by Amazon's security investigators — built into an existing case management system — to help them prioritize work, track progress, and act without friction.</p>
+      <div class="case-details">
+        <div><span class="case-detail-label">Role</span><span class="case-detail-value">UX Design Intern</span></div>
+        <div><span class="case-detail-label">Timeline</span><span class="case-detail-value">Summer 2024</span></div>
+        <div><span class="case-detail-label">Type</span><span class="case-detail-value">Net-new Feature Design</span></div>
+        <div><span class="case-detail-label">Focus</span><span class="case-detail-value">Enterprise UX, Workflow Design</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="case-content">
+
+    <!-- THE STORY -->
+    <h3>The setup</h3>
+    <h2>An unreleased product just went public.</h2>
+
+    <div class="story-sequence">
+      <div class="story-beat accent">
+        <div class="story-beat-time">Day 0</div>
+        <p>Photos of an <strong>unreleased Amazon Echo</strong> appear online. The product hasn't been announced. How did this get out?</p>
+      </div>
+      <div class="story-beat">
+        <div class="story-beat-time">12 hours later</div>
+        <p>A security investigator — let's call her <strong>Lisa</strong> — gets assigned to find the source of the leak before more information escapes.</p>
+      </div>
+      <div class="story-beat warning">
+        <div class="story-beat-time">Day 1, morning</div>
+        <p>Lisa opens the Investigations Dashboard. She has <strong>17 active cases</strong> and no idea where to start. The tool she relies on most is working against her.</p>
+      </div>
+    </div>
+
+    <!-- DISCOVERY -->
+    <h3>Discovery</h3>
+    <h2>The system was making investigators feel like they were guessing.</h2>
+    <p>I surveyed and interviewed 18 security investigators. What I found was people adapting to a broken tool rather than the tool adapting to them.</p>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number">17</div>
+        <div class="stat-label">Average active cases per investigator at any given time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">50%+</div>
+        <div class="stat-label">Of investigators find it hard to collaborate with supporting teams</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">~0</div>
+        <div class="stat-label">Investigators who primarily used the dashboard to start their day</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>"I feel like I'm guessing what to do next. I just open cases randomly and hope I pick the right one."</p>
+      <span class="callout-attr">— Security Investigator, survey response</span>
+    </div>
+
+    <p>Three challenges surfaced in nearly every interview: <strong>knowing which case to work on first</strong>, <strong>tracking progress</strong> across a large caseload, and <strong>reaching supporting teams</strong> when a case got stuck waiting on someone else.</p>
+
+    <!-- DEFINING -->
+    <h3>Defining</h3>
+    <h2>Two investigators, the same broken tool.</h2>
+
+    <div class="persona-grid">
+      <div class="persona-card">
+        <div class="persona-name">Lisa</div>
+        <div class="persona-role">Senior Investigator</div>
+        <div class="persona-need">Needs to quickly prioritize her caseload and track progress across all of them. Currently digs into each case individually to understand status — a process that can take her entire morning.</div>
+        <div class="persona-quote">"I spend more time figuring out what to work on than actually working."</div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-name">Raj</div>
+        <div class="persona-role">Mid-level Investigator</div>
+        <div class="persona-need">Has been flagged for missing response deadlines — not because he's slow, but because he never knew his cases were stalled waiting on another team. By the time he realized, it was too late.</div>
+        <div class="persona-quote">"I got in trouble for something I didn't even know was happening."</div>
+      </div>
+    </div>
+
+    <div class="pain-journey">
+      <div class="pain-step">
+        <div class="pain-num">1</div>
+        <div class="pain-content">
+          <h4>Logging in — no starting point</h4>
+          <p>The dashboard shows a wall of case IDs and subjects. Nothing about status, urgency, or what needs attention today. Investigators have to memorize which numbers map to which cases.</p>
+        </div>
+      </div>
+      <div class="pain-step">
+        <div class="pain-num">2</div>
+        <div class="pain-content">
+          <h4>Case prioritization — forced guessing</h4>
+          <p>With 17 average active cases, there's no system for surfacing what's most critical. Investigators click through cases one by one, hoping to stumble onto something urgent.</p>
+        </div>
+      </div>
+      <div class="pain-step">
+        <div class="pain-num">3</div>
+        <div class="pain-content">
+          <h4>Tracking progress — invisible bottlenecks</h4>
+          <p>Cases stuck waiting on another team showed no signal. Raj's missed deadlines happened because nothing in the interface communicated that a case had stalled — or who was responsible for unblocking it.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- OLD SYSTEM -->
+    <h3>The old system</h3>
+    <h2>Tables stacked on tables.</h2>
+    <p>Before proposing anything, I audited the existing dashboard. The fundamental problem: every case was represented as a row in a table, with only the case ID and subject visible. Nothing else.</p>
+
+    <div class="case-mockup">
+      <div class="demo-wrap" style="border-radius:0;border:none;">
+        <div class="demo-header">
+          <span class="demo-label">Before — existing system</span>
+          <span class="demo-hint">17 cases, no priority signals, no next steps</span>
+        </div>
+        <div class="amz-dashboard amz-before">
+          <div class="amz-section-title">All Cases (17)</div>
+          <table class="amz-old-table">
+            <thead><tr><th>Case ID</th><th>Subject</th><th>Opened</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>SEC-2847</td><td>Unreleased Product Photo Leak</td><td>Apr 2</td><td>Active</td></tr>
+              <tr><td>SEC-2831</td><td>Unauthorized Data Access — AWS</td><td>Mar 29</td><td>Active</td></tr>
+              <tr><td>SEC-2819</td><td>Supplier NDA Breach Investigation</td><td>Mar 25</td><td>Active</td></tr>
+              <tr><td>SEC-2807</td><td>Insider Threat — Finance Team</td><td>Mar 20</td><td>Active</td></tr>
+              <tr><td>SEC-2794</td><td>Third-Party Vendor Access Audit</td><td>Mar 15</td><td>Active</td></tr>
+              <tr><td>SEC-2781</td><td>Phishing Campaign — EU Region</td><td>Mar 10</td><td>Active</td></tr>
+              <tr><td>SEC-2770</td><td>Code Repository Exfiltration</td><td>Mar 6</td><td>Active</td></tr>
+              <tr><td>SEC-2762</td><td>Employee Device Compromise</td><td>Mar 1</td><td>Active</td></tr>
+              <tr><td>SEC-2751</td><td>Access Control Policy Violation</td><td>Feb 25</td><td>Active</td></tr>
+              <tr><td>SEC-2743</td><td>Social Engineering Attempt — HR</td><td>Feb 20</td><td>Active</td></tr>
+            </tbody>
+          </table>
+          <div class="amz-old-overload">+ 7 more cases not shown · No priority indicators · No status details · No next steps</div>
+        </div>
+      </div>
+    </div>
+
+    <p>The audit logs were just as unhelpful — timestamped entries with no context. And there was <strong>no visual distinction between a P1 case that needed immediate action and a low-priority case from three weeks ago</strong>. Everything looked the same.</p>
+
+    <div class="insight">
+      <p class="insight-label">The core problem</p>
+      <p>The system was built around data storage, not decision support. It showed investigators everything equally, which meant it helped them with nothing specifically.</p>
+    </div>
+
+    <!-- FEATURE 1 -->
+    <h3>Feature 1 — Case prioritization</h3>
+    <h2>Give investigators control over their signal-to-noise ratio.</h2>
+    <p>The goal: let investigators pin specific cases to surface focused status at the top of their queue — cutting through 17 cases to show what actually needs attention that day.</p>
+    <p>I explored three directions, each with a different approach to how much information a pinned case should show.</p>
+
+    <div class="iteration-grid">
+      <div class="iter-card">
+        <div class="iter-label">Design A</div>
+        <div class="iter-title">Minimal flag + modal</div>
+        <div class="iter-desc">A pin icon on each row. Clicking it flags the case; details open in a modal overlay.</div>
+        <div class="iter-verdict fail">Rejected — too many clicks to get useful info</div>
+      </div>
+      <div class="iter-card selected">
+        <div class="iter-label selected-label">Design B — Selected</div>
+        <div class="iter-title">Inline priority cards</div>
+        <div class="iter-desc">Starred cases surface as rich cards at the top — status, summary, latest update, next step, and lead in one view.</div>
+        <div class="iter-verdict pass">Validated — A/B preference + data sufficiency tests</div>
+      </div>
+      <div class="iter-card">
+        <div class="iter-label">Design C</div>
+        <div class="iter-title">Full sidebar panel</div>
+        <div class="iter-desc">A persistent right-hand panel showing starred cases. Rich but took up too much real estate.</div>
+        <div class="iter-verdict fail">Rejected — reduced space for active case work</div>
+      </div>
+    </div>
+
+    <p>Design B was validated through preference tests with 12 investigators and data sufficiency tests — confirming that the card showed exactly what was needed to take action without opening the full case. Engineers implemented it; I then ran usability tests measuring time-to-first-action, information clarity, and error rate.</p>
+
+    <div class="case-mockup">
+      <div class="demo-wrap" style="border-radius:0;border:none;">
+        <div class="demo-header">
+          <span class="demo-label">Priority cases — watch list</span>
+          <span class="demo-hint">SEC-2847 is pinned to the watch list</span>
+        </div>
+        <div class="ent-dashboard" id="priority-demo">
+          <div class="ent-toolbar">
+            <div class="ent-toolbar-left">
+              <span class="ent-toolbar-title">My Queue</span>
+              <span class="ent-toolbar-count">3 active</span>
+              <span class="ent-toolbar-meta">sort: SLA ↑</span>
+            </div>
+            <span class="ent-toolbar-meta">pin to watch list</span>
+          </div>
+          <div id="starred-area" style="display:none;">
+            <div class="ent-section-label" id="priority-section-title">Watch List <span class="ent-count-pill" id="pinned-count">0</span></div>
+            <div class="ent-pinned-list" id="starred-cards"></div>
+          </div>
+          <div id="all-cases-wrap"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sus-metric">
+      <div class="sus-score sus-before">
+        <div class="sus-score-num">61</div>
+        <div class="sus-score-label">SUS Before</div>
+      </div>
+      <div class="sus-arrow">→</div>
+      <div class="sus-score sus-after">
+        <div class="sus-score-num">88</div>
+        <div class="sus-score-label">SUS After</div>
+      </div>
+      <div class="sus-context">
+        Usability score jumped from <strong>"Ok" (61)</strong> to <strong>"Excellent" (88)</strong> on the System Usability Scale (SUS) — a 44% improvement. Time-to-first-action dropped significantly. Errors from misreading case information fell to near zero across all test sessions.
+      </div>
+    </div>
+
+    <!-- FEATURE 2 -->
+    <h3>Feature 2 — Case transparency</h3>
+    <h2>The answer was already in the case log — just invisible.</h2>
+    <p>With 17 cases to manage, investigators needed a way to quickly recall what was happening in a case without clicking into it. I tested three popover designs that appeared when hovering a case ID — each showing a different amount of information. The core question: how much detail is helpful before it becomes disruptive?</p>
+
+    <div class="iteration-grid">
+      <div class="iter-card">
+        <div class="iter-label">Option A</div>
+        <div class="iter-title">Sparse tooltip</div>
+        <div class="iter-desc">Status + subject only. Fast to scan, but left too many questions unanswered.</div>
+        <div class="iter-verdict fail">Rejected — not enough info to triage</div>
+      </div>
+      <div class="iter-card">
+        <div class="iter-label">Option B</div>
+        <div class="iter-title">Medium tooltip</div>
+        <div class="iter-desc">Added case lead. Better, but investigators still had to open the case for next steps.</div>
+        <div class="iter-verdict fail">Rejected — still required a follow-up click</div>
+      </div>
+      <div class="iter-card selected">
+        <div class="iter-label selected-label">Option C — Selected</div>
+        <div class="iter-title">Dense tooltip</div>
+        <div class="iter-desc">Status, summary, lead, and next step. Enough to fully triage without opening the case.</div>
+        <div class="iter-verdict pass">Validated — workflow interrupt + backlog triage tests</div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <p class="insight-label">Key finding</p>
+      <p>The dense popover gave investigators enough information to assess and act on a case without opening it — effectively a triage tool that didn't interrupt their flow. Investigators using option C were significantly faster at identifying bottlenecks than those using any pop-up or full-card alternative.</p>
+    </div>
+
+    <div class="case-mockup">
+      <div class="demo-wrap" style="border-radius:0;border:none;">
+        <div class="demo-header">
+          <span class="demo-label">Case log — popover density comparison</span>
+          <span class="demo-hint">three iterations shown below, option C selected</span>
+        </div>
+        <div class="ent-case-log-wrap">
+          <div class="ent-toolbar">
+            <div class="ent-toolbar-left">
+              <span class="ent-toolbar-title">Case Log</span>
+              <span class="ent-toolbar-count">3 of 17</span>
+              <span class="ent-toolbar-meta">filter: assigned to me</span>
+            </div>
+            <span class="ent-toolbar-meta">Apr 4, 2024 · 14:30</span>
+          </div>
+          <table class="ent-case-log">
+            <thead>
+              <tr>
+                <th>Case ID ↕</th>
+                <th>Investigation</th>
+                <th>Opened ↓</th>
+                <th>Lead</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="ent-popover-wrapper">
+                    <span class="ent-case-id-link">SEC-2847</span>
+                    <div class="ent-popover" id="tip1"></div>
+                  </div>
+                </td>
+                <td style="font-size:11.5px;color:var(--ent-text)">Unreleased Product Photo Leak</td>
+                <td style="font-size:11px;font-family:var(--ent-mono);color:var(--ent-text-3)">Apr 2</td>
+                <td style="font-size:11px;color:var(--ent-text-2)">L. Chen</td>
+                <td><span class="ent-badge ent-badge-investigating">Investigating</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="ent-popover-wrapper">
+                    <span class="ent-case-id-link">SEC-2831</span>
+                    <div class="ent-popover" id="tip2"></div>
+                  </div>
+                </td>
+                <td style="font-size:11.5px;color:var(--ent-text)">Unauthorized Data Access — AWS</td>
+                <td style="font-size:11px;font-family:var(--ent-mono);color:var(--ent-text-3)">Mar 29</td>
+                <td style="font-size:11px;color:var(--ent-text-2)">R. Patel</td>
+                <td><span class="ent-badge ent-badge-bottlenecked">Bottlenecked</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="ent-popover-wrapper">
+                    <span class="ent-case-id-link">SEC-2819</span>
+                    <div class="ent-popover" id="tip3"></div>
+                  </div>
+                </td>
+                <td style="font-size:11.5px;color:var(--ent-text)">Supplier NDA Breach Investigation</td>
+                <td style="font-size:11px;font-family:var(--ent-mono);color:var(--ent-text-3)">Mar 25</td>
+                <td style="font-size:11px;color:var(--ent-text-2)">L. Chen</td>
+                <td><span class="ent-badge ent-badge-active">Active</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- Side-by-side density comparison (static) -->
+          <div class="ent-tc-row">Popover density — three iterations compared for case SEC-2847</div>
+          <div class="ent-tc-grid">
+            <!-- A: Sparse -->
+            <div class="ent-tc-card">
+              <div class="ent-tc-head"><span>A — Sparse</span></div>
+              <div class="ent-tc-body">
+                <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;">
+                  <div style="flex:1"><div style="font-family:var(--ent-mono);font-size:8.5px;color:var(--ent-text-3);margin-bottom:1px;">SEC-2847 · SEC OPS</div><div style="font-size:10px;font-weight:600;color:var(--ent-text);line-height:1.3">Unreleased Product Photo Leak</div></div>
+                  <span class="ent-badge ent-badge-investigating" style="flex-shrink:0">Invest.</span>
+                </div>
+                <div style="font-size:10px;color:var(--ent-text-2);line-height:1.45;">Echo device images published on third-party blog 48h before embargo.</div>
+                <div style="font-size:8.5px;color:var(--ent-text-3);margin-top:6px;padding-top:5px;border-top:1px solid var(--ent-border)">Lead: L. Chen</div>
+              </div>
+            </div>
+            <!-- B: Medium -->
+            <div class="ent-tc-card">
+              <div class="ent-tc-head"><span>B — Medium</span></div>
+              <div class="ent-tc-body">
+                <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;">
+                  <div style="flex:1"><div style="font-family:var(--ent-mono);font-size:8.5px;color:var(--ent-text-3);margin-bottom:1px;">SEC-2847 · SEC OPS</div><div style="font-size:10px;font-weight:600;color:var(--ent-text);line-height:1.3">Unreleased Product Photo Leak</div></div>
+                  <span class="ent-badge ent-badge-investigating" style="flex-shrink:0">Invest.</span>
+                </div>
+                <div style="font-size:10px;color:var(--ent-text-2);line-height:1.45;margin-bottom:6px;">Echo device images published on third-party blog 48h before embargo.</div>
+                <div class="ent-stage-track" style="margin:0 0 6px">
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Filed</div></div>
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Evid.</div></div>
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Coord</div></div>
+                  <div class="ent-stage"><div class="ent-stage-lbl">Legal</div></div>
+                  <div class="ent-stage"><div class="ent-stage-lbl">Close</div></div>
+                </div>
+                <div style="font-size:8.5px;color:var(--ent-text-3);padding-top:5px;border-top:1px solid var(--ent-border)">Lead: L. Chen</div>
+              </div>
+            </div>
+            <!-- C: Dense (selected) -->
+            <div class="ent-tc-card ent-tc-selected">
+              <div class="ent-tc-head"><span>C — Dense</span><span class="ent-tc-chosen">Selected</span></div>
+              <div class="ent-tc-body">
+                <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;">
+                  <div style="flex:1"><div style="font-family:var(--ent-mono);font-size:8.5px;color:var(--ent-text-3);margin-bottom:1px;">SEC-2847 · SEC OPS</div><div style="font-size:10px;font-weight:600;color:var(--ent-text);line-height:1.3">Unreleased Product Photo Leak</div></div>
+                  <span class="ent-badge ent-badge-investigating" style="flex-shrink:0">Invest.</span>
+                </div>
+                <div style="font-size:10px;color:var(--ent-text-2);line-height:1.45;margin-bottom:5px;">Echo device images published on third-party blog 48h before embargo.</div>
+                <div class="ent-stage-track" style="margin:0 0 5px">
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Filed</div></div>
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Evid.</div></div>
+                  <div class="ent-stage s-done"><div class="ent-stage-lbl">Coord</div></div>
+                  <div class="ent-stage"><div class="ent-stage-lbl">Legal</div></div>
+                  <div class="ent-stage"><div class="ent-stage-lbl">Close</div></div>
+                </div>
+                <div style="border-top:1px solid var(--ent-border);padding-top:5px;display:flex;flex-direction:column;gap:3px;margin-bottom:5px;">
+                  <div class="ent-pop-log-entry"><span class="ent-pop-log-time" style="min-width:42px">Apr 4 14:22</span><span class="ent-pop-log-text">Access logs exported from Portal</span></div>
+                  <div class="ent-pop-log-entry"><span class="ent-pop-log-time" style="min-width:42px">Apr 4 09:11</span><span class="ent-pop-log-text">3 accounts flagged in eu-west-2</span></div>
+                </div>
+                <div style="background:var(--ent-blue-bg);border:1px solid var(--ent-blue-border);padding:4px 6px;margin-top:2px;">
+                  <span style="font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--ent-blue)">Next: </span>
+                  <span style="font-size:9.5px;color:var(--ent-blue);font-weight:500">Complete access log review by EOD</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEATURE 3 -->
+    <h3>Feature 3 — Bottleneck visibility</h3>
+    <h2>Investigators didn't need to find the bottleneck. They needed to understand it.</h2>
+    <p>Early in research I assumed the problem was investigators couldn't identify bottlenecked cases. I was wrong. They knew cases were stalled — what they didn't know was <em>where</em> in the process the stall was occurring and who owned it.</p>
+
+    <p>I designed a stage tracker embedded within each case, showing the investigation lifecycle as a series of steps with clear ownership and status at each one. The key insight: show investigators not just that a case is stalled, but exactly which step owns the block — and whether that block is preventing downstream steps from starting at all.</p>
+
+    <div class="case-mockup">
+      <div class="demo-wrap" style="border-radius:0;border:none;">
+        <div class="demo-header">
+          <span class="demo-label">Investigation timeline — SEC-2847</span>
+        </div>
+        <div class="ent-dashboard">
+          <div class="ent-toolbar">
+            <div class="ent-toolbar-left">
+              <span class="ent-toolbar-title">SEC-2847</span>
+              <span class="ent-toolbar-count">Unreleased Product Photo Leak</span>
+            </div>
+            <span class="ent-toolbar-meta">Opened Apr 2 · Lead: L. Chen</span>
+          </div>
+          <!-- Stage bar — 5 steps, static -->
+          <div style="padding:12px 14px 10px;">
+            <div class="ent-stage-track" style="margin:0">
+              <div class="ent-stage s-done"><div class="ent-stage-lbl">01 · Filed</div></div>
+              <div class="ent-stage s-done"><div class="ent-stage-lbl">02 · Evidence</div></div>
+              <div class="ent-stage s-bottleneck"><div class="ent-stage-lbl">03 · Coord</div></div>
+              <div class="ent-stage s-blocked"><div class="ent-stage-lbl">04 · Legal</div></div>
+              <div class="ent-stage"><div class="ent-stage-lbl">05 · Close</div></div>
+            </div>
+          </div>
+          <!-- Two detail panels side by side -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px;">
+            <!-- Bottleneck -->
+            <div style="background:var(--ent-red-bg);border:1px solid var(--ent-red-border);border-left:3px solid var(--ent-red);padding:10px 12px;">
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--ent-red);margin-bottom:4px;">Step 3 · Bottlenecked · 3 days stalled</div>
+              <div style="font-size:12px;font-weight:600;color:var(--ent-text);margin-bottom:5px;">Team Coordination</div>
+              <div style="font-size:11px;color:var(--ent-text-2);line-height:1.55;margin-bottom:8px;">Waiting on Supplier Risk team response. No reply in 3 days. SLA breach in 2h.</div>
+              <div style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--ent-text-3);margin-bottom:2px;">Escalation contact</div>
+              <div style="font-family:var(--ent-mono);font-size:10px;color:var(--ent-red);">supplier-risk-escalations@amazon.com</div>
+            </div>
+            <!-- Cascade -->
+            <div style="background:var(--ent-purple-bg);border:1px solid var(--ent-purple-border);border-left:3px solid var(--ent-purple);padding:10px 12px;">
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--ent-purple);margin-bottom:4px;">Step 4 · Cascading block</div>
+              <div style="font-size:12px;font-weight:600;color:var(--ent-text);margin-bottom:5px;">Legal Review</div>
+              <div style="font-size:11px;color:var(--ent-text-2);line-height:1.55;margin-bottom:8px;">Legal cannot start until step 3 resolves. This is not an independent issue — it is a downstream effect of the coordination block above.</div>
+              <div style="font-size:9px;font-weight:600;color:var(--ent-purple);background:var(--ent-purple-bg);border:1px solid var(--ent-purple-border);display:inline-block;padding:2px 6px;">Previously invisible to investigators</div>
+            </div>
+          </div>
+          <!-- Before/after context row -->
+          <div style="border-top:1px solid var(--ent-border);display:grid;grid-template-columns:1fr 1fr;gap:0;">
+            <div style="padding:10px 14px;border-right:1px solid var(--ent-border);">
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--ent-text-3);margin-bottom:5px;">Before — what investigators saw</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-family:var(--ent-mono);font-size:10.5px;color:var(--ent-text-2);">SEC-2847</span>
+                <span class="ent-badge ent-badge-investigating">Active</span>
+                <span style="font-size:10.5px;color:var(--ent-text-3);">No stage info</span>
+              </div>
+            </div>
+            <div style="padding:10px 14px;">
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--ent-text-3);margin-bottom:5px;">After — bottleneck located immediately</div>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span style="font-family:var(--ent-mono);font-size:10.5px;color:var(--ent-text-2);">SEC-2847</span>
+                <span class="ent-badge ent-badge-bottlenecked">Bottlenecked</span>
+                <span style="font-size:10px;color:var(--ent-text-3);">Step 3/5 · 3 days · cascade →4</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p>This component was validated through concept and usability testing. The design shown above — stage bar with ownership labels, days stalled, and escalation contact — was consistently preferred. Investigators described it as "finally seeing where the fire actually is."</p>
+
+    <hr class="case-divider">
+
+    <!-- OUTCOMES -->
+    <h3>Outcomes</h3>
+    <h2>Lisa found her Sherlock Holmes again.</h2>
+    <p>Across all three features, the redesigned dashboard showed substantial improvements in every usability dimension measured. The system went from something investigators actively avoided to a primary tool for starting and managing their day.</p>
+
+    <div class="insight">
+      <p class="insight-label">Measured results</p>
+      <p><strong>SUS 61 → 88</strong> — usability score across all three features. <strong>Time-to-first-action</strong> dropped significantly on the priority queue. <strong>Bottleneck identification</strong> went from "unknown" to correctly located on the first try for every test participant.</p>
+    </div>
+
+    <!-- REFLECTION -->
+    <h2>What I learned.</h2>
+    <p><strong>User-centered design is only as good as the research behind it.</strong> The bottleneck insight — that investigators needed location, not detection — only came from going deeper than surface-level complaints. If I'd stopped at "they can't find bottlenecks," I would have built the wrong thing.</p>
+    <p><strong>Iteration isn't just changing the design.</strong> Each round of testing with investigators produced specific, actionable feedback that changed not just the visuals but the underlying information hierarchy. The SUS jump from 61 to 88 didn't come from polish — it came from repeatedly asking "does this actually reduce your decision-making time?"</p>
+    <p><strong>Collaboration across functions changes what you build.</strong> Working closely with engineers shaped what was feasible; working with investigators shaped what was necessary. Neither alone would have produced the same outcome.</p>
+
+  </div>
+
+  <footer class="case-footer">
+    <a href="mailto:abigailcleyva@gmail.com">abigailcleyva@gmail.com</a>
+    <a href="https://www.linkedin.com/in/abigailleyva" target="_blank" rel="noopener">LinkedIn</a>
+  </footer>
+
+  <script>
+    // ========== EMAIL COPY ==========
+    document.addEventListener('DOMContentLoaded', function() {
+      var emailLink = document.querySelector('.case-footer a[href^="mailto"]');
+      if (emailLink) {
+        emailLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          navigator.clipboard.writeText('abigailcleyva@gmail.com').catch(function() {});
+          window.location.href = 'mailto:abigailcleyva@gmail.com';
+        });
+      }
+    });
+
+    // ========== PRIORITY CASES COMPONENT ==========
+    const cases = [
+      { id:'SEC-2847', title:'Unreleased Product Photo Leak', summary:'Echo device images appeared on a third-party tech blog 48h before embargo lift. Source unknown.', update:'Supplier access logs pulled — reviewing 3 flagged accounts in eu-west-2.', priority:'P1', status:'Investigating', lead:'L. Chen', team:'Sec Ops', sla:'2h remaining', stage:3, totalStages:5, stageLabel:'Coordination', starred:true },
+      { id:'SEC-2831', title:'Unauthorized AWS Data Access', summary:'Abnormal API calls from deprovisioned IAM role. Accessed 4 S3 buckets in eu-west-1.', update:'IAM role revoked. Waiting on CloudTrail export from infra team.', priority:'P2', status:'Bottlenecked', lead:'R. Patel', team:'Cloud Sec', sla:'6h remaining', stage:3, totalStages:5, stageLabel:'Legal review', starred:false },
+      { id:'SEC-2819', title:'Supplier NDA Breach', summary:'Confidential roadmap details shared externally by third-party vendor. Legal notified.', update:'Vendor contract pulled. Scheduling call with legal for escalation path.', priority:'P2', status:'Active', lead:'L. Chen', team:'Vendor Sec', sla:'1d remaining', stage:2, totalStages:5, stageLabel:'Evidence', starred:false },
+    ];
+
+    function priorityBadge(p) {
+      if (p === 'P1') return `<span class="ent-badge ent-badge-p1">P1 · Critical</span>`;
+      if (p === 'P2') return `<span class="ent-badge ent-badge-p2">P2 · High</span>`;
+      return `<span class="ent-badge ent-badge-p3">P3</span>`;
+    }
+    function statusBadge(s) {
+      const map = { 'Bottlenecked':'ent-badge-bottlenecked', 'Investigating':'ent-badge-investigating', 'Active':'ent-badge-active', 'Blocked':'ent-badge-blocked' };
+      const cls = map[s] || 'ent-badge-p3';
+      return `<span class="ent-badge ${cls}">${s}</span>`;
+    }
+    function slaClass(s) { return s.startsWith('2h')||s.startsWith('1h') ? 'urgent' : s.startsWith('6h') ? 'warn' : ''; }
+
+    function stageTrackHTML(c) {
+      const stageNames = ['Filed','Evidence','Coord','Legal','Close'];
+      return stageNames.map((lbl, i) => {
+        let cls = '';
+        if (i < c.stage - 1) cls = 's-done';
+        else if (i === c.stage - 1) {
+          if (c.status === 'Bottlenecked') cls = 's-bottleneck';
+          else if (c.status === 'Blocked') cls = 's-blocked';
+          else cls = 's-done';
+        }
+        return `<div class="ent-stage ${cls}"><div class="ent-stage-dot"></div><div class="ent-stage-lbl">${lbl}</div></div>`;
+      }).join('');
+    }
+
+    function renderTableRow(c) {
+      const sc = slaClass(c.sla);
+      return `<tr class="${c.starred ? 'ent-row-pinned' : ''}" id="row-${c.id}">
+        <td>
+          <button class="ent-pin-btn${c.starred ? ' pinned' : ''}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="${c.starred ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1z"/></svg>
+          </button>
+        </td>
+        <td>${priorityBadge(c.priority)}</td>
+        <td><span class="ent-mono-id">${c.id}</span></td>
+        <td style="max-width:160px">
+          <div style="font-size:11.5px;color:var(--ent-text);font-weight:500;line-height:1.3">${c.title}</div>
+          <div style="font-size:9.5px;color:var(--ent-text-3);margin-top:2px">Step ${c.stage}/${c.totalStages} · ${c.stageLabel}</div>
+        </td>
+        <td>${statusBadge(c.status)}</td>
+        <td style="font-size:11.5px;color:var(--ent-text-2)">${c.lead}<div style="font-size:9.5px;color:var(--ent-text-3)">${c.team}</div></td>
+        <td style="font-size:11px;font-weight:${sc ? '600' : '400'}" class="${sc ? 'ent-'+sc : ''}">${c.sla}</td>
+      </tr>`;
+    }
+
+    function renderPinnedCard(c) {
+      const sc = slaClass(c.sla);
+      const priorityCardClass = c.priority === 'P1' ? 'ent-card-p1' : 'ent-card-p2';
+      return `<div class="ent-card ${priorityCardClass}" id="pinned-${c.id}">
+        <div class="ent-card-head">
+          <div style="flex:1">
+            <div class="ent-card-id">${c.id} · ${c.team}</div>
+            <div class="ent-card-title">${c.title}</div>
+          </div>
+          <button class="ent-close-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <div class="ent-card-body">
+          <div class="ent-card-meta-row">
+            ${priorityBadge(c.priority)}
+            ${statusBadge(c.status)}
+          </div>
+          <div class="ent-stage-track">${stageTrackHTML(c)}</div>
+          <div class="ent-kv-grid">
+            <div class="ent-kv"><span class="ent-kv-key">Lead</span><span class="ent-kv-val">${c.lead}</span></div>
+            <div class="ent-kv"><span class="ent-kv-key">SLA</span><span class="ent-kv-val${sc ? ' '+sc : ''}">${c.sla}</span></div>
+            <div class="ent-kv"><span class="ent-kv-key">Stage</span><span class="ent-kv-val">${c.stage}/${c.totalStages}</span></div>
+          </div>
+          <div class="ent-update">
+            <div class="ent-update-label">Latest activity</div>
+            <div class="ent-update-text">${c.update}</div>
+          </div>
+        </div>
+        <div class="ent-card-foot">
+          <div class="ent-btn-row">
+            <button class="ent-btn ent-btn-primary">Open case</button>
+            <button class="ent-btn ent-btn-ghost">Message lead</button>
+            ${c.status === 'Bottlenecked' ? `<button class="ent-btn ent-btn-danger">Escalate</button>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function renderPriorityDemo() {
+      const starred = cases.filter(c => c.starred);
+      const starredArea = document.getElementById('starred-area');
+      const pinnedCount = document.getElementById('pinned-count');
+      const starredCards = document.getElementById('starred-cards');
+      const allWrap = document.getElementById('all-cases-wrap');
+
+      pinnedCount.textContent = starred.length;
+      if (starred.length > 0) {
+        starredArea.style.display = 'block';
+        starredCards.innerHTML = starred.map(renderPinnedCard).join('');
+      } else {
+        starredArea.style.display = 'none';
+      }
+
+      allWrap.innerHTML = `
+        <div class="ent-section-label">All investigations <span class="ent-count-pill">${cases.length}</span></div>
+        <div class="ent-table-wrap">
+          <table class="ent-table">
+            <thead><tr>
+              <th></th><th>Priority</th><th>Case ID</th><th>Investigation</th><th>Status</th><th>Lead</th><th>SLA</th>
+            </tr></thead>
+            <tbody>${cases.map(renderTableRow).join('')}</tbody>
+          </table>
+        </div>`;
+
+      // Re-attach pin button listeners
+      document.querySelectorAll('.ent-pin-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const row = this.closest('tr');
+          if (row) {
+            const id = row.id.replace('row-', '');
+            toggleStar(id);
+          }
+        });
+      });
+
+      // Re-attach close button listeners
+      document.querySelectorAll('.ent-close-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const card = this.closest('[id^="pinned-"]');
+          if (card) {
+            const id = card.id.replace('pinned-', '');
+            toggleStar(id);
+          }
+        });
+      });
+    }
+
+    function toggleStar(id) {
+      const c = cases.find(x => x.id === id);
+      if (c) { c.starred = !c.starred; renderPriorityDemo(); }
+    }
+
+    renderPriorityDemo();
+
+    // ========== TOOLTIP DEMO ==========
+    let tooltipDensity = 'dense';
+    const tooltipData = {
+      'tip1': {
+        caseId: 'SEC-2847', title: 'Unreleased Product Photo Leak',
+        statusKey: 'investigating', statusLabel: 'Investigating',
+        summary: 'Echo device images published on third-party tech blog 48h before embargo. Source under review.',
+        lead: 'L. Chen', team: 'Sec Ops',
+        stages: ['s-done','s-done','s-done','',''],
+        logs: [
+          { time: 'Apr 4 14:22', text: 'Supplier access logs exported from Portal' },
+          { time: 'Apr 4 09:11', text: '3 flagged accounts flagged in eu-west-2' },
+          { time: 'Apr 3 16:45', text: 'Evidence phase marked complete by L. Chen' },
+        ],
+        nextStep: 'Complete access log review by EOD today',
+      },
+      'tip2': {
+        caseId: 'SEC-2831', title: 'Unauthorized AWS Data Access',
+        statusKey: 'bottlenecked', statusLabel: 'Bottlenecked',
+        summary: 'Deprovisioned IAM role made abnormal API calls; accessed 4 S3 buckets in eu-west-1.',
+        lead: 'R. Patel', team: 'Cloud Sec',
+        stages: ['s-done','s-done','s-bottleneck','s-blocked',''],
+        logs: [
+          { time: 'Apr 2 11:30', text: 'IAM role revoked. Awaiting CloudTrail export' },
+          { time: 'Apr 1 17:00', text: 'Infra team notified — no response in 3 days' },
+          { time: 'Mar 31 09:44', text: 'S3 bucket access pattern documented' },
+        ],
+        nextStep: 'Escalate to infra-escalations@amazon.com — SLA breach in 6h',
+      },
+      'tip3': {
+        caseId: 'SEC-2819', title: 'Supplier NDA Breach',
+        statusKey: 'active', statusLabel: 'Active',
+        summary: 'Third-party vendor shared confidential product roadmap details in a public-facing document.',
+        lead: 'L. Chen', team: 'Vendor Sec',
+        stages: ['s-done','s-done','','',''],
+        logs: [
+          { time: 'Mar 27 10:15', text: 'Vendor contract and NDA terms pulled' },
+          { time: 'Mar 26 14:30', text: 'External document identified and archived' },
+          { time: 'Mar 25 08:50', text: 'Case opened, legal notified' },
+        ],
+        nextStep: 'Schedule legal escalation call — waiting on L. Chen availability',
+      },
+    };
+
+    const stageNames2 = ['Filed','Evidence','Coord','Legal','Close'];
+
+    function buildPopoverStages(stages) {
+      return `<div class="ent-stage-track" style="margin-bottom:0">` +
+        stages.map((cls, i) =>
+          `<div class="ent-stage ${cls}"><div class="ent-stage-dot"></div><div class="ent-stage-lbl">${stageNames2[i]}</div></div>`
+        ).join('') +
+      `</div>`;
+    }
+
+    function buildTooltipHTML(id) {
+      const d = tooltipData[id];
+      const badge = `<span class="ent-badge ent-badge-${d.statusKey}">${d.statusLabel}</span>`;
+      const head = `<div class="ent-pop-head"><div class="ent-pop-title-block"><div class="ent-pop-case-id">${d.caseId} · ${d.team}</div><div class="ent-pop-case-title">${d.title}</div></div>${badge}</div>`;
+
+      if (tooltipDensity === 'sparse') {
+        return head +
+          `<div class="ent-pop-body"><div class="ent-pop-summary">${d.summary}</div></div>`;
+      }
+      if (tooltipDensity === 'medium') {
+        return head +
+          `<div class="ent-pop-body">
+            <div class="ent-pop-summary">${d.summary}</div>
+            ${buildPopoverStages(d.stages)}
+            <div style="font-size:10px;color:var(--ent-text-3);margin-top:6px;padding-bottom:8px">Lead: <span style="color:var(--ent-text-2);font-weight:500">${d.lead}</span></div>
+          </div>`;
+      }
+      // dense
+      const logHTML = d.logs.slice(0,2).map(l =>
+        `<div class="ent-pop-log-entry"><span class="ent-pop-log-time">${l.time}</span><span class="ent-pop-log-text">${l.text}</span></div>`
+      ).join('');
+      return head +
+        `<div class="ent-pop-body">
+          <div class="ent-pop-summary">${d.summary}</div>
+          ${buildPopoverStages(d.stages)}
+          <div style="height:6px"></div>
+        </div>
+        <div class="ent-pop-log">${logHTML}</div>
+        <div class="ent-pop-next"><span class="ent-pop-next-lbl">Next</span><span class="ent-pop-next-text">${d.nextStep}</span></div>`;
+    }
+
+    function showTip(id) { const el=document.getElementById(id); if(el){el.innerHTML=buildTooltipHTML(id);el.classList.add('visible');} }
+    function hideTip(id) { const el=document.getElementById(id); if(el) el.classList.remove('visible'); }
+
+    // Attach hover listeners to popover wrappers
+    document.querySelectorAll('.ent-popover-wrapper').forEach(wrapper => {
+      const tip = wrapper.querySelector('.ent-popover');
+      if (!tip) return;
+      const id = tip.id;
+      wrapper.addEventListener('mouseenter', () => showTip(id));
+      wrapper.addEventListener('mouseleave', () => hideTip(id));
+    });
+
+  </script>
+
+</body>
+</html>

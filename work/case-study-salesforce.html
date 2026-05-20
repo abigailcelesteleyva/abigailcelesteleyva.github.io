@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="icon" type="image/png" sizes="180x180" href="../favicon.png">
+  <link rel="apple-touch-icon" href="../favicon.png">
+  <title>Robotforce — Abigail Leyva</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: #EDE8DC; color: #1C1510; }
+
+    /* Nav */
+    #nav { position: fixed; bottom: 1rem; left: 0; right: 0; z-index: 200; display: flex; justify-content: center; pointer-events: none; }
+    @media (min-width: 768px) { #nav { top: 1.5rem; bottom: auto; } }
+    #nav-pill { pointer-events: all; display: flex; align-items: center; gap: 0.25rem; background: rgba(7,15,25,0.38); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(209,173,102,0.10); border-radius: 999px; padding: 0.35rem; }
+    .nav-item { display: flex; align-items: center; padding: 0.45rem 0.85rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; color: rgba(245,237,214,0.38); text-decoration: none; transition: background 0.2s, color 0.2s; white-space: nowrap; }
+    .nav-item:hover { background: rgba(209,173,102,0.08); color: rgba(245,237,214,0.8); }
+    .nav-item.active { background: rgba(209,173,102,0.12); color: rgba(245,237,214,0.95); font-weight: 600; }
+
+    /* Hero — dark Monet */
+    .case-hero { background: #0D1118; padding: 8rem 3rem 4rem; }
+    @media (max-width: 768px) { .case-hero { padding: 6rem 1.5rem 3rem; } }
+    .case-back { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 500; color: rgba(245,237,214,0.45); text-decoration: none; margin-bottom: 2.5rem; transition: color 0.2s; letter-spacing: 0.01em; }
+    .case-back:hover { color: rgba(245,237,214,0.8); }
+    .case-eyebrow { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.7); margin-bottom: 0.75rem; }
+    .case-hero h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 600; color: #F5EDD6; line-height: 1.15; letter-spacing: -0.025em; margin-bottom: 1.25rem; max-width: 760px; }
+    .case-subtitle { font-size: clamp(0.92rem, 1.4vw, 1.05rem); font-weight: 400; color: rgba(245,237,214,0.6); line-height: 1.7; max-width: 620px; margin-bottom: 2.5rem; }
+    .case-details { display: flex; flex-wrap: wrap; gap: 2.5rem; }
+    .case-detail-label { display: block; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,237,214,0.35); margin-bottom: 0.3rem; }
+    .case-detail-value { font-size: 0.875rem; font-weight: 500; color: rgba(245,237,214,0.8); }
+
+    /* Wide hero asset strip */
+    .case-asset-wide { width: 100%; background: #111820; }
+    .case-asset-wide img, .case-asset-wide video { width: 100%; height: auto; display: block; }
+
+    /* Article */
+    .case-content { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 8rem; }
+    .case-content h2 { font-size: clamp(1.45rem, 2.5vw, 1.9rem); font-weight: 600; color: #1C1510; letter-spacing: -0.02em; line-height: 1.2; margin-top: 4rem; margin-bottom: 1rem; }
+    .case-content h2:first-child { margin-top: 0; }
+    .case-content h3 { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin-top: 3rem; margin-bottom: 0.5rem; }
+    .case-content p { font-size: 1rem; line-height: 1.78; color: rgba(28,21,16,0.72); margin-bottom: 1.25rem; }
+    .case-content strong { color: #1C1510; font-weight: 600; }
+    .case-content ul, .case-content ol { padding-left: 1.4rem; margin-bottom: 1.25rem; }
+    .case-content li { font-size: 1rem; line-height: 1.78; color: rgba(28,21,16,0.72); margin-bottom: 0.4rem; }
+    .case-divider { border: none; border-top: 1px solid rgba(28,21,16,0.1); margin: 4rem 0; }
+
+    /* Inline media wrapper */
+    .case-media { margin: 3rem 0; border-radius: 12px; overflow: hidden; background: #111820; }
+    .case-media img, .case-media video { width: 100%; height: auto; display: block; }
+    .case-media-caption { font-size: 0.78rem; color: rgba(28,21,16,0.45); margin-top: 0.75rem; text-align: center; font-style: italic; }
+
+    /* Insight box */
+    .case-insight { background: rgba(209,173,102,0.08); border-left: 2px solid rgba(209,173,102,0.5); border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2.5rem 0; }
+    .case-insight-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin-bottom: 0.5rem; }
+    .case-insight p { margin-bottom: 0; }
+
+    /* Wide iframe embed */
+    .case-embed-wide { width: 100%; aspect-ratio: 16/9; background: #111820; margin: 0; }
+    .case-embed-wide iframe { width: 100%; height: 100%; border: none; display: block; }
+
+    /* Footer */
+    .case-footer { background: #0D1118; padding: 3rem 2rem; display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+    .case-footer a { color: rgba(245,237,214,0.45); font-size: 0.8rem; text-decoration: none; transition: color 0.2s; }
+    .case-footer a:hover { color: rgba(245,237,214,0.85); }
+    .case-footer span { color: rgba(245,237,214,0.25); font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav" aria-label="Main navigation">
+    <div id="nav-pill">
+      <a href="../#home" class="nav-item">Home</a>
+      <a href="../#work" class="nav-item active">Work</a>
+      <a href="../#play" class="nav-item">Play</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="case-hero">
+    <div style="max-width:1100px; margin:0 auto;">
+      <a href="../#work" class="case-back">← Work</a>
+      <p class="case-eyebrow">Salesforce · 2024–2025</p>
+      <h1>Commanding the robot workforce.</h1>
+      <p class="case-subtitle">Designing "Robotforce" — an AI-driven command center for human-robot collaboration, integrated directly into the conversational interface of Slack.</p>
+      <div class="case-details">
+        <div>
+          <span class="case-detail-label">Role</span>
+          <span class="case-detail-value">Product Designer</span>
+        </div>
+        <div>
+          <span class="case-detail-label">Timeline</span>
+          <span class="case-detail-value">2024-2025</span>
+        </div>
+        <div>
+          <span class="case-detail-label">Type</span>
+          <span class="case-detail-value">0→1 Product</span>
+        </div>
+        <div>
+          <span class="case-detail-label">Focus</span>
+          <span class="case-detail-value">Human-Robot Interaction (HRI), AI</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WIDE VIDEO EMBED -->
+  <div class="case-embed-wide">
+    <iframe src="https://play.vidyard.com/7WUP5Nw1xLGDdCM1jCgHMR.html?autoplay=1&muted=1&loop=1&v=4&type=inline&controls=0"
+            scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen></iframe>
+  </div>
+
+  <!-- ARTICLE -->
+  <div class="case-content">
+
+    <!-- THE VISION -->
+    <h2>The vision</h2>
+    <p>As robots move from factory floors to hospitals and offices, the need for a central management system becomes critical. Robotforce is our answer: an AI-native command center that allows human supervisors to monitor, intervene, and collaborate with autonomous robot fleets through Slack.</p>
+
+    <!-- KEY FEATURES -->
+    <h2 style="margin-top: 5rem;">Key Features</h2>
+
+    <!-- Feature 1 -->
+    <h3>Incident Response and Monitoring</h3>
+    <div class="case-media">
+      <video autoplay loop muted playsinline>
+        <source src="../SALESFORCE/incidentresponse.mp4" type="video/mp4">
+      </video>
+    </div>
+    <p>Robot fleet managers can investigate critical incidents reported by agents (e.g., fire at a power plant), reviewing AI-detected footage, a reasoning and action thread showing the agent timeline, and a mapped location.</p>
+
+    <!-- Feature 2 -->
+    <h3>Digital Twin</h3>
+    <div class="case-media">
+      <video autoplay loop muted playsinline>
+        <source src="../SALESFORCE/digitaltwin.mp4" type="video/mp4">
+      </video>
+    </div>
+    <p>A real-time 3D digital twin of the site, visualizing robot positions, active zones, and system alerts. This interface helps monitor operations spatially and identify anomalies or hotspots quickly. <strong>All made in Blender!</strong></p>
+
+    <!-- Feature 3 -->
+    <h3>Agentic Intervention</h3>
+    <div class="case-media">
+      <video autoplay loop muted playsinline>
+        <source src="../SALESFORCE/invention.mp4" type="video/mp4">
+      </video>
+    </div>
+    <p>Users can collaborate directly with a robot on a specific issue. They can discuss root causes, align on next steps, and add people to the conversation—all within a dedicated resolution thread.</p>
+
+    <!-- Feature 4 -->
+    <h3>Fleet Impact</h3>
+    <div class="case-media">
+      <video autoplay loop muted playsinline>
+        <source src="../SALESFORCE/impact.mp4" type="video/mp4">
+      </video>
+    </div>
+    <p>Upon expanding a graph, supporting text explains the data. The built-in thread panel enables real-time team collaboration, letting users tag colleagues, add context, or propose next steps directly alongside the data. Agents join the conversation when an action is proposed.</p>
+
+    <!-- DESIGN PROCESS -->
+    <h3>Design Process</h3>
+    <h2>Testing the limits of autonomy.</h2>
+
+    <div class="case-media" style="background: transparent; border-radius: 0;">
+      <img src="../SALESFORCE/design-process-large.svg" alt="Design Process Phase 1">
+    </div>
+
+    <p>Our process involved over 15 stakeholder interviews and several rounds of "Wizard of Oz" testing to understand where humans wanted more control vs. where they trusted the AI. We used "Crazy Eights" to quickly ideate on how to represent 3D robot movement within a 2D chat bubble.</p>
+
+    <div class="case-media" style="background: transparent; border-radius: 0;">
+      <img src="../SALESFORCE/design-process2-large.svg" alt="Design Process Phase 2">
+    </div>
+
+    <div class="case-insight">
+      <p class="case-insight-label">Design insight</p>
+      <p>3D spatial data is hard to grasp in text. By integrating Blender-built digital twins into Slack, we allowed supervisors to see exactly what the robot sees, providing the necessary "spatial context" to make split-second intervention decisions.</p>
+    </div>
+
+    <!-- THE IMPACT -->
+    <h3>Impact</h3>
+    <h2>Toward Dreamforce 2025.</h2>
+    <p>Robotforce is currently a high-priority project targeting a major reveal at Dreamforce 2025. It represents the next frontier of Salesforce's "Agentforce" vision — moving beyond software agents to physical, autonomous coworkers.</p>
+
+    <hr class="case-divider">
+
+    <!-- REFLECTION -->
+    <h2>Reflection</h2>
+    <p>Robotforce pushed me to think beyond traditional screen-based UX. Designing for physical agents requires a deep empathy for both the human supervisor and the robot's "worldview." It's taught me that the future of AI isn't just about answering questions — it's about acting in the physical world alongside us.</p>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="case-footer">
+    <a href="mailto:abigailcleyva@gmail.com">abigailcleyva@gmail.com</a>
+    <span>·</span>
+    <a href="https://www.linkedin.com/in/abigailleyva" target="_blank" rel="noopener">LinkedIn</a>
+    <span>·</span>
+    <span>Abigail Leyva · 2025</span>
+  </footer>
+
+</body>
+</html>

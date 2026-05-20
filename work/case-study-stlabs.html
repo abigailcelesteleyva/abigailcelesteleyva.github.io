@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="icon" type="image/png" sizes="180x180" href="../favicon.png">
+  <link rel="apple-touch-icon" href="../favicon.png">
+  <title>STLabs — Abigail Leyva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: #EDE8DC; color: #1C1510; }
+
+    /* Nav */
+    #nav { position: fixed; bottom: 1rem; left: 0; right: 0; z-index: 200; display: flex; justify-content: center; pointer-events: none; }
+    @media (min-width: 768px) { #nav { top: 1.5rem; bottom: auto; } }
+    #nav-pill { pointer-events: all; display: flex; align-items: center; gap: 0.25rem; background: rgba(7,15,25,0.38); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(209,173,102,0.10); border-radius: 999px; padding: 0.35rem; }
+    .nav-item { display: flex; align-items: center; padding: 0.45rem 0.85rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; color: rgba(245,237,214,0.38); text-decoration: none; transition: background 0.2s, color 0.2s; white-space: nowrap; }
+    .nav-item:hover { background: rgba(209,173,102,0.08); color: rgba(245,237,214,0.8); }
+    .nav-item.active { background: rgba(209,173,102,0.12); color: rgba(245,237,214,0.95); font-weight: 600; }
+
+    /* Hero — dark Monet */
+    .case-hero { background: #0D1118; padding: 8rem 3rem 4rem; }
+    @media (max-width: 768px) { .case-hero { padding: 6rem 1.5rem 3rem; } }
+    .case-back { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 500; color: rgba(245,237,214,0.45); text-decoration: none; margin-bottom: 2.5rem; transition: color 0.2s; letter-spacing: 0.01em; }
+    .case-back:hover { color: rgba(245,237,214,0.8); }
+    .case-eyebrow { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.7); margin-bottom: 0.75rem; }
+    .case-hero h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 600; color: #F5EDD6; line-height: 1.15; letter-spacing: -0.025em; margin-bottom: 1.25rem; max-width: 760px; }
+    .case-subtitle { font-size: clamp(0.92rem, 1.4vw, 1.05rem); font-weight: 400; color: rgba(245,237,214,0.6); line-height: 1.7; max-width: 620px; margin-bottom: 2.5rem; }
+    .case-details { display: flex; flex-wrap: wrap; gap: 2.5rem; }
+    .case-detail-label { display: block; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,237,214,0.35); margin-bottom: 0.3rem; }
+    .case-detail-value { font-size: 0.875rem; font-weight: 500; color: rgba(245,237,214,0.8); }
+
+    /* Article */
+    .case-content { max-width: 720px; margin: 0 auto; padding: 5rem 2rem 8rem; }
+    .case-content h2 { font-size: clamp(1.45rem, 2.5vw, 1.9rem); font-weight: 600; color: #1C1510; letter-spacing: -0.02em; line-height: 1.2; margin-top: 4rem; margin-bottom: 1rem; }
+    .case-content h2:first-child { margin-top: 0; }
+    .case-content h3 { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin-top: 4rem; margin-bottom: 0.5rem; }
+    .case-content p { font-size: 1rem; line-height: 1.78; color: rgba(28,21,16,0.72); margin-bottom: 1.25rem; }
+    .case-content strong { color: #1C1510; font-weight: 600; }
+    .case-content ul, .case-content ol { padding-left: 1.4rem; margin-bottom: 1.25rem; }
+    .case-content li { font-size: 1rem; line-height: 1.78; color: rgba(28,21,16,0.72); margin-bottom: 0.4rem; }
+    .case-divider { border: none; border-top: 1px solid rgba(28,21,16,0.1); margin: 4rem 0; }
+
+    /* Section break between the three pieces */
+    .case-section-break { border: none; border-top: 2px solid rgba(28,21,16,0.08); margin: 6rem 0 0; }
+
+    /* Inline mockup/iframe wrapper */
+    .case-mockup { margin: 3rem -2rem; border-radius: 12px; overflow: hidden; background: #f8f6f2; }
+    .case-mockup iframe { display: block; width: 100%; border: none; }
+    @media (max-width: 760px) { .case-mockup { margin: 3rem 0; border-radius: 8px; } }
+
+    /* Callout / blockquote */
+    .callout { border-left: 2px solid rgba(209,173,102,0.5); padding: 0.4rem 0 0.4rem 1rem; margin: 1.25rem 0; }
+    .callout p { font-size: 0.9rem; font-style: italic; color: #1C1510; line-height: 1.5; margin-bottom: 0; display: inline; }
+    .callout-attr { font-size: 0.75rem; font-style: normal; color: rgba(28,21,16,0.4); display: inline; margin-left: 0.3rem; }
+
+    /* Insight box */
+    .insight { background: rgba(28,21,16,0.04); border-radius: 10px; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+    .insight-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin-bottom: 0.5rem; }
+    .insight p { font-size: 0.95rem; color: #1C1510; margin-bottom: 0; }
+
+    /* Raw asset */
+    .raw-asset { margin: 2.5rem 0; }
+    .raw-asset img { display: block; width: 100%; height: auto; }
+
+    /* Case asset box */
+    .case-asset { margin: 2.5rem 0; border: 1px solid rgba(28,21,16,0.08); border-radius: 12px; overflow: hidden; background: rgba(28,21,16,0.03); }
+    .case-asset-caption { padding: 0.75rem 1.5rem; font-size: 0.75rem; color: rgba(28,21,16,0.4); border-top: 1px solid rgba(28,21,16,0.06); }
+
+    /* Component caption */
+    .component-caption { font-size: 0.75rem; color: rgba(28,21,16,0.4); margin-top: 0.6rem; margin-bottom: 0; }
+
+    /* ── Ticket Inbox interactive demos ── */
+
+    /* Iteration 1 — free-floating click demo */
+    .iter1-free { position: relative; margin: 2.5rem 0; }
+    .iter1-overlay { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 24px; }
+    .iter1-overlay-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(209,173,102,0.8); }
+    .iter1-overlay-hint { font-size: 0.7rem; font-weight: 400; color: rgba(28,21,16,0.4); }
+    .iter1-overlay .demo-dots { margin-left: auto; }
+    .demo-dots { display: flex; gap: 6px; align-items: center; }
+    .demo-dot { width: 7px; height: 7px; border-radius: 50%; background: #d4d4d8; transition: background 0.3s ease; }
+    .demo-dot.filled { background: rgba(209,173,102,0.8); }
+    .demo-stage { cursor: pointer; position: relative; overflow: hidden; border-radius: 8px; }
+    .demo-stage img { width: 100%; height: auto; display: block; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.8s ease; pointer-events: none; z-index: 1; }
+    .demo-stage img.active { opacity: 1; position: relative; pointer-events: auto; z-index: 2; }
+    .demo-stage img.prev { opacity: 1; z-index: 1; }
+
+    /* Vertical scroll snap — iter2 */
+    .vsnap-header { display: flex; gap: 1.5rem; padding: 0; margin-bottom: 12px; }
+    .vsnap-label { font-size: 0.75rem; font-weight: 500; color: rgba(28,21,16,0.35); cursor: pointer; transition: color 0.3s ease; }
+    .vsnap-label.active { color: rgba(209,173,102,0.8); }
+    .vsnap-wrapper { position: relative; border-radius: 12px; overflow: hidden; margin: 0 0 3rem; }
+    .vsnap-container { aspect-ratio: 1201 / 471; background: #0D1118; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+    .vsnap-container::-webkit-scrollbar { display: none; }
+    .vsnap-slide { aspect-ratio: 1201 / 471; flex-shrink: 0; scroll-snap-align: center; display: flex; align-items: center; justify-content: center; }
+    .vsnap-slide img { width: 100%; height: auto; display: block; }
+
+    /* Iteration 3 — snap strip */
+    .iter3-snap { aspect-ratio: 1467 / 164; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; margin: 2.5rem 0; border-radius: 8px; }
+    .iter3-snap::-webkit-scrollbar { display: none; }
+    .iter3-slide { aspect-ratio: 1467 / 164; flex-shrink: 0; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; }
+    .iter3-slide img { width: 100%; height: auto; display: block; }
+
+    /* Three actions */
+    .three-actions { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1rem; }
+    .action-item { display: grid; grid-template-columns: 70px 1fr; gap: 1rem; align-items: flex-start; }
+    .action-icon-wrap { display: flex; align-items: center; justify-content: center; height: 100%; }
+    .action-icon { height: 28px; width: auto; }
+    .action-item p { font-size: 0.95rem; margin-bottom: 0; }
+
+    /* Gamified resolution */
+    .gamified-resolution { height: 74px; display: flex; align-items: center; justify-content: center; gap: 2.5rem; margin: 1rem 0; background: #EDE8DC; border-radius: 0; }
+    .res-stat { display: flex; flex-direction: column; align-items: center; transform-origin: center center; transition: transform 0.6s ease; }
+    .gamified-resolution.popped .res-stat:first-child { transform: translateX(-40px); }
+    .res-stat-resolved { transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.4); transform-origin: right center; }
+    .res-stat-resolved.pop { transform: scale(1.3); }
+    .res-number-row { display: flex; align-items: center; gap: 6px; }
+    .res-number { font-family: 'Lato', sans-serif; font-size: 1.65rem; font-weight: 900; color: rgba(28,21,16,0.3); font-variant-numeric: tabular-nums; line-height: 1; transition: color 0.6s ease; }
+    .res-label { font-family: 'Lato', sans-serif; font-size: 1.65rem; font-weight: 900; color: rgba(28,21,16,0.3); transition: color 0.6s ease; }
+    .res-arrow { transition: transform 0.4s ease; }
+    .res-arrow polyline, .res-arrow path { transition: stroke 0.6s ease; }
+    .res-stat-resolved.pop .res-number, .res-stat-resolved.pop .res-label { background: linear-gradient(135deg, #22c55e, #16a34a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .res-stat-resolved.pop .res-arrow polyline, .res-stat-resolved.pop .res-arrow path { stroke: #22c55e; }
+
+    /* ── Ticket Detail interactive demos ── */
+
+    /* Proto wrap (iframes) */
+    .proto-wrap { position: relative; margin: 2.5rem 0; }
+    .proto-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 16px; }
+    .proto-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(209,173,102,0.8); }
+    .proto-hint { font-size: 0.7rem; color: rgba(28,21,16,0.4); }
+    .proto-dots { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+    .proto-dot { width: 7px; height: 7px; border-radius: 50%; background: #d4d4d8; transition: background 0.3s; }
+    .proto-dot.filled { background: rgba(209,173,102,0.8); }
+    .proto-caption { font-size: 0.75rem; color: rgba(28,21,16,0.4); margin-top: 0.5rem; }
+    .proto-stage { border-radius: 8px; overflow: hidden; border: 1px solid rgba(28,21,16,0.08); position: relative; cursor: pointer; }
+    .proto-frame-wrap { width: 860px; transform-origin: top left; position: relative; }
+    .proto-frame-wrap iframe { width: 860px; border: none; display: none; background: #FEFEFE; }
+    .proto-frame-wrap iframe.active { display: block; animation: iframeFadeIn 0.12s ease forwards; }
+    @keyframes iframeFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Workflow demos */
+    .wf-grid { display: flex; flex-direction: column; gap: 2.5rem; margin: 3.5rem 0; }
+    .wf-item { display: flex; flex-direction: column; gap: 0.6rem; }
+    .wf-header { display: flex; align-items: center; gap: 0.5rem; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(28,21,16,0.35); }
+    .wf-interactive-label { color: rgba(209,173,102,0.8); }
+    .wf-res-block { background: #f5f0e8; border-radius: 10px; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; transition: all 0.4s ease; min-height: 80px; border: 1px solid rgba(28,21,16,0.04); }
+    .wf-res-block.done { background: rgba(28,21,16,0.04); opacity: 0.7; border-color: transparent; }
+    .wf-res-block.failed { background: #fff5f5; border: 1px solid rgba(192,57,43,0.08); }
+    .wf-info { flex: 1; min-width: 0; }
+    .wf-name { font-size: 0.95rem; font-weight: 600; color: #1C1510; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(28,21,16,0.1); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+    .wf-desc { font-size: 0.8rem; color: rgba(28,21,16,0.55); line-height: 1.4; }
+    .wf-run-btn { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 600; background: #9A3700; color: #fff; border: none; border-radius: 6px; padding: 8px 18px; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+    .wf-run-btn:hover { background: #7E2D00; }
+    .wf-retry-btn { font-size: 0.7rem; font-weight: 600; background: #EDE8DC; color: #1C1510; border: 1px solid rgba(28,21,16,0.12); border-radius: 6px; padding: 5px 12px; cursor: pointer; margin-top: 4px; }
+    .wf-logo-running { width: 24px; height: 24px; animation: wf-pulse 1.2s ease-in-out infinite; }
+    @keyframes wf-pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1) translateY(-1px); opacity: 1; } }
+    .wf-tag { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: #16a34a; }
+    .wf-tag-failed { color: #c0392b; }
+    .wf-logo-green { filter: hue-rotate(90deg) saturate(1.5); }
+    .wf-logo-red { filter: brightness(0) saturate(100%) invert(25%) sepia(90%) saturate(1500%) hue-rotate(340deg); }
+    .wf-reset-btn { font-size: 0.6rem; color: rgba(28,21,16,0.35); background: none; border: none; cursor: pointer; text-decoration: underline; align-self: flex-start; }
+    .wf-status-text { font-size: 0.7rem; color: rgba(28,21,16,0.5); margin-top: 4px; font-style: italic; }
+
+    /* Activity timeline (static inline version from ticket-detail) */
+    .tl-container { margin: 2.5rem 0; border: 1px solid rgba(28,21,16,0.08); border-radius: 12px; overflow: hidden; background: #EDE8DC; }
+    .timeline-mini-av { background: rgba(28,21,16,0.08) !important; color: rgba(28,21,16,0.6) !important; }
+
+    /* ── Inspect Panel component frames ── */
+    .component-frame { border-radius: 12px; overflow: hidden; background: #0E0C08; max-width: 980px; margin: 0 auto; }
+    .component-frame iframe { display: block; width: 100%; border: none; background: #0E0C08; }
+    .component-frame-outer { padding: 1.5rem 0; }
+
+    /* Outlier scenario toggle */
+    .outlier-scenario-btn { font-family: inherit; font-size: 0.75rem; font-weight: 500; color: rgba(28,21,16,0.4); background: none; border: 1px solid rgba(28,21,16,0.12); border-radius: 6px; padding: 0.35rem 0.85rem; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+    .outlier-scenario-btn:hover { color: rgba(28,21,16,0.65); border-color: rgba(28,21,16,0.25); }
+    .outlier-scenario-btn.outlier-active { color: rgba(209,173,102,0.9); border-color: rgba(209,173,102,0.4); }
+
+    /* Footer */
+    .case-footer { background: #0D1118; padding: 3rem 2rem; display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+    .case-footer a { color: rgba(245,237,214,0.45); font-size: 0.8rem; text-decoration: none; transition: color 0.2s; }
+    .case-footer a:hover { color: rgba(245,237,214,0.85); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav" aria-label="Main navigation">
+    <div id="nav-pill">
+      <a href="spring-hero-explore.html#home" class="nav-item">Home</a>
+      <a href="spring-hero-explore.html#work" class="nav-item active">Work</a>
+      <a href="spring-hero-explore.html#play" class="nav-item">Play</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="case-hero">
+    <a href="spring-hero-explore.html#work" class="case-back">← Back to work</a>
+    <p class="case-eyebrow">STLabs · 2022–2024</p>
+    <h1>Rethinking mass ticket resolution for IT ops.</h1>
+    <p class="case-subtitle">Three interconnected design systems — the inbox that groups and resolves tickets in bulk, the split-view detail where agents execute, and the inspect panel that makes cluster intelligence legible before anyone acts.</p>
+    <div class="case-details">
+      <div>
+        <span class="case-detail-label">Role</span>
+        <span class="case-detail-value">UX Designer</span>
+      </div>
+      <div>
+        <span class="case-detail-label">Timeline</span>
+        <span class="case-detail-value">2022–2024</span>
+      </div>
+      <div>
+        <span class="case-detail-label">Type</span>
+        <span class="case-detail-value">0→1 Product</span>
+      </div>
+      <div>
+        <span class="case-detail-label">Focus</span>
+        <span class="case-detail-value">Enterprise UX · AI Workflows · Data Visualization</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- ARTICLE BODY -->
+  <!-- ============================================================ -->
+  <div class="case-content">
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 01 — TICKET INBOX -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <h3>01 — Ticket Inbox</h3>
+    <h2>Rethinking mass ticket resolution for IT ops.</h2>
+    <p>A 0→1 design for grouping, prioritizing, and resolving tickets in seconds — through three major iterations shaped by stakeholder tension and user empathy.</p>
+
+    <!-- THE PROBLEM -->
+    <h3>The problem</h3>
+    <h2>Starting from zero.</h2>
+    <p>A core selling point of our product: intake and group tickets by workflow, then resolve them in bulk. But this was a 0→1 product — no existing patterns to reference, no shared understanding of what "grouping" meant across the team. The founder, engineers, and I each had a different mental model.</p>
+
+    <!-- ITERATION 1 -->
+    <h3>Iteration 1 — The safe bet</h3>
+    <h2>Starting with the known.</h2>
+    <p>I started with what existed in the market: a table view. Rows of tickets, expandable grouping applied on top. Each group showed the title, description, labels, a thumbnail of tickets inside, and a Resolve button with status controls. Groups could expand or collapse. The intention: mass resolve tickets in seconds.</p>
+
+    <div class="iter1-free">
+      <div class="iter1-overlay">
+        <span class="iter1-overlay-label">Interactive</span>
+        <span class="iter1-overlay-hint" id="demo-hint-text">Click to explore</span>
+        <div class="demo-dots" id="demo-dots">
+          <span class="demo-dot"></span>
+          <span class="demo-dot"></span>
+          <span class="demo-dot"></span>
+        </div>
+      </div>
+      <div class="demo-stage" id="demo-iter1">
+        <img class="active" src="../STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-collapsed-component.svg" alt="">
+        <img src="../STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-table-component.svg" alt="">
+        <img src="../STLABS/TICKET_GROUPING/Iteration_1_components/iteration-1-full-table.svg" alt="">
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>"This is exactly what I was thinking — I just couldn't explain it."</p>
+      <span class="callout-attr">— Grant Fuhr, Software Engineer</span>
+    </div>
+
+    <p>The engineer in charge of the grouping mechanism validated it immediately. But the founder's reaction was different:</p>
+
+    <div class="callout">
+      <p>"It feels too old world. Yes, we're capturing grouping and resolution — but we're not going to sell the product like this."</p>
+      <span class="callout-attr">— Amit Agarwal, Founder</span>
+    </div>
+
+    <!-- THE PIVOT -->
+    <h3>The pivot</h3>
+    <h2>Dark mode and the IT admin's identity.</h2>
+    <p>This led to a full redesign — not just the inbox, but the design system. Every competitor prioritized dark mode. Our user, the IT admin, is used to being the "boring sibling" of the engineer. Dark mode wasn't aesthetic — it was empowerment.</p>
+
+    <div class="insight">
+      <p class="insight-label">Design decision</p>
+      <p>The shift to dark mode wasn't aesthetic — it was strategic. It signaled to IT admins: this tool was built for you, not adapted from someone else's workflow.</p>
+    </div>
+
+    <!-- ITERATION 2 -->
+    <h3>Iteration 2 — Editorial layout</h3>
+    <h2>From table rows to a continuum.</h2>
+
+    <p>Instead of a table, the redesign presented groups editorially — a flowing continuum of grouped tickets, each with its title, description, ticket count, labels, thumbnails, and resolution action.</p>
+
+    <div class="raw-asset">
+      <img src="../STLABS/TICKET_GROUPING/Iteration_2_components/tickets_full.svg" alt="">
+    </div>
+
+    <p>A common question from engineers and the founder: <em>how do we show ungrouped tickets?</em> My answer: the component doesn't change. A single ungrouped ticket looks the same — just with one ticket inside. Making it visually different would create unintended signals: "Was something wrong?" "Should I focus on this first?" That's not what we want.</p>
+
+    <div class="insight">
+      <p class="insight-label">Key insight</p>
+      <p>Visual consistency is trust. If the component looks different based on ticket count, users start reading meaning into the difference — meaning that doesn't exist.</p>
+    </div>
+
+    <p style="margin-bottom: 3rem;">But two new problems emerged.</p>
+
+    <!-- VERTICAL SCROLL SNAP -->
+    <div class="vsnap-header">
+      <span class="vsnap-label active" data-index="0">Run Agent</span>
+      <span class="vsnap-label" data-index="1">Run Workflow</span>
+      <span class="vsnap-label" data-index="2">Investigate</span>
+    </div>
+    <div class="vsnap-wrapper" id="iter2-vsnap-wrapper">
+      <div class="vsnap-container" id="iter2-vsnap">
+        <div class="vsnap-slide">
+          <img src="../STLABS/TICKET_GROUPING/Iteration_2_components/tickets_1_ticketpage.svg" alt="">
+        </div>
+        <div class="vsnap-slide">
+          <img src="../STLABS/TICKET_GROUPING/Iteration_2_components/tickets_2_ticketpage.svg" alt="">
+        </div>
+        <div class="vsnap-slide">
+          <img src="../STLABS/TICKET_GROUPING/Iteration_2_components/tickets_3_ticketpage.svg" alt="">
+        </div>
+      </div>
+    </div>
+
+    <p><strong>Problem 1: Engineering jargon in the UI.</strong> Working closely with engineers, I'd absorbed their language. The buttons read "Run Agent," "Run Workflow," "Investigate" — terms that meant nothing to an IT admin. Run Agent runs multiple workflows. Run Workflow runs one. Investigate opens a conversation with an AI agent. These distinctions mattered to engineers, not users.</p>
+    <p><strong>Problem 2: Confidence.</strong> The design was essentially asking: <em>"Here's our grouping — want to confirm?"</em> That undermines trust. It also created an overwhelming landing screen: too many rows, too many actions, when the main thing is resolution. Period.</p>
+    <p>My PM wanted to ship. I pushed back.</p>
+
+    <!-- ITERATION 3 -->
+    <h3>Iteration 3 — Confident &amp; simple</h3>
+    <h2>Present the answer, not the question.</h2>
+    <p>The final redesign flipped the posture. Groups are presented confidently — not as a suggestion, but as a decision. Click to preview tickets, but the focus is on description, resolution description, and the action itself.</p>
+
+    <div class="iter3-snap" id="iter3-snap">
+      <div class="iter3-slide"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/Group-1.svg" alt=""></div>
+      <div class="iter3-slide"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/Group-2.svg" alt=""></div>
+      <div class="iter3-slide"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/Group-3.svg" alt=""></div>
+      <div class="iter3-slide"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/Group-4.svg" alt=""></div>
+    </div>
+
+    <p>Resolution collapsed to three clear actions:</p>
+
+    <div class="insight">
+      <p class="insight-label">The three actions</p>
+      <div class="three-actions">
+        <div class="action-item">
+          <div class="action-icon-wrap"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/run.svg" alt="Run" class="action-icon"></div>
+          <p><strong>Run</strong> — resolve autonomously. Whether it's one workflow or multiple agents, the user doesn't need to know the plumbing.</p>
+        </div>
+        <div class="action-item">
+          <div class="action-icon-wrap"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/inspect.svg" alt="Inspect" class="action-icon"></div>
+          <p><strong>Inspect</strong> — conversation with an AI agent to arrive at a decision together. If inspect appears alone, it means there's no automated resolution — the path to resolution <em>is</em> the conversation.</p>
+        </div>
+        <div class="action-item">
+          <div class="action-icon-wrap"><img src="../STLABS/TICKET_GROUPING/Iteration_3_components/dismiss.svg" alt="Dismiss" class="action-icon" style="height:22px;"></div>
+          <p><strong>Dismiss</strong> — remove from the queue.</p>
+        </div>
+      </div>
+    </div>
+
+    <p>I realized I'd been stuck in engineering language. "Run Agent" and "Run Workflow" both lead to the same outcome: resolved tickets. Is there really a need to distinguish them for the user? I brought this to engineering — and they agreed.</p>
+
+    <hr class="case-divider">
+
+    <!-- THE DETAILS -->
+    <h2>The details that matter.</h2>
+    <p><strong>Gamified resolution.</strong> When someone resolves a large batch of tickets at once, the UI celebrates it. Speed should feel rewarding.</p>
+
+    <div class="gamified-resolution" id="gamified-res">
+      <div class="res-stat">
+        <div class="res-number-row">
+          <span class="res-number" id="res-total">187</span>
+          <span class="res-label">Total</span>
+          <svg class="res-arrow res-arrow-down" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(28,21,16,0.25)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>
+          </svg>
+        </div>
+      </div>
+      <div class="res-stat res-stat-resolved" id="res-resolved-group">
+        <div class="res-number-row">
+          <span class="res-number" id="res-resolved">12</span>
+          <span class="res-label" id="res-resolved-label">Resolved Today</span>
+          <svg class="res-arrow" id="res-resolved-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(28,21,16,0.25)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <p><strong>Color as priority.</strong> Component ordering and color coding draw the eye to what matters most — no need to read labels to know urgency.</p>
+    <p><strong>Conversational foundation.</strong> The page is inherently interactive. An expandable chat bar sits at the bottom — the inbox is a conversation, not just a list.</p>
+
+    <div class="raw-asset">
+      <img src="../STLABS/TICKET_GROUPING/fullview.svg" alt="">
+    </div>
+
+    <hr class="case-divider">
+
+    <!-- REFLECTION -->
+    <h2>What I learned.</h2>
+    <p>Working this closely with engineers is a gift and a trap. You gain deep technical fluency — you can talk in their terms, understand constraints, move fast. But you also start <em>designing</em> in their terms. The biggest shift in this project was remembering that the user doesn't care about the difference between an agent and a workflow. They care that the problem goes away.</p>
+    <p>The other lesson: conviction matters. My PM was ready to ship iteration 2. I wasn't. The final design was better because I trusted the discomfort and pushed for one more round.</p>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <hr class="case-section-break">
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 02 — TICKET DETAIL -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <h3 style="margin-top: 6rem;">02 — Ticket Detail</h3>
+    <h2>The deepest view of a ticket — and where every decision starts.</h2>
+    <p>Designing the individual ticket detail: a split-view experience where AI agent conversations meet structured ticket data, across any source system.</p>
+
+    <div class="case-asset">
+      <video id="intro-vid" width="100%" controls autoplay loop muted playsinline preload="auto" style="display: block; width: 100%; height: auto;">
+        <source src="../STLABS/SINGLE_TICKET_VIEW/first_vid.mov">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+    <script>
+      document.getElementById('intro-vid').playbackRate = 1.25;
+    </script>
+
+    <!-- 1. THE PROBLEM -->
+    <h2>The problem</h2>
+    <p>Enterprise ITSM tickets come from everywhere — Slack, ServiceNow, Jira — each with different data and context. Admins context-switch between systems to understand what's happening and figure out what to do. No single view synthesizes what the user reported, what the system knows, and what action to take.</p>
+
+    <!-- 2. ENRICHMENT -->
+    <h3>Enrichment</h3>
+    <h2>The hero content.</h2>
+    <p>By grounding every ticket in our graph database, I replaced the traditional description with a synthesized brief that merges user-reported issues with live environment context. This layout uses a "We found" transition to clearly distinguish human input from AI reasoning, guiding the eye toward bolded critical facts that drive faster triage.</p>
+
+    <div class="insight">
+      <p class="insight-label">Key insight</p>
+      <p>Conversation sources (Slack): enrichment absorbs everything — no separate description. Ticketing sources (ServiceNow, Jira): the original form submission appears separately as reference. The enrichment still synthesizes, but the source material is preserved.</p>
+    </div>
+
+    <div class="proto-wrap" id="proto-enrichment">
+      <div class="proto-header">
+        <span class="proto-label">Interactive</span>
+        <span class="proto-hint">Click here</span>
+        <div class="proto-dots">
+          <span class="proto-dot filled"></span>
+          <span class="proto-dot"></span>
+        </div>
+      </div>
+      <div class="proto-stage">
+        <div class="proto-frame-wrap">
+          <iframe class="active" src="../STLABS/SINGLE_TICKET_VIEW/pane-slack-short.html" height="700"></iframe>
+          <iframe src="../STLABS/SINGLE_TICKET_VIEW/pane-sn-zone-short.html" height="800"></iframe>
+        </div>
+      </div>
+      <p class="proto-caption">Slack ticket (enrichment absorbs everything) vs ServiceNow ticket (description preserved separately).</p>
+    </div>
+
+    <!-- 3. WORKFLOW RUN LIFECYCLE -->
+    <h3>Workflow lifecycle</h3>
+    <h2>The agent doesn't just suggest — it executes.</h2>
+
+    <p>Confidence through clarity. The workflow run isn't just a status — it's the core utility of the product. I designed the lifecycle to be calm and deterministic, moving from suggestion to execution without unnecessary friction.</p>
+
+    <div class="insight">
+      <p class="insight-label">Design principles</p>
+      <p><strong>Brand as signal.</strong> The STLabs logo pulses in place of the Run button. No spinners, no "Running" text — just the brand doing the work.</p>
+      <p style="margin-top:0.75rem;"><strong>Deterministic failure.</strong> Transient errors offer a Retry. If that fails, or if the error is terminal, the system auto-suggests an alternative or opens a chat to investigate.</p>
+      <p style="margin-top:0.75rem;"><strong>Closed loop.</strong> Completion cross-fades the action block into a persistent resolution record, signaling that the work is truly done.</p>
+    </div>
+
+    <div class="wf-grid">
+      <!-- Happy Path -->
+      <div class="wf-item">
+        <div class="wf-header"><span class="wf-interactive-label">Interactive</span> — Happy Path</div>
+        <div class="wf-res-block" id="wf-happy-block">
+          <div class="wf-info">
+            <span class="wf-name">Okta MFA Reset <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="opacity:0.4;"><path d="M3 9L9 3M9 3H5M9 3V7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <p class="wf-desc">Unlock account and push MFA re-enrollment to Grant Fuhr.</p>
+          </div>
+          <div id="wf-happy-action">
+            <button class="wf-run-btn" onclick="runWfHappy()">Run</button>
+          </div>
+        </div>
+        <button class="wf-reset-btn" onclick="resetWfHappy()">Reset demo</button>
+      </div>
+
+      <!-- Failure/Retry -->
+      <div class="wf-item">
+        <div class="wf-header"><span class="wf-interactive-label">Interactive</span> — Retry &amp; Auto-Suggest</div>
+        <div class="wf-res-block" id="wf-fail-block">
+          <div class="wf-info" id="wf-fail-info">
+            <span class="wf-name">Restore Workday Access <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="opacity:0.4;"><path d="M3 9L9 3M9 3H5M9 3V7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <p class="wf-desc">Re-enroll MFA device and restore Workday access for Sarah K.</p>
+          </div>
+          <div id="wf-fail-action">
+            <button class="wf-run-btn" onclick="runWfFail()">Run</button>
+          </div>
+        </div>
+        <div id="wf-fail-status" class="wf-status-text"></div>
+        <button class="wf-reset-btn" onclick="resetWfFail()">Reset demo</button>
+      </div>
+    </div>
+
+    <!-- 4. ACTIVITY TIMELINE -->
+    <h3>Activity timeline</h3>
+    <h2>The record of everything.</h2>
+
+    <div style="display: grid; grid-template-columns: 280px 1fr; gap: 3rem; margin: 2.5rem 0; align-items: start;">
+      <!-- Timeline Component -->
+      <div style="background: #EDE8DC; border: 1px solid rgba(28,21,16,0.08); border-radius: 10px; padding: 1.25rem;">
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <!-- Ticket closed -->
+          <div style="display: flex; gap: 0.6rem;">
+            <div style="display: flex; flex-direction: column; align-items: center; width: 20px; flex-shrink: 0;">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: rgba(28,21,16,0.2); margin-top: 5px;"></div>
+              <div style="width: 1px; flex: 1; background: rgba(28,21,16,0.1); margin-top: 3px; min-height: 12px;"></div>
+            </div>
+            <div style="flex: 1; padding-top: 2px;">
+              <div style="display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap;">
+                <span style="font-size: 0.75rem; color: rgba(28,21,16,0.55);">Ticket closed</span>
+                <span style="font-size: 0.7rem; color: rgba(28,21,16,0.3);">11:14 AM PST</span>
+              </div>
+            </div>
+          </div>
+          <!-- Human -->
+          <div style="display: flex; gap: 0.6rem;">
+            <div style="display: flex; flex-direction: column; align-items: center; width: 20px; flex-shrink: 0;">
+              <div class="timeline-mini-av" style="width: 20px; height: 20px; border-radius: 50%; background: rgba(28,21,16,0.08); display: flex; align-items: center; justify-content: center; font-size: 0.45rem; font-weight: 700; color: rgba(28,21,16,0.55);">JK</div>
+              <div style="width: 1px; flex: 1; background: rgba(28,21,16,0.1); margin-top: 3px; min-height: 12px;"></div>
+            </div>
+            <div style="flex: 1; padding-top: 2px;">
+              <div style="display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap;">
+                <span style="font-size: 0.75rem; color: rgba(28,21,16,0.55);">Jordan K. ran Okta MFA Reset</span>
+                <span style="font-size: 0.7rem; color: rgba(28,21,16,0.3);">11:02 AM</span>
+              </div>
+            </div>
+          </div>
+          <!-- Agent -->
+          <div style="display: flex; gap: 0.6rem;">
+            <div style="display: flex; flex-direction: column; align-items: center; width: 20px; flex-shrink: 0;">
+              <img src="../stlabs-orange-icon.svg" style="width: 14px; height: 14px; margin-top: 3px; filter: grayscale(1); opacity: 0.4;">
+              <div style="width: 1px; flex: 1; background: rgba(28,21,16,0.1); margin-top: 3px; min-height: 12px;"></div>
+            </div>
+            <div style="flex: 1; padding-top: 2px;">
+              <div style="display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap;">
+                <span style="font-size: 0.75rem; color: rgba(28,21,16,0.55);">Agent assessed ticket</span>
+                <span style="font-size: 0.7rem; color: rgba(28,21,16,0.3);">8:42 PM PST</span>
+              </div>
+              <div style="font-size: 0.7rem; color: rgba(28,21,16,0.3); margin-top: 2px;">Suggested Okta MFA Reset · Assigned to Jordan K.</div>
+              <div style="font-size: 0.7rem; color: rgba(28,21,16,0.3); text-decoration: underline; text-underline-offset: 2px; margin-top: 2px; opacity: 0.7;">Show less</div>
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px;">
+                <div style="font-size: 0.7rem; color: rgba(28,21,16,0.3); line-height: 1.5; padding-left: 10px; position: relative;">
+                  <span style="position: absolute; left: 0; top: 6px; width: 3px; height: 3px; border-radius: 50%; background: rgba(28,21,16,0.2);"></span>
+                  Queried Okta auth logs — account locked, 3 failed sign-ins from 10.0.47.12
+                </div>
+                <div style="font-size: 0.7rem; color: rgba(28,21,16,0.3); line-height: 1.5; padding-left: 10px; position: relative;">
+                  <span style="position: absolute; left: 0; top: 6px; width: 3px; height: 3px; border-radius: 50%; background: rgba(28,21,16,0.2);"></span>
+                  Queried Okta user profile — MFA token expired, last enrolled device replaced
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Source -->
+          <div style="display: flex; gap: 0.6rem;">
+            <div style="display: flex; flex-direction: column; align-items: center; width: 20px; flex-shrink: 0;">
+              <img src="../slack.png" style="width: 16px; height: 16px; margin-top: 1px;">
+            </div>
+            <div style="flex: 1; padding-top: 2px;">
+              <div style="display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap;">
+                <span style="font-size: 0.75rem; color: rgba(28,21,16,0.55);">Ticket created via Slack</span>
+                <span style="font-size: 0.7rem; color: rgba(28,21,16,0.3);">8:41 PM</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 0.75rem; font-size: 0.65rem; color: rgba(28,21,16,0.25); text-align: center;">↑ newest &nbsp;&nbsp; oldest ↓</div>
+      </div>
+
+      <!-- Text Block -->
+      <div>
+        <p style="margin-bottom: 1.25rem;">The timeline has three actors: <strong>Source</strong> (where the ticket came from), <strong>Agent</strong> (our agent), and <strong>Human</strong> (any person). Plus <strong>outcomes</strong> — results with no actor.</p>
+        <p>The spine icon always shows who. The text shows what and where. Newest events first. Collapsed by default with a chevron and event count — the enrichment and suggested resolution above are the primary content.</p>
+      </div>
+    </div>
+
+    <!-- 5. THE FULL PICTURE -->
+    <h3>The full picture</h3>
+    <h2>Table to conversation in one click.</h2>
+    <p>The split view brings it all together — agent conversation on the left, ticket detail on the right. The admin reads the enrichment, clicks Run, watches the timeline build, handles complications through chat.</p>
+
+    <div class="case-asset">
+      <video id="full-vid" width="100%" controls autoplay loop muted playsinline preload="auto" style="display: block; width: 100%; height: auto;">
+        <source src="../STLABS/SINGLE_TICKET_VIEW/full_vid.mov">
+        Your browser does not support the video tag.
+      </video>
+      <div class="case-asset-caption">Ticket table → split view. Agent conversation on the left, ticket detail on the right.</div>
+    </div>
+
+    <script>
+      document.getElementById('full-vid').playbackRate = 1.25;
+    </script>
+
+    <hr class="case-divider">
+
+    <!-- 6. EXPLORATIONS -->
+    <h3>Explorations</h3>
+    <h2>Roads not taken.</h2>
+
+    <div class="proto-wrap" id="proto-roads-not-taken">
+      <div class="proto-header">
+        <span class="proto-label">Interactive</span>
+        <span class="proto-hint">Click Here</span>
+        <div class="proto-dots">
+          <span class="proto-dot filled"></span>
+          <span class="proto-dot"></span>
+        </div>
+      </div>
+      <div class="proto-stage">
+        <div class="proto-frame-wrap">
+          <iframe class="active" src="../STLABS/SINGLE_TICKET_VIEW/pane-sn-per-field-labels.html" height="850"></iframe>
+          <iframe src="../STLABS/SINGLE_TICKET_VIEW/pane-sn-v1-sidebar.html" height="850"></iframe>
+        </div>
+      </div>
+      <p class="proto-caption">Per-field blue labels (noisy) and horizontal metadata strip (competed for vertical space). We moved away from these early approaches because they either created too much visual noise or restricted space for critical enrichment content.</p>
+    </div>
+
+    <p>Other iterations: "Context" → "What we know" → "Summary" → no label. "Checked" → "Sources." "Agent processed ticket" → "Agent assessed ticket." Each round shaped by whether the language described the system's action or the user's mental model.</p>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <hr class="case-section-break">
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- SECTION 03 — INSPECT PANEL -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <h3 style="margin-top: 6rem;">03 — Inspect Panel</h3>
+    <h2>Making cluster intelligence visible.</h2>
+    <p>Three components. One question: why are these tickets together?</p>
+
+  </div><!-- end .case-content (temporarily close to allow full-width frame) -->
+
+  <!-- Full inspect panel — intro (full-width) -->
+  <div class="component-frame-outer" style="padding: 2rem 1.5rem 0; max-width: 980px; margin: 0 auto;">
+    <div style="max-width: 720px; margin: 0 auto 1.5rem;">
+      <h3 style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin: 0 0 0.5rem;">The inspect panel</h3>
+      <h2 style="font-size: clamp(1.45rem, 2.5vw, 1.9rem); font-weight: 600; color: #1C1510; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 0.75rem;">Three questions before the operator acts.</h2>
+      <p style="font-size: 1rem; line-height: 1.78; color: rgba(28,21,16,0.72); max-width: 560px; margin: 0;">The Ticket Inbox groups related IT tickets and lets operators resolve them in bulk. Before they act, they open the inspect panel — three components, each answering a different question about why the tickets are together.</p>
+    </div>
+    <div class="component-frame">
+      <iframe
+        src="../drill_down/full-panel.html"
+        width="100%"
+        height="600"
+        frameborder="0"
+        scrolling="no"
+        title="Full Inspect Panel — Intro"
+      ></iframe>
+    </div>
+  </div>
+
+  <!-- Re-open .case-content for the article body -->
+  <div class="case-content">
+
+    <!-- CONTEXT -->
+    <h2>Operators were running the panel on faith.</h2>
+
+    <p>Most clusters came with an AI-generated summary. In early research, operators either trusted it without verifying, or dismissed the whole cluster because they had no way to check it. The gap wasn't the summary — it was the absence of verifiable evidence behind it.</p>
+
+    <p>Research surfaced three questions operators asked before acting on any cluster: <em>Is anything in the environment behaving unusually?</em> <em>Is this the same problem across all these tickets?</em> <em>Is this still happening?</em> None of those questions were answered anywhere in the product. The inspect panel was designed to answer them — one component per question.</p>
+
+    <hr class="case-divider">
+
+    <!-- COMPONENT 1 — ENVIRONMENT SIGNAL -->
+    <h3>Component 1 — Environment Signal</h3>
+    <h2>The wrong question was "what do these tickets have in common?"</h2>
+
+    <p>Tickets are already grouped by similarity — confirming that similarity is tautological. The right question: is anything in the environment behaving unusually? The system has a model of the full org, pulled from CrowdStrike, Jamf, and Okta. That makes it possible to compare the cluster against org-wide baseline distributions, not just against itself.</p>
+
+    <!-- Iteration 1 -->
+    <div class="case-asset">
+      <div style="background: #1C1410; padding: 0; min-height: 0;">
+        <iframe src="../drill_down/commonality/iteration-1.html" width="100%" height="320" frameborder="0" scrolling="no" title="Common Attributes — iteration 1"></iframe>
+      </div>
+      <div class="case-asset-caption">Iteration 1 — Single bar, match percentage. "21 of 24 tickets share these patterns." No baseline context.</div>
+    </div>
+
+    <p>In testing, 5 of 8 operators asked the same thing: <em>"Is 96% high? Is that normal for that gateway?"</em> The original design couldn't answer them. A 96% match on VPN gateway sounds alarming until you learn that gateway handles 95% of all company VPN traffic. Without a baseline, every percentage is noise.</p>
+
+    <!-- Intermediate iteration -->
+    <div class="case-asset">
+      <div style="background: #1C1410; padding: 0; min-height: 0;">
+        <iframe src="../drill_down/commonality/iteration-intermediate.html" width="100%" height="330" frameborder="0" scrolling="no" title="Environment Signal — intermediate iteration"></iframe>
+      </div>
+      <div class="case-asset-caption">Intermediate — Renamed to "Environment Signal." Delta shown as text (↑ +76 above). Historical match row added. Still a single bar — the two-population comparison comes next.</div>
+    </div>
+
+    <div class="callout">
+      <p>"A bar showing 96% concentration is only meaningful if the operator knows whether 96% is normal. Without a baseline, every bar is noise."</p>
+      <span class="callout-attr">— Design Process, Environment Signal</span>
+    </div>
+
+    <p>The rename from "Common Attributes" to "Environment Signal" was a framing shift, not a label change. Common Attributes asked what the tickets shared internally. Environment Signal asked what the environment was doing that it shouldn't. Three rounds of copy testing ran alongside the visual iteration: Round 1 flagged terms like "baseline distribution" as jargon operators didn't use. Round 2 introduced relative language — "higher than usual" — which was ambiguous without knowing the reference population. Round 3 shipped with explicit scope and raw percentages. Slower to read, but verifiable.</p>
+
+    <p>The two-population bar design made the anomaly visible before reading a number: org-wide (muted) on one row, this cluster (orange) below. Below-baseline attributes rendered in blue-gray — absence is a different failure mode than concentration.</p>
+
+    <p>The final design replaced per-attribute snapshots with a shared time axis. All three signals — VPN gateway routing percentage, client version adoption curve, OS version prevalence — on one chart. One marker at 09:03 cuts through all three lines. Gateway and Client Version bend at it. OS Version crosses it flat. That contrast encodes the diagnosis before anything is read. The attribute rows below act as a reference layer: value, cluster%, org%.</p>
+
+    <!-- Environment Signal — final component -->
+    <div style="margin: 2rem 0 0; background: #1C1410; border-radius: 10px; padding: 18px 20px;">
+      <div id="env-signal-root"></div>
+    </div>
+    <p class="component-caption">Final — three org-wide signals on a shared time axis. Gateway and Client Version bend at 09:03; OS Version is unaffected. Hover to read values at any point.</p>
+
+    <hr class="case-divider">
+
+    <!-- COMPONENT 2 — VOLUME TIMELINE -->
+    <h3>Component 2 — Ticket Rate</h3>
+    <h2>Without time, every cluster feels equally urgent.</h2>
+
+    <p>The inspect panel could tell operators what the cluster was and what was anomalous in the environment. What it couldn't tell them: <em>is this still happening?</em> A cluster that peaked 40 minutes ago needs a different response than one still climbing. Without temporal context, operators can't calibrate their response to something they can't place in time.</p>
+
+    <!-- Iteration 1 -->
+    <div class="case-asset">
+      <div style="background: #1C1410; padding: 0; min-height: 0;">
+        <iframe src="../drill_down/volume_timeline/iteration-1.html" width="100%" height="210" frameborder="0" scrolling="no" title="Volume — iteration 1, bar chart"></iframe>
+      </div>
+      <div class="case-asset-caption">Iteration 1 — Bar chart with "Gateway failover detected" annotation and collapse chevron. 5 of 8 participants described it as "something in the background." Both elements were cut.</div>
+    </div>
+
+    <p>The bar chart was invisible at panel width. Smooth curves were worse: they imply continuous data between discrete arrival buckets — a smooth line between minute 3 and minute 4 invents data that doesn't exist. Step interpolation is honest about bucket boundaries. Each horizontal segment is a minute; nothing is smoothed between them.</p>
+
+    <div class="callout">
+      <p>"The step line was the only variant where participants spontaneously asked 'what's this one?' pointing at the ghost — indicating the shape was clear enough that the second line registered as meaningful rather than noise."</p>
+      <span class="callout-attr">— Design Process, Ticket Rate · Round 1 testing (n=8)</span>
+    </div>
+
+    <p>The final component overlays a ghost cluster from the most comparable prior incident — not a number, not a label, but a shape. Operators could see whether the current cluster was tracking above or below a pattern they'd already resolved. Across five rounds and 42 participants, operators without the chart made wrong decisions on escalating clusters at three times the rate of operators who had it. Median time to decision dropped from 54 seconds to 38.</p>
+
+    <!-- Ticket Rate — final component -->
+    <div class="case-asset" style="margin: 2rem 0 0;">
+      <div style="background: #1C1410; padding: 12px; min-height: 0;">
+        <iframe src="../drill_down/volume_timeline/vpn-cluster.html" width="100%" height="175" frameborder="0" scrolling="no" title="Ticket Rate — final component" style="display: block;"></iframe>
+      </div>
+    </div>
+    <p class="component-caption">Final — step-interpolated line with ghost overlay from the most comparable prior cluster. Tapering state shown.</p>
+
+    <hr class="case-divider">
+
+    <!-- COMPONENT 3 — OUTLIER SURFACING -->
+    <h3>Component 3 — Outlier Surfacing</h3>
+    <h2>Three actions was too many.</h2>
+
+    <p>Before any workflow runs, some tickets in the cluster diverge from the dominant attribute pattern — not because they don't belong (they passed clustering), but because one detail is different: a different Okta tenant, a different region. The component's job is to surface that before the operator acts, without alarming anyone. The core tension: how quiet is too quiet?</p>
+
+    <!-- Iteration 1 -->
+    <div class="case-asset">
+      <div style="background: #1C1410; padding: 0; min-height: 0;">
+        <iframe src="../drill_down/outlier_surfacing/iteration-1.html" width="100%" height="138" frameborder="0" scrolling="no" title="Outliers — iteration 1, three actions"></iframe>
+      </div>
+      <div class="case-asset-caption">Iteration 1 — Three actions per card: Investigate, Exclude from workflow, Keep &amp; proceed. Orange label. Diff data hidden behind tooltip tags.</div>
+    </div>
+
+    <p>In testing, "Route separately" had zero interaction rate: <em>"Route separately — where? I don't have another workflow in front of me right now."</em> The action model was designed for a threat level the component didn't carry.</p>
+
+    <p>The signal problem ran deeper than the actions. Early iterations used a numeric badge — "3 outliers" — to indicate divergence in the collapsed row. In testing, 50% of operators expanded the section when they saw only the badge. When attribute names appeared in the collapsed row instead — "Identity Provider, Region" — that rate jumped to 75%. The number didn't mean anything. The attribute name told operators whether the divergence was relevant to their cluster.</p>
+
+    <div class="callout">
+      <p>"The action model should match the signal weight. A low-urgency pre-run signal doesn't need three decisions — it needs one easy out and one meaningful escalation path."</p>
+      <span class="callout-attr">— Design Process, Outlier Surfacing</span>
+    </div>
+
+    <p>Four iterations later: two actions — <em>Got it</em> and <em>Remove from group</em> — diff data moved from tooltips into inline rows, attribute names visible in the collapsed state. "Got it" reached 8/8 comprehension; "Noted" had been 2/6. Time to first action dropped from 18 seconds to 11.</p>
+
+    <!-- Outlier Surfacing — final component -->
+    <div style="margin: 2rem 0 0;">
+      <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+        <button id="outlier-btn-small" onclick="switchOutlier('small')" class="outlier-scenario-btn outlier-active">2 outliers of 24</button>
+        <button id="outlier-btn-large" onclick="switchOutlier('large')" class="outlier-scenario-btn">6 outliers of 24</button>
+      </div>
+      <div id="outlier-root"></div>
+    </div>
+    <p class="component-caption">Final — two actions, attribute names visible in collapsed state. Toggle to see a smaller or larger outlier set.</p>
+
+    <hr class="case-divider">
+
+    <!-- THE THROUGH-LINE -->
+    <h2>Evidence layer, not decision layer.</h2>
+
+    <p>Environment Signal shows what's anomalous in the infrastructure. Ticket Rate shows whether it's still happening. Outlier Surfacing flags what sits outside the dominant pattern before the run. None of these components tell the operator what to do — that's intentional. Their job is to make the available evidence visible and legible, not to make the decision for the person holding it.</p>
+
+    <hr class="case-divider">
+
+    <!-- WHAT I LEARNED -->
+    <h2>What I learned.</h2>
+
+    <p>The question drives the design. "What do these tickets have in common?" was our original framing for the commonality component. The right question — "what is the environment doing that it shouldn't?" — produces a completely different component. Getting there required exploration, not refinement. Those aren't the same thing.</p>
+
+    <p>Testing exposed gaps that couldn't be designed around. The single bar with a tick mark failed for 7 of 10 participants on an encoding I thought was obvious. A smooth curve read as "a trend" instead of discrete ticket arrivals. "Noted" had 2/6 comprehension; "Got it" had 8/8. You can't see those gaps from the inside.</p>
+
+    <p>Engineering and ML reviews were design inputs, not implementation checkpoints. The ML lead's note — <em>"surfacing our uncertainty builds trust in the cases where we are confident"</em> — restored a confidence indicator that had been cut. The engineering walkthrough of Outlier Surfacing produced four open questions that sharpened the spec. The best design feedback came from people who weren't UX designers.</p>
+
+  </div><!-- end .case-content -->
+
+  <!-- Full combined panel (full-width) -->
+  <div style="padding: 0 1.5rem; max-width: 980px; margin: 0 auto 4rem;">
+    <div style="max-width: 720px; margin: 0 auto 2rem;">
+      <h3 style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(209,173,102,0.8); margin: 0 0 0.5rem;">All together</h3>
+      <h2 style="font-size: clamp(1.45rem, 2.5vw, 1.9rem); font-weight: 600; color: #1C1510; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 1rem;">The full inspect panel.</h2>
+      <p style="font-size: 1rem; line-height: 1.78; color: rgba(28,21,16,0.72);">Environment Signal, Ticket Rate, and Outlier Surfacing live together in the panel — each a different layer of the same cluster, read in sequence before the operator decides what to do.</p>
+    </div>
+    <div class="component-frame">
+      <iframe
+        src="../drill_down/full-panel.html"
+        width="100%"
+        height="600"
+        frameborder="0"
+        scrolling="no"
+        title="Full Inspect Panel — All Components"
+      ></iframe>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="case-footer">
+    <a href="https://www.linkedin.com/in/abigailleyva" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:abigailcleyva@gmail.com">abigailcleyva@gmail.com</a>
+    <a href="spring-hero-explore.html">← Back to portfolio</a>
+  </footer>
+
+  <!-- ============================================================ -->
+  <!-- SCRIPTS -->
+  <!-- ============================================================ -->
+  <script>
+    // ========== TICKET INBOX SCRIPTS ==========
+
+    // Demo iter1: click → advance, auto-dots
+    const stage = document.getElementById('demo-iter1');
+    const frames = stage.querySelectorAll('img');
+    const dots = document.querySelectorAll('#demo-dots .demo-dot');
+    const hintText = document.getElementById('demo-hint-text');
+    let step = 0;
+
+    function goTo(s) {
+      const prev = step;
+      frames.forEach(f => f.classList.remove('prev'));
+      frames[prev].classList.remove('active');
+      frames[prev].classList.add('prev');
+      step = s;
+      frames[step].classList.add('active');
+      setTimeout(() => frames[prev].classList.remove('prev'), 900);
+      dots.forEach((d, i) => { d.classList.toggle('filled', i <= step); });
+    }
+
+    stage.addEventListener('click', () => {
+      const next = (step + 1) % frames.length;
+      goTo(next);
+      if (next === 0) {
+        dots.forEach(d => d.classList.remove('filled'));
+        hintText.style.display = '';
+      } else {
+        hintText.style.display = 'none';
+      }
+    });
+
+    // Iteration 2 — vertical scroll cycle
+    const vsnapEl = document.getElementById('iter2-vsnap');
+    const vsnapSlides = vsnapEl.querySelectorAll('.vsnap-slide');
+    const vsnapLabels = document.querySelectorAll('.vsnap-label');
+    let vsnapIndex = 0;
+
+    function vsnapGoTo(i) {
+      vsnapIndex = i;
+      vsnapEl.scrollTo({ top: i * vsnapEl.offsetHeight, behavior: 'smooth' });
+      vsnapLabels.forEach((l, j) => l.classList.toggle('active', j === i));
+    }
+    vsnapEl.addEventListener('scroll', () => {
+      const i = Math.round(vsnapEl.scrollTop / vsnapEl.offsetHeight);
+      vsnapLabels.forEach((l, j) => l.classList.toggle('active', j === i));
+      vsnapIndex = i;
+    }, { passive: true });
+
+    let vsnapInterval = setInterval(() => {
+      vsnapGoTo((vsnapIndex + 1) % vsnapSlides.length);
+    }, 3000);
+
+    vsnapLabels.forEach(label => {
+      label.addEventListener('click', () => {
+        clearInterval(vsnapInterval);
+        vsnapGoTo(parseInt(label.dataset.index));
+        setTimeout(() => {
+          vsnapInterval = setInterval(() => {
+            vsnapGoTo((vsnapIndex + 1) % vsnapSlides.length);
+          }, 3000);
+        }, 10000);
+      });
+    });
+
+    // Gamified resolution
+    const resTotal = document.getElementById('res-total');
+    const resResolved = document.getElementById('res-resolved');
+    const resGroup = document.getElementById('res-resolved-group');
+    let resRunning = false;
+
+    function animateCount(el, from, to, duration) {
+      const start = performance.now();
+      const step = (now) => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(from + (to - from) * eased);
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    function runResAnimation() {
+      if (resRunning) return;
+      resRunning = true;
+      setTimeout(() => {
+        animateCount(resTotal, 187, 167, 1200);
+        animateCount(resResolved, 12, 32, 1200);
+        setTimeout(() => {
+          resGroup.classList.add('pop');
+          document.getElementById('gamified-res').classList.add('popped');
+        }, 800);
+        setTimeout(() => {
+          resGroup.classList.remove('pop');
+          document.getElementById('gamified-res').classList.remove('popped');
+          setTimeout(() => {
+            resTotal.textContent = '187';
+            resResolved.textContent = '12';
+            resRunning = false;
+          }, 600);
+        }, 3200);
+      }, 500);
+    }
+
+    const resObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) runResAnimation(); });
+    }, { threshold: 0.5 });
+    resObserver.observe(document.getElementById('gamified-res'));
+
+    setInterval(() => {
+      const rect = document.getElementById('gamified-res').getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) runResAnimation();
+    }, 6000);
+
+    // Iteration 3 — auto-cycle snap strip
+    const iter3 = document.getElementById('iter3-snap');
+    const iter3Slides = iter3.querySelectorAll('.iter3-slide');
+    let iter3Index = 0;
+    setInterval(() => {
+      iter3Index = (iter3Index + 1) % iter3Slides.length;
+      iter3.scrollTo({ top: iter3Index * iter3.offsetHeight, behavior: 'smooth' });
+    }, 3000);
+
+    // ========== TICKET DETAIL SCRIPTS ==========
+
+    // Scale iframes to fit containers
+    function scaleFrames() {
+      document.querySelectorAll('.proto-frame-wrap').forEach(wrap => {
+        const container = wrap.parentElement;
+        const scale = container.offsetWidth / 860;
+        wrap.style.transform = `scale(${scale})`;
+        const active = wrap.querySelector('iframe.active');
+        if (active) container.style.height = (parseInt(active.height) * scale) + 'px';
+      });
+    }
+    window.addEventListener('load', scaleFrames);
+    window.addEventListener('resize', scaleFrames);
+
+    // Click-to-advance proto wraps
+    document.querySelectorAll('.proto-wrap').forEach(wrap => {
+      const frameWrap = wrap.querySelector('.proto-frame-wrap');
+      const iframes = frameWrap.querySelectorAll('iframe');
+      if (iframes.length < 2) return;
+
+      const dots = wrap.querySelectorAll('.proto-dot');
+      const stage = wrap.querySelector('.proto-stage');
+      let step = 0;
+      let advancing = false;
+
+      function goToFrame(i) {
+        iframes[step].classList.remove('active');
+        step = i;
+        iframes[step].classList.add('active');
+        dots.forEach((d, j) => d.classList.toggle('filled', j <= step));
+        const scale = stage.offsetWidth / 860;
+        stage.style.height = (parseInt(iframes[step].height) * scale) + 'px';
+      }
+
+      wrap.addEventListener('click', () => {
+        if (advancing) return;
+        if (step === 0) {
+          goToFrame(1);
+        } else {
+          goToFrame(0);
+          advancing = false;
+        }
+      });
+    });
+
+    // Workflow demos
+    const logoSrc = '../stlabs-orange-icon.svg';
+    const logoHtml = `<img src="${logoSrc}" class="wf-logo-running">`;
+    const externalLinkSvg = `<svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="opacity:0.4;"><path d="M3 9L9 3M9 3H5M9 3V7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+    function runWfHappy() {
+      const block = document.getElementById('wf-happy-block');
+      const action = document.getElementById('wf-happy-action');
+      action.innerHTML = logoHtml;
+      setTimeout(() => {
+        block.classList.add('done');
+        action.innerHTML = `<div class="wf-tag"><img src="${logoSrc}" class="wf-logo-green" width="16"> Completed</div>`;
+      }, 1800);
+    }
+    function resetWfHappy() {
+      const block = document.getElementById('wf-happy-block');
+      const action = document.getElementById('wf-happy-action');
+      block.classList.remove('done');
+      action.innerHTML = '<button class="wf-run-btn" onclick="runWfHappy()">Run</button>';
+    }
+
+    function runWfFail() {
+      const block = document.getElementById('wf-fail-block');
+      const action = document.getElementById('wf-fail-action');
+      const status = document.getElementById('wf-fail-status');
+      action.innerHTML = logoHtml;
+      status.textContent = 'Running...';
+      setTimeout(() => {
+        block.classList.add('failed');
+        action.innerHTML = `
+          <div style="position: relative; display: flex; align-items: center; justify-content: flex-end;">
+            <div class="wf-tag wf-tag-failed" style="position: absolute; bottom: 100%; right: 0; margin-bottom: 6px; white-space: nowrap;">
+              <img src="${logoSrc}" class="wf-logo-red" width="14"> Failed
+            </div>
+            <button class="wf-retry-btn" onclick="retryWfFail()">Retry</button>
+          </div>
+        `;
+        status.textContent = 'Transient error. Click Retry.';
+      }, 1500);
+    }
+
+    function retryWfFail() {
+      const block = document.getElementById('wf-fail-block');
+      const action = document.getElementById('wf-fail-action');
+      const status = document.getElementById('wf-fail-status');
+      const info = document.getElementById('wf-fail-info');
+      block.classList.remove('failed');
+      action.innerHTML = logoHtml;
+      status.textContent = 'Retrying...';
+      setTimeout(() => {
+        block.classList.add('failed');
+        action.innerHTML = `
+          <div style="position: relative; display: flex; align-items: center; justify-content: flex-end;">
+            <div class="wf-tag wf-tag-failed" style="position: absolute; bottom: 100%; right: 0; margin-bottom: 6px; white-space: nowrap;">
+              <img src="${logoSrc}" class="wf-logo-red" width="14"> Failed
+            </div>
+          </div>
+        `;
+        status.textContent = 'Retry failed. Agent suggesting new workflow...';
+
+        setTimeout(() => {
+          block.classList.remove('failed');
+          info.innerHTML = `
+            <span class="wf-name">Workday Direct Unlock ${externalLinkSvg}</span>
+            <p class="wf-desc">Bypass MFA and directly unlock Workday access for Sarah K.</p>
+          `;
+          action.innerHTML = '<button class="wf-run-btn" onclick="runWfNew()">Run</button>';
+          status.textContent = 'Agent suggested Workday Direct Unlock.';
+        }, 1200);
+      }, 1500);
+    }
+
+    function runWfNew() {
+      const block = document.getElementById('wf-fail-block');
+      const action = document.getElementById('wf-fail-action');
+      const status = document.getElementById('wf-fail-status');
+      action.innerHTML = logoHtml;
+      status.textContent = 'Running new workflow...';
+      setTimeout(() => {
+        block.classList.add('done');
+        action.innerHTML = `<div class="wf-tag"><img src="${logoSrc}" class="wf-logo-green" width="16"> Completed</div>`;
+        status.textContent = 'Resolved via Workday Direct Unlock.';
+      }, 1500);
+    }
+
+    function resetWfFail() {
+      const block = document.getElementById('wf-fail-block');
+      const action = document.getElementById('wf-fail-action');
+      const status = document.getElementById('wf-fail-status');
+      const info = document.getElementById('wf-fail-info');
+      block.classList.remove('done', 'failed');
+      block.style.animation = '';
+      info.innerHTML = `
+        <span class="wf-name">Restore Workday Access ${externalLinkSvg}</span>
+        <p class="wf-desc">Re-enroll MFA device and restore Workday access for Sarah K.</p>
+      `;
+      action.innerHTML = '<button class="wf-run-btn" onclick="runWfFail()">Run</button>';
+      status.textContent = '';
+    }
+
+    // ========== INSPECT PANEL SCRIPTS ==========
+
+    function switchOutlier(scenario) {
+      if (window.__setOutlierScenario) window.__setOutlierScenario(scenario);
+      document.getElementById('outlier-btn-small').classList.toggle('outlier-active', scenario === 'small');
+      document.getElementById('outlier-btn-large').classList.toggle('outlier-active', scenario === 'large');
+    }
+
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+  </script>
+
+  <!-- ========== INLINE REACT COMPONENTS (Environment Signal + Outlier Surfacing) ========== -->
+  <script type="text/babel">
+  (function() {
+    const C = {
+      orange:'#E8833A', label:'#8A7A6A', body:'#E8E0D0', muted:'#6A5A4A',
+      faint:'#4A3A2A', link:'#6B9FD4', amber:'#D48A2A', panelBg:'#1C1410',
+      card:'#252018', divider:'#2A2010',
+    };
+
+    /* ── Environment Signal (Final — Unified Multi-line Chart) ── */
+    const ES_SVG_W = 200, ES_CH = 52, ES_CBL = 46, ES_CTOP = 4;
+    const ES_ET = 319/360;
+
+    const ES_GW_PTS = [
+      {t:0,dev:1},{t:0.1,dev:0},{t:0.2,dev:1},{t:0.3,dev:0},{t:0.5,dev:1},{t:0.7,dev:0},{t:0.8,dev:1},{t:0.86,dev:2},{t:ES_ET,dev:3},
+      {t:0.893,dev:10},{t:0.902,dev:18},{t:0.911,dev:23},{t:0.92,dev:26},{t:0.93,dev:27},{t:1,dev:26},
+    ];
+    const ES_CV_PTS = [
+      {t:0,dev:8},{t:0.1,dev:9},{t:0.2,dev:10},{t:0.3,dev:11},{t:0.4,dev:12},{t:0.5,dev:13},
+      {t:0.6,dev:14},{t:0.7,dev:15},{t:0.8,dev:16},{t:0.85,dev:17},{t:ES_ET,dev:17},{t:0.92,dev:18},{t:1,dev:20},
+    ];
+    const ES_OS_PTS = [{t:0,dev:4},{t:0.2,dev:4.2},{t:0.4,dev:4.4},{t:0.6,dev:4.6},{t:0.8,dev:4.8},{t:1,dev:5}];
+    const ES_ALL_PTS = [ES_GW_PTS, ES_CV_PTS, ES_OS_PTS];
+    const ES_LINE_STYLES = [
+      { stroke: '#E8833A', op: 0.85, w: 1.5 },
+      { stroke: '#E8833A', op: 0.42, w: 1.0 },
+      { stroke: '#8A7A6A', op: 0.48, w: 0.75 },
+    ];
+
+    function esInterpolate(pts, t) {
+      if (t <= pts[0].t) return pts[0].dev;
+      if (t >= pts[pts.length-1].t) return pts[pts.length-1].dev;
+      for (let i = 0; i < pts.length-1; i++) {
+        if (t >= pts[i].t && t <= pts[i+1].t) {
+          const f = (t - pts[i].t) / (pts[i+1].t - pts[i].t);
+          return pts[i].dev + f * (pts[i+1].dev - pts[i].dev);
+        }
+      }
+      return 0;
+    }
+
+    function EnvironmentSignal() {
+      const [hoverT, setHoverT] = React.useState(null);
+      const allDevs = ES_ALL_PTS.flatMap(pts => pts.map(p => p.dev));
+      const maxDev  = Math.max(...allDevs, 1);
+      const scale   = (ES_CBL - ES_CTOP) / maxDev;
+      function cy(d) { return ES_CBL - d * scale; }
+
+      function sPath(pts) {
+        return pts.map((p,i) => `${i===0?'M':'L'} ${(p.t*ES_SVG_W).toFixed(1)},${cy(p.dev).toFixed(1)}`).join(' ');
+      }
+      function aPath(pts) {
+        const last = pts[pts.length-1];
+        return [`M ${(pts[0].t*ES_SVG_W).toFixed(1)},${ES_CBL}`, ...pts.map(p=>`L ${(p.t*ES_SVG_W).toFixed(1)},${cy(p.dev).toFixed(1)}`), `L ${(last.t*ES_SVG_W).toFixed(1)},${ES_CBL} Z`].join(' ');
+      }
+
+      const ES_NAMES = ['VPN Gateway', 'VPN Client Version', 'OS Version'];
+      const ES_ATTRS = [
+        { name: 'VPN Gateway',        value: 'gw-us-east-02', cluster: 96, org: 20, source: 'CrowdStrike' },
+        { name: 'VPN Client Version', value: 'v6.3.1',        cluster: 88, org: 20, source: 'Jamf' },
+        { name: 'OS Version',         value: 'macOS 14.3',    cluster: 79, org: 55, source: 'Jamf' },
+      ];
+
+      const hoverVals = hoverT !== null ? ES_ALL_PTS.map((pts, i) => ({
+        orgPct: Math.round([20,0,50][i] + esInterpolate(pts, hoverT)),
+      })) : null;
+
+      function tToTime(t) {
+        const m = Math.round((3*60+44) + t*360);
+        const h = Math.floor(m/60)%24, mn = m%60;
+        return `${h%12||12}:${String(mn).padStart(2,'0')} ${h>=12?'PM':'AM'}`;
+      }
+
+      return (
+        <div>
+          <div style={{marginBottom:6}}>
+            <span style={{fontSize:11,color:C.label,fontWeight:500,textTransform:'uppercase',letterSpacing:'0.04em'}}>Environment Signal</span>
+            <p style={{fontSize:11,color:C.muted,marginTop:3}}>
+              Compared to{' '}
+              <span style={{color:C.link,textDecoration:'underline',textUnderlineOffset:2,cursor:'pointer'}}>Boston HQ</span>
+            </p>
+          </div>
+
+          <div style={{ position: 'relative', height: ES_CH, cursor: 'crosshair', marginTop: 20 }}
+            onMouseMove={e => {
+              const r = e.currentTarget.getBoundingClientRect();
+              setHoverT(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)));
+            }}
+            onMouseLeave={() => setHoverT(null)}>
+
+            <div style={{ position: 'absolute', top: -12, left: `${ES_ET*100}%`, transform: 'translateX(-50%)', fontSize: 8, color: 'rgba(232,131,58,0.65)', whiteSpace: 'nowrap', pointerEvents: 'none' }}>
+              09:03 ↑
+            </div>
+
+            {hoverT !== null && hoverVals && (
+              <div style={{
+                position: 'absolute', top: -62,
+                left: `${hoverT*100}%`,
+                transform: hoverT > 0.72 ? 'translateX(-100%)' : hoverT < 0.15 ? 'translateX(0)' : 'translateX(-50%)',
+                background: '#0D0A08', border: '1px solid #2A2010',
+                borderRadius: 4, padding: '5px 8px',
+                pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 10,
+              }}>
+                <div style={{ fontSize: 8, color: C.muted, marginBottom: 4 }}>{tToTime(hoverT)}</div>
+                {ES_NAMES.map((n, i) => (
+                  <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
+                    <span style={{ width: 4, height: 4, borderRadius: '50%', background: ES_LINE_STYLES[i].stroke, opacity: ES_LINE_STYLES[i].op, display: 'inline-block', flexShrink: 0 }} />
+                    <span style={{ fontSize: 9, color: C.muted, width: 95 }}>{n}</span>
+                    <span style={{ fontSize: 9, color: i < 2 ? C.orange : C.muted, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{hoverVals[i].orgPct}%</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <svg viewBox={`0 0 ${ES_SVG_W} ${ES_CH}`} preserveAspectRatio="none" style={{ width: '100%', height: ES_CH, display: 'block', overflow: 'visible' }}>
+              <defs>
+                {ES_ALL_PTS.map((_, i) => (
+                  <linearGradient key={i} id={`es-fg-${i}`} x1="0" y1={ES_CTOP} x2="0" y2={ES_CBL} gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor={ES_LINE_STYLES[i].stroke} stopOpacity={ES_LINE_STYLES[i].op * 0.3} />
+                    <stop offset="100%" stopColor={ES_LINE_STYLES[i].stroke} stopOpacity="0" />
+                  </linearGradient>
+                ))}
+              </defs>
+              <line x1="0" y1={ES_CBL} x2={ES_SVG_W} y2={ES_CBL} stroke="rgba(138,122,106,0.15)" strokeWidth="0.5" />
+              <line x1={ES_ET*ES_SVG_W} y1="0" x2={ES_ET*ES_SVG_W} y2={ES_CH} stroke="rgba(232,131,58,0.18)" strokeWidth="0.75" strokeDasharray="2,2" />
+              {ES_ALL_PTS.map((pts, i) => <path key={`a${i}`} d={aPath(pts)} fill={`url(#es-fg-${i})`} />)}
+              {ES_ALL_PTS.map((pts, i) => (
+                <path key={`s${i}`} d={sPath(pts)} fill="none"
+                  stroke={ES_LINE_STYLES[i].stroke} strokeWidth={ES_LINE_STYLES[i].w}
+                  strokeOpacity={ES_LINE_STYLES[i].op} strokeLinejoin="round" strokeLinecap="round" />
+              ))}
+              {hoverT !== null && (
+                <>
+                  <line x1={hoverT*ES_SVG_W} y1="0" x2={hoverT*ES_SVG_W} y2={ES_CH} stroke="rgba(138,122,106,0.25)" strokeWidth="0.75" />
+                  {ES_ALL_PTS.map((pts, i) => (
+                    <circle key={`hc${i}`} cx={hoverT*ES_SVG_W} cy={cy(esInterpolate(pts,hoverT))} r="1.75"
+                      fill={ES_LINE_STYLES[i].stroke} fillOpacity={ES_LINE_STYLES[i].op} />
+                  ))}
+                </>
+              )}
+            </svg>
+
+            <div style={{ position: 'absolute', top: 0, bottom: 0, left: `${ES_ET*100}%`, width: 1, background: 'rgba(232,131,58,0.14)', pointerEvents: 'none' }} />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 3, marginBottom: 12 }}>
+            <span style={{ fontSize: 8, color: C.muted, opacity: 0.3 }}>org-wide · 6h ago</span>
+            <span style={{ fontSize: 8, color: C.muted, opacity: 0.3 }}>now</span>
+          </div>
+
+          {ES_ATTRS.map((b, i) => (
+            <div key={b.name} style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 7, paddingLeft: 6, borderLeft: '2px solid transparent' }}>
+              <span style={{ width: 4, height: 4, borderRadius: '50%', background: ES_LINE_STYLES[i].stroke, opacity: ES_LINE_STYLES[i].op, display: 'inline-block', flexShrink: 0, position: 'relative', top: -1 }} />
+              <span style={{ fontSize: 10, color: C.muted, width: 110, flexShrink: 0 }}>{b.name}</span>
+              <span style={{ fontSize: 10, color: C.muted, opacity: 0.55, fontFamily: 'monospace', flexShrink: 0 }}>{b.value}</span>
+              <span style={{ fontSize: 10, color: C.orange, marginLeft: 'auto', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{b.cluster}%</span>
+              <span style={{ fontSize: 9, color: C.muted, opacity: 0.4, fontVariantNumeric: 'tabular-nums' }}>vs {b.org}%</span>
+              <span style={{ fontSize: 9, color: C.muted, opacity: 0.35 }}>{b.source}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    /* ── Outlier Surfacing ── */
+    const OUTLIERS_SMALL=[
+      {id:'S1',title:'VPN Not Connecting for 20 min',reason:"Identity record spans multiple tenant domains. Standard remediation assumes a single Okta tenant.",confidence:'high',differs:[{attr:'Identity Provider',ticketVal:'Okta (EU)',clusterVal:'Okta (US)'},{attr:'Region',ticketVal:'EU-West',clusterVal:'US-East'}]},
+      {id:'S2',title:'Stuck On Connecting For 20 Minutes',reason:"Device is not enrolled in MDM. Standard remediation steps may not apply.",confidence:'medium',differs:[{attr:'Device Enrollment',ticketVal:'Unmanaged',clusterVal:'Corporate MDM'}]},
+    ];
+    const OUTLIERS_LARGE=[
+      {id:'L1',title:'VPN Not Connecting for 20 min',reason:"Identity record spans multiple tenant domains. Auth and region routing both differ from cluster norm.",differs:[{attr:'Identity Provider',ticketVal:'Okta (EU)',clusterVal:'Okta (US)'},{attr:'Region',ticketVal:'EU-West',clusterVal:'US-East'},{attr:'Auth Method',ticketVal:'SAML',clusterVal:'OIDC'}]},
+      {id:'L2',title:'VPN Auth Loop — Okta Not Responding',reason:"OS version predates the MDM policy rollout. Certificate chain differs from the cluster majority.",differs:[{attr:'OS Version',ticketVal:'macOS 12.6',clusterVal:'macOS 14.x'},{attr:'Cert Chain',ticketVal:'Legacy CA',clusterVal:'Corp PKI'}]},
+      {id:'L3',title:'Stuck On Connecting For 20 Minutes',reason:"Device is not enrolled in MDM. Standard remediation steps may not apply.",differs:[{attr:'Device Enrollment',ticketVal:'Unmanaged',clusterVal:'Corporate MDM'},{attr:'VPN Client',ticketVal:'GP 5.2',clusterVal:'GP 6.1'}]},
+      {id:'L4',title:'VPN Crashes Immediately After Opening Files',reason:"Split-tunnel config is non-standard. Traffic routing will differ from the remediation assumption.",differs:[{attr:'Tunnel Mode',ticketVal:'Split',clusterVal:'Full'}]},
+      {id:'L5',title:'Connection Drops Every 5 Minutes on Corp WiFi',reason:"Known issue with Intel Wi-Fi 6E on this VPN client version.",differs:[{attr:'Network Adapter',ticketVal:'Intel Wi-Fi 6E',clusterVal:'Broadcom BCM94360'}]},
+      {id:'L6',title:'Cannot Reach Internal Tools After Sleep',reason:"Contractor device. Network policy differs from employee policy.",differs:[{attr:'User Type',ticketVal:'Contractor',clusterVal:'FTE'}]},
+    ];
+
+    function OutlierCard({outlier,startOpen}){
+      const[open,setOpen]=React.useState(!!startOpen);
+      const[state,setState]=React.useState('idle');
+      const isIdle=state==='idle',isAck=state==='acknowledged',isRem=state==='removed';
+      return(
+        <div style={{background:C.card,borderRadius:6,overflow:'hidden',opacity:isRem?0.5:1,transition:'opacity 0.25s'}}>
+          <div onClick={()=>isIdle&&setOpen(o=>!o)} style={{display:'flex',alignItems:'center',gap:8,padding:'9px 12px',cursor:isIdle?'pointer':'default',userSelect:'none',minWidth:0}}>
+            <div style={{flex:1,minWidth:0}}>
+              <span style={{fontSize:12,color:isRem?C.muted:C.body,display:'block',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',lineHeight:1.4,textDecoration:isRem?'line-through':'none',textDecorationColor:'#3A2A1A'}}>{outlier.title}</span>
+              {!open&&isIdle&&<div style={{display:'flex',alignItems:'center',gap:4,overflow:'hidden',minWidth:0,marginTop:2}}>{outlier.differs.map((d,i)=>(<React.Fragment key={d.attr}>{i>0&&<span style={{width:2,height:2,borderRadius:'50%',background:'#3A2A1A',flexShrink:0,display:'inline-block'}}/>}<span style={{fontSize:10,color:'#7A6A5A',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{d.attr}</span></React.Fragment>))}</div>}
+              {isRem&&<div style={{display:'flex',alignItems:'center',gap:6,marginTop:2}}><span style={{fontSize:11,color:C.faint}}>Removed from group.</span><button onClick={()=>setState('idle')} style={{background:'none',border:'none',color:C.label,fontSize:11,cursor:'pointer',padding:0,fontFamily:'inherit',textDecoration:'underline',textUnderlineOffset:2}}>Undo</button></div>}
+            </div>
+            {isAck&&<span style={{fontSize:11,color:C.faint,flexShrink:0}}>✓</span>}
+            {isIdle&&<span style={{fontSize:11,color:C.faint,flexShrink:0,display:'inline-block',transform:open?'rotate(90deg)':'rotate(0deg)',transition:'transform 0.2s',lineHeight:1}}>›</span>}
+          </div>
+          <div style={{overflow:'hidden',transition:'max-height 0.28s ease,opacity 0.22s ease',maxHeight:open&&isIdle?300:0,opacity:open&&isIdle?1:0}}>
+            <div style={{padding:'0 12px 12px'}}>
+              <div style={{height:1,background:C.divider,marginBottom:10}}/>
+              <p style={{fontSize:12,color:C.muted,marginBottom:outlier.confidence==='medium'?5:10,lineHeight:1.55}}>{outlier.reason}</p>
+              {outlier.confidence==='medium'&&<p style={{fontSize:10,color:C.faint,marginBottom:10,letterSpacing:'0.02em'}}>Moderate confidence · flag may not apply</p>}
+              <div style={{marginBottom:12}}>{outlier.differs.map(d=>(<div key={d.attr} style={{display:'flex',gap:6,fontSize:11,lineHeight:1.75}}><span style={{color:'#8A7A6A',minWidth:110,flexShrink:0}}>{d.attr}</span><span style={{color:'#D4C8B0'}}>{d.ticketVal}</span><span style={{color:'#6A5A4A'}}>vs</span><span style={{color:'#A89B8A'}}>{d.clusterVal}</span></div>))}</div>
+              <div style={{display:'flex',alignItems:'center',gap:14}}>
+                <button onClick={()=>{setState('acknowledged');setOpen(false);}} style={{background:'#E8833A',border:'none',color:'#1A0E06',borderRadius:6,padding:'5px 14px',fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:'inherit',transition:'background 0.15s'}}>Got it</button>
+                <button onClick={()=>{setState('removed');setOpen(false);}} style={{background:'transparent',border:'1px solid rgba(232,131,58,0.22)',color:'#B8A898',fontSize:11,cursor:'pointer',padding:'5px 14px',fontFamily:'inherit',borderRadius:6,transition:'border-color 0.15s, color 0.15s'}}>Remove from group</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function OutlierShowcase(){
+      const[scenario,setScenario]=React.useState('small');
+      window.__setOutlierScenario=setScenario;
+      const isSmall=scenario==='small';
+      const outliers=isSmall?OUTLIERS_SMALL:OUTLIERS_LARGE;
+      const[showAll,setShowAll]=React.useState(false);
+      React.useEffect(()=>setShowAll(false),[scenario]);
+      const FOLD=3;
+      const visible=!isSmall&&!showAll?outliers.slice(0,FOLD):outliers;
+      const hiddenCt=!isSmall?outliers.length-FOLD:0;
+      return(
+        <div>
+          <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',marginBottom:10}}>
+            <span style={{fontSize:11,color:C.label,fontWeight:500,letterSpacing:'0.04em',textTransform:'uppercase'}}>Outliers</span>
+            <span style={{fontSize:11,color:C.faint}}>{outliers.length} of 24 tickets</span>
+          </div>
+          <div style={{display:'flex',flexDirection:'column',gap:4}}>
+            {visible.map((o,i)=><OutlierCard key={o.id+scenario} outlier={o} startOpen={i===0}/>)}
+          </div>
+          {!isSmall&&!showAll&&hiddenCt>0&&<button onClick={()=>setShowAll(true)} style={{background:'none',border:'none',color:'#4A3A2A',fontSize:11,cursor:'pointer',padding:'8px 0 0',fontFamily:'inherit',display:'flex',alignItems:'center',gap:5}}>+{hiddenCt} more · Show all</button>}
+          {!isSmall&&showAll&&<button onClick={()=>setShowAll(false)} style={{background:'none',border:'none',color:'#4A3A2A',fontSize:11,cursor:'pointer',padding:'8px 0 0',fontFamily:'inherit'}}>Show less</button>}
+        </div>
+      );
+    }
+
+    /* ── Mount ── */
+    const esEl = document.getElementById('env-signal-root');
+    const osEl = document.getElementById('outlier-root');
+    if (esEl) ReactDOM.createRoot(esEl).render(<EnvironmentSignal />);
+    if (osEl) ReactDOM.createRoot(osEl).render(<OutlierShowcase />);
+
+  })();
+  </script>
+
+</body>
+</html>
